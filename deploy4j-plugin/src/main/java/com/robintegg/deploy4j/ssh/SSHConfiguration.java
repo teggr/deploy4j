@@ -1,4 +1,4 @@
-package com.robintegg.deploy4j;
+package com.robintegg.deploy4j.ssh;
 
 import lombok.Getter;
 
@@ -9,6 +9,7 @@ public class SSHConfiguration {
   private String privateKey;
   private String passPhrase;
   private String knownHosts;
+  private boolean logging;
 
   public SSHConfiguration() {
 
@@ -16,6 +17,7 @@ public class SSHConfiguration {
     this.privateKey = System.getProperty("server.ssh.privateKey");
     this.passPhrase = System.getProperty("server.ssh.passPhrase");
     this.knownHosts = System.getProperty("server.ssh.knownHosts");
+    this.logging = Boolean.valueOf(System.getProperty("server.ssh.logging", "false"));
 
   }
 

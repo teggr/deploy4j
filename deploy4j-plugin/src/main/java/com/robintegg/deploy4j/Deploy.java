@@ -1,10 +1,12 @@
 package com.robintegg.deploy4j;
 
+import com.robintegg.deploy4j.ssh.SSHClient;
+import com.robintegg.deploy4j.ssh.SSHConfiguration;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 
 @Slf4j
 public class Deploy {
@@ -18,16 +20,17 @@ public class Deploy {
 
     ApplicationFiles applicationFiles = new ApplicationFiles("spring-boot-web-application", workingDirectory);
 
+    // connect to the SSH servers over SSH
+    ServerConfiguration serverConfiguration = new ServerConfiguration();
+    SSHConfiguration sshConfiguration = new SSHConfiguration();
 
-    try( Server server = new Server( new ServerConfiguration(), new SSHConfiguration() ) ) {
-      // connect to the SSH servers over SSH
+    try (SSHClient sshClient = new SSHClient(serverConfiguration.getHost(), sshConfiguration)) {
+      Server server = new Server(serverConfiguration, sshClient);
       server.installDocker();
       server.pushApplication(applicationFiles);
-      server.buildApplication();
     }
 
   }
-
 
 
 }
