@@ -131,6 +131,13 @@ public class Server implements Closeable {
 
   }
 
+  @SneakyThrows
+  public void buildApplication() {
+
+      executeCommand( "cd /root/spring-boot-web-application && docker build --force-rm --quiet -t newtag ." );
+
+  }
+
   private record ChannelWrapper(ChannelExec channel) implements AutoCloseable {
     @Override
     public void close() throws Exception {
@@ -139,14 +146,36 @@ public class Server implements Closeable {
   }
 
   @SneakyThrows
-  public void pushApplication(Path jarFile) {
+  public void pushApplication(ApplicationFiles applicationFiles) {
 
-    log.info("pushing file {}", jarFile.toAbsolutePath().toString());
+    log.info("pushing application files {}", applicationFiles);
 
     openSession();
 
-    copyLocalToRemote(jarFile.getParent().toAbsolutePath().toString(), "/root", jarFile.getFileName().toString());
+    // jar file
+    String from = applicationFiles.getTargetDirectory().toAbsolutePath().toString();
+    String to = "/root/" + flip(applicationFiles.getTargetDirectory().toString());
+    String fileName = applicationFiles.getJarFile().getFileName().toString();
 
+    ensureDirectoryExists(to);
+    copyLocalToRemote(from, to, fileName);
+
+    // docker file
+    from = applicationFiles.getWorkingDirectory().toAbsolutePath().toString();
+    to = "/root/" + flip(applicationFiles.getWorkingDirectory().toString());
+    fileName = applicationFiles.getDockerFile().getFileName().toString();
+
+    ensureDirectoryExists(to);
+    copyLocalToRemote(from, to, fileName);
+
+  }
+
+  private void ensureDirectoryExists(String to) throws Exception {
+    executeCommand("mkdir -p " + to);
+  }
+
+  private String flip(String string) {
+    return string.replaceAll("\\\\", "/");
   }
 
   @Override
@@ -158,6 +187,9 @@ public class Server implements Closeable {
   }
 
   private void copyLocalToRemote(String from, String to, String fileName) throws Exception {
+
+    log.info("copy local to remote: [from] {} [to] {} [filename] {}", from, to, fileName);
+
     boolean ptimestamp = true;
     from = from + File.separator + fileName;
 

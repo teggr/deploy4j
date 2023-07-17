@@ -16,19 +16,14 @@ public class Deploy {
     var workingDirectory = Paths.get(System.getProperty("workingDirectory", ""));
     log.info("working directory: {}", workingDirectory.toAbsolutePath());
 
-    // need to pick up jar files
-    var targetDirectorty = workingDirectory.resolve("target/");
+    ApplicationFiles applicationFiles = new ApplicationFiles("spring-boot-web-application", workingDirectory);
 
-    var applicationJarFile = targetDirectorty.resolve("spring-boot-web-application-sample-0.0.1-SNAPSHOT.jar");
-
-    log.info("jar file: {}", applicationJarFile.toAbsolutePath());
-
-    log.info("file info: size({})", Files.size(applicationJarFile));
 
     try( Server server = new Server( new ServerConfiguration(), new SSHConfiguration() ) ) {
       // connect to the SSH servers over SSH
       server.installDocker();
-      server.pushApplication(applicationJarFile);
+      server.pushApplication(applicationFiles);
+      server.buildApplication();
     }
 
   }
