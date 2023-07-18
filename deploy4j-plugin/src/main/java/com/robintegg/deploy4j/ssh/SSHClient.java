@@ -1,22 +1,20 @@
 package com.robintegg.deploy4j.ssh;
 
 import com.jcraft.jsch.*;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.nio.file.Path;
 
 @Slf4j
-public class SSHClient implements AutoCloseable {
+public class SSHClient {
 
   private final String host;
   private final SSHConfiguration sshConfiguration;
   private final JSch jSch;
   private Session session;
 
-  @SneakyThrows
-  public SSHClient(String host, SSHConfiguration sshConfiguration) {
+  public SSHClient(String host, SSHConfiguration sshConfiguration) throws JSchException {
 
     this.host = host;
     this.sshConfiguration = sshConfiguration;
@@ -47,15 +45,13 @@ public class SSHClient implements AutoCloseable {
     }
   }
 
-  public int executeCommandForStatus(String command) {
+  public int executeCommandForStatus(String command) throws Exception {
     return executeCommand(command).status();
   }
 
-  @SneakyThrows
-  public CommandResult executeCommand(String command) {
+  public CommandResult executeCommand(String command) throws Exception {
 
     log.info("executing command: {}", command);
-
 
     openSession();
 
@@ -95,7 +91,6 @@ public class SSHClient implements AutoCloseable {
 
   }
 
-  @Override
   public void close() {
     if (session != null) {
       session.disconnect();

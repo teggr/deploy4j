@@ -6,7 +6,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Paths;
-import java.time.LocalDate;
 
 @Slf4j
 public class Deploy {
@@ -24,10 +23,12 @@ public class Deploy {
     ServerConfiguration serverConfiguration = new ServerConfiguration();
     SSHConfiguration sshConfiguration = new SSHConfiguration();
 
-    try (SSHClient sshClient = new SSHClient(serverConfiguration.getHost(), sshConfiguration)) {
-      Server server = new Server(serverConfiguration, sshClient);
+    try (CLI cli = new CLI(new SSHClient(serverConfiguration.getHost(), sshConfiguration))) {
+      Server server = new Server(serverConfiguration, cli);
       server.installDocker();
       server.pushApplication(applicationFiles);
+      server.runTraefik();
+      server.bootApplication();
     }
 
   }
