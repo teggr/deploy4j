@@ -50,7 +50,7 @@
                 <version>3.1.0</version>
                 <configuration>
                     <skip>false</skip>
-                    <mainClass>com.robintegg.deploy4j.Deploy</mainClass>
+                    <mainClass>com.robintegg.deploy4j.Deploy4J</mainClass>
                     <systemProperties>
                         <systemProperty>
                             <key>workingDirectory</key>
