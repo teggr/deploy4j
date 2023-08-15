@@ -1,5 +1,6 @@
 package com.robintegg.deploy4j;
 
+import com.robintegg.deploy4j.deploy.BuildFiles;
 import com.robintegg.deploy4j.deploy.Deployer;
 import com.robintegg.deploy4j.ssh.SshConfig;
 import com.robintegg.deploy4j.ssh.SshConnectionFactory;
@@ -22,8 +23,9 @@ public class Deploy4J {
     Path workingDirectory = Path.of(workingDirectoryProperty);
 
     // what am i deploying?
-    Path jarFilePath = workingDirectory.resolve("target/spring-boot-web-application-0.0.1-SNAPSHOT.jar");
-    Path dockerFilePath = workingDirectory.resolve("Dockerfile");
+    Path jarFilePath = Path.of("target/spring-boot-web-application-0.0.1-SNAPSHOT.jar");
+    Path dockerFilePath = Path.of("Dockerfile");
+    BuildFiles buildFiles = new BuildFiles(workingDirectory, dockerFilePath, List.of(jarFilePath));
 
     // where am i deploying?
     SshConfig sshConfig = new SshConfig(
@@ -39,7 +41,7 @@ public class Deploy4J {
     );
 
     // deploy
-    Deployer.deploy(List.of(jarFilePath,dockerFilePath), sshConnectionFactory);
+    Deployer.deploy(buildFiles, sshConnectionFactory);
 
   }
 

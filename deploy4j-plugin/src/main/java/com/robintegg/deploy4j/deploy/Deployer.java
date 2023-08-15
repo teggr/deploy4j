@@ -4,13 +4,10 @@ import com.robintegg.deploy4j.ssh.SshConnection;
 import com.robintegg.deploy4j.ssh.SshConnectionFactory;
 import lombok.SneakyThrows;
 
-import java.nio.file.Path;
-import java.util.List;
-
 public class Deployer {
 
   @SneakyThrows
-  public static void deploy(List<Path> files, SshConnectionFactory sshConnectionFactory) {
+  public static void deploy(BuildFiles buildFiles, SshConnectionFactory sshConnectionFactory) {
 
     // what's in a deployment?
 
@@ -24,13 +21,16 @@ public class Deployer {
       Traefik.startTraefik(sshConnection);
 
       // push files
-      UploadedFiles uploadedFiles = Uploader.uploadFiles(sshConnection, files);
+      // map of paths to upload locations
+      String uploadDirectory = Uploader.uploadFiles(sshConnection, buildFiles);
 
       // build image
-      // DockerImage dockerImage = dockerClient.build(uploadedFiles);
+      String image = "my-app:latest";
+      Docker.build(sshConnection, uploadDirectory, image);
 
-      // start container
-      // dockerClient.run(dockerImage);
+      // start or run container
+      String name = "my-app";
+      Docker.startOrRun(sshConnection, image, name);
 
     }
 

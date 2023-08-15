@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.file.Path;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -63,5 +64,9 @@ public class SshConnection implements AutoCloseable {
 
   }
 
-
+  @SneakyThrows
+  public void pushFile(String from, String to, String fileName) {
+    log.info("pushing file {} from {} to {}", fileName, from, to);
+    Scp.copyLocalToRemote(session, from, to, fileName);
+  }
 }
