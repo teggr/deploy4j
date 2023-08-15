@@ -11,9 +11,9 @@ import java.util.List;
 @Slf4j
 public class Uploader {
 
-  public static String uploadFiles(SshConnection sshConnection, BuildFiles buildFiles) {
+  public static String uploadFiles(SshConnection sshConnection, Deployable deployable) {
 
-    String uploadDirectory = "/root/upload/" + buildFiles.workingDirectory().getFileName().toString();
+    String uploadDirectory = "/root/deploy4j/" + deployable.serviceName() + "/" + deployable.version();
 
     SshCommandResult mkdirResult = sshConnection.executeCommand("mkdir -p " + uploadDirectory);
 
@@ -25,8 +25,8 @@ public class Uploader {
     }
 
     List<Path> files = new ArrayList<>();
-    files.add(buildFiles.dockerFilePath());
-    files.addAll(buildFiles.buildContext());
+    files.add(deployable.buildFiles().dockerFilePath());
+    files.addAll(deployable.buildFiles().buildContext());
 
     files.forEach(p -> {
 
@@ -34,7 +34,7 @@ public class Uploader {
 
       String targetDirectory = uploadDirectory;
 
-      if(!isRoot) {
+      if (!isRoot) {
 
         targetDirectory = uploadDirectory + "/" + remotePath(p.getParent());
 
@@ -49,7 +49,7 @@ public class Uploader {
 
       }
 
-      String from = buildFiles.workingDirectory().resolve(p).getParent().toAbsolutePath().toString();
+      String from = deployable.buildFiles().workingDirectory().resolve(p).getParent().toAbsolutePath().toString();
       String to = targetDirectory;
       String fileName = p.getFileName().toString();
 

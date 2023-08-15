@@ -14,7 +14,7 @@ public class RestApiController {
 
   @GetMapping("/messages")
   public CollectionModel<Message> getMessages() {
-    List<Message> messages = List.of(new Message("hi there"));
+    List<Message> messages = List.of(new Message("hi there deploy4j community"));
     CollectionModel<Message> model = CollectionModel.of(messages);
     model.add(linkTo(methodOn(RestApiController.class).getMessages()).withSelfRel());
     return model;

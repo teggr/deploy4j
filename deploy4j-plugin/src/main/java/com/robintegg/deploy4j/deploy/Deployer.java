@@ -4,10 +4,13 @@ import com.robintegg.deploy4j.ssh.SshConnection;
 import com.robintegg.deploy4j.ssh.SshConnectionFactory;
 import lombok.SneakyThrows;
 
+import java.security.SecureRandom;
+import java.util.List;
+
 public class Deployer {
 
   @SneakyThrows
-  public static void deploy(BuildFiles buildFiles, SshConnectionFactory sshConnectionFactory) {
+  public static void deploy(Deployable deployable, SshConnectionFactory sshConnectionFactory) {
 
     // what's in a deployment?
 
@@ -17,20 +20,47 @@ public class Deployer {
       // install docker
       Docker.install(sshConnection);
 
+      // TODO: load other images (postgresql) + gather urls etc.
+
       // start traefik
+      // TODO: enable/disable dashboard --insecure option
+      String traefikRoute = deployable.serviceName();
       Traefik.startTraefik(sshConnection);
 
       // push files
       // map of paths to upload locations
-      String uploadDirectory = Uploader.uploadFiles(sshConnection, buildFiles);
+      String uploadDirectory = Uploader.uploadFiles(sshConnection, deployable);
+
+      // docker related vars
+      String imagePrefix = deployable.serviceName();
+      String latestImage = imagePrefix + ":latest";
+      String versionedImage = imagePrefix + ":" + deployable.version();
+      String containerNamePrefix = deployable.serviceName();
+      String containerName = containerNamePrefix + "-" + deployable.version();
 
       // build image
-      String image = "my-app:latest";
-      Docker.build(sshConnection, uploadDirectory, image);
+      Docker.build(sshConnection, uploadDirectory, latestImage, versionedImage);
+
+      // rename existing versions
+      List<String> renamedExistingContainerNames = Docker.getRunningContainerNamesByName(sshConnection, containerNamePrefix).stream()
+          .map(name -> {
+            String tmpContainerName = name + "_replaced_" + Integer.toHexString(new SecureRandom().nextInt());
+            Docker.renameContainer(sshConnection, name, tmpContainerName);
+            return tmpContainerName;
+          })
+          .toList();
 
       // start or run container
-      String name = "my-app";
-      Docker.startOrRun(sshConnection, image, name);
+      Docker.startOrRun(sshConnection, versionedImage, containerName, traefikRoute);
+
+      // TODO: wait for healthy...
+
+      // stop containers
+      Docker.stopAll(sshConnection, renamedExistingContainerNames);
+
+      // prune containers
+      // TODO: prune images
+      Docker.removeAllStoppedContainers(sshConnection, containerNamePrefix);
 
     }
 
