@@ -1,4 +1,4 @@
-package com.robintegg.deploy4j.ssh;
+package deploy4j.ssh;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.Session;
@@ -7,7 +7,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayOutputStream;
-import java.nio.file.Path;
 
 @Slf4j
 @RequiredArgsConstructor

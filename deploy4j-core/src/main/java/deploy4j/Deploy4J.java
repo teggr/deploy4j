@@ -1,10 +1,10 @@
-package com.robintegg.deploy4j;
+package deploy4j;
 
-import com.robintegg.deploy4j.deploy.BuildFiles;
-import com.robintegg.deploy4j.deploy.Deployable;
-import com.robintegg.deploy4j.deploy.Deployer;
-import com.robintegg.deploy4j.ssh.SshConfig;
-import com.robintegg.deploy4j.ssh.SshConnectionFactory;
+import deploy4j.deploy.BuildFiles;
+import deploy4j.deploy.Deployable;
+import deploy4j.deploy.Deployer;
+import deploy4j.ssh.SshConfig;
+import deploy4j.ssh.SshConnectionFactory;
 
 import java.nio.file.Path;
 import java.util.List;

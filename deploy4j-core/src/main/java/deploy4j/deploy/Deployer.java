@@ -1,7 +1,7 @@
-package com.robintegg.deploy4j.deploy;
+package deploy4j.deploy;
 
-import com.robintegg.deploy4j.ssh.SshConnection;
-import com.robintegg.deploy4j.ssh.SshConnectionFactory;
+import deploy4j.ssh.SshConnection;
+import deploy4j.ssh.SshConnectionFactory;
 import lombok.SneakyThrows;
 
 import java.security.SecureRandom;

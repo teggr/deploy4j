@@ -39,24 +39,22 @@
 
     <build>
         <plugins>
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
+                <groupId>dev.deploy4j</groupId>
+                <artifactId>deploy4j-maven-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
                 <configuration>
-                    <skip>false</skip>
-                    <mainClass>com.robintegg.deploy4j.Deploy4J</mainClass>
-                    <systemProperties>
-                        <systemProperty>
-                            <key>workingDirectory</key>
-                            <value>${project.basedir}</value>
-                        </systemProperty>
-                    </systemProperties>
+                    <sshUsername>root</sshUsername>
+                    <sshPrivateKeyPath>C:\Users\someuser\.ssh\id_rsa</sshPrivateKeyPath>
+                    <sshPassPhrase>******</sshPassPhrase>
+                    <sshKnownHostsPath>C:\Users\someuser\.ssh\known_hosts</sshKnownHostsPath>
+                    <host>123.123.123.123</host>
                 </configuration>
             </plugin>
 

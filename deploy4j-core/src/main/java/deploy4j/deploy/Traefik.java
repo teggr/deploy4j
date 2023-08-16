@@ -1,7 +1,7 @@
-package com.robintegg.deploy4j.deploy;
+package deploy4j.deploy;
 
-import com.robintegg.deploy4j.ssh.SshCommandResult;
-import com.robintegg.deploy4j.ssh.SshConnection;
+import deploy4j.ssh.SshCommandResult;
+import deploy4j.ssh.SshConnection;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.stream.Collectors;

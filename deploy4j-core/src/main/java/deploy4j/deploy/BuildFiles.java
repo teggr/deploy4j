@@ -1,4 +1,4 @@
-package com.robintegg.deploy4j.deploy;
+package deploy4j.deploy;
 
 import java.nio.file.Path;
 import java.util.List;

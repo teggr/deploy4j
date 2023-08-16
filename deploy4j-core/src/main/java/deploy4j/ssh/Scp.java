@@ -1,4 +1,4 @@
-package com.robintegg.deploy4j.ssh;
+package deploy4j.ssh;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
