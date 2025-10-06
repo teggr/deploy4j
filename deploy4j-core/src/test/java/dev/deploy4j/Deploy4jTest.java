@@ -4,6 +4,7 @@ import dev.deploy4j.configuration.Deploy4jConfig;
 import dev.deploy4j.configuration.ServerConfig;
 import dev.deploy4j.configuration.SshConfig;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ class Deploy4jTest {
       "teggr/deploy4j-demo:0.0.1-SNAPSHOT",
       List.of(new ServerConfig( "localhost" )),
       new SshConfig(
+        "root",
         2222,
         System.getenv("PRIVATE_KEY"),
         System.getenv("PRIVATE_KEY_PASSPHRASE"),
@@ -25,8 +27,16 @@ class Deploy4jTest {
       null
     );
 
-    Deploy4j deploy4j = new Deploy4j();
-    deploy4j.run(config);
+    // create the hosts
+    List<Host> hosts = new ArrayList<>();
+    for( ServerConfig serverConfig : config.servers() ) {
+      hosts.add( new Host( serverConfig.host(), config.ssh() ) );
+    }
+
+    Server server = new Server();
+    server.bootstrap(hosts);
+
+    hosts.forEach( Host::close );
 
   }
 
