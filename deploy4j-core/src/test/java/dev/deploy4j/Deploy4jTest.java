@@ -1,21 +1,27 @@
 package dev.deploy4j;
 
-import dev.deploy4j.configuration.Deploy4jConfig;
-import dev.deploy4j.configuration.ServerConfig;
-import dev.deploy4j.configuration.SshConfig;
+import dev.deploy4j.configuration.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static dev.deploy4j.Commands.optionize;
 
 class Deploy4jTest {
 
   public static void main(String[] args) {
 
     Deploy4jConfig config = new Deploy4jConfig(
+      null,
+      "0.0.1-SNAPSHOT",
       "deploy4j-demo",
-      "teggr/deploy4j-demo:0.0.1-SNAPSHOT",
-      List.of(new ServerConfig( "localhost" )),
+      "teggr/deploy4j-demo",
+      new RegistryConfig(
+        "",
+        "DOCKER_USERNAME",
+        "DOCKER_PASSWORD"
+      ),
+      List.of(new ServerConfig("localhost")),
       new SshConfig(
         "root",
         2222,
@@ -23,22 +29,27 @@ class Deploy4jTest {
         System.getenv("PRIVATE_KEY_PASSPHRASE"),
         false
       ),
-      Map.of( "DATABASE_HOST", "mysql-db" ),
+      Map.of("DATABASE_HOST", "mysql-db"),
+      new TraefikConfig(
+        Map.of(
+          "publish", "8080:8080"
+        ),
+        Map.of(
+        "api.insecure", "true"
+      )),
       null
     );
 
-    // create the hosts
-    List<Host> hosts = new ArrayList<>();
-    for( ServerConfig serverConfig : config.servers() ) {
-      hosts.add( new Host( serverConfig.host(), config.ssh() ) );
+    try (Deploy4j deploy4j = new Deploy4j(new Context(config));) {
+
+      deploy4j.setup();
+
+    } catch (Exception e) {
+
+      throw new RuntimeException(e);
+
     }
 
-    Server server = new Server();
-    server.bootstrap(hosts);
-
-    hosts.forEach( Host::close );
-
   }
-
 
 }

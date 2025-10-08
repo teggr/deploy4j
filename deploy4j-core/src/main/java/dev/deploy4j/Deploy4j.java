@@ -1,58 +1,59 @@
 package dev.deploy4j;
 
-import com.jcraft.jsch.JSchException;
-import dev.deploy4j.commands.BuilderCommands;
-import dev.deploy4j.commands.DockerCommands;
-import dev.deploy4j.commands.ServerCommands;
-import dev.deploy4j.commands.TraefikCommands;
-import dev.deploy4j.config.Traefik;
-import dev.deploy4j.configuration.Deploy4jConfig;
-import dev.deploy4j.ssh.ExecResult;
-import dev.deploy4j.ssh.SSHTemplate;
+public class Deploy4j implements AutoCloseable {
 
-import java.io.IOException;
+  private final Context context;
 
-import static dev.deploy4j.RandomHex.randomHex;
+  public Deploy4j(Context context) {
+    this.context = context;
+  }
 
-public class Deploy4j {
+  /**
+   * Setup all accessories, push the env, and deploy app to servers
+   */
+  public void setup() {
+
+    long start = System.currentTimeMillis();
+
+    try {
+
+      context.server().bootstrap();
+
+      // envify()
+      // context.getEnv().push();
+      // context.accesssory().boot();
+
+      deploy();
+
+    } finally {
+
+      long end = System.currentTimeMillis();
+
+      System.out.println("=================================");
+      System.out.println("Deployed in " + (end - start) / 1000 + " seconds");
+
+    }
+
+  }
+
+  /**
+   * Deploy the app to servers
+   */
+  public void deploy() {
+
+    context.registry().login();
+    context.build().pull();
+    // ensure Traefik is running...
+    context.traefik().boot();
+    // Detect stale containers...
+//    context.app().staleContainers();
+//    context.app().boot();
+//    context.prune().all();
+
+  }
 
   public static void main(String[] args) throws Exception {
 
-//    System.out.println("Hello, Deploy4j!");
-//
-//
-//      long start = System.currentTimeMillis();
-//
-//      try {
-//
-//        Role role = new Role("web", config);
-//
-//        BuilderCommands builderCommands = new BuilderCommands(config);
-//        ServerCommands serverCommands = new ServerCommands(config);
-//        AppCommands appCommands = new AppCommands(config, role, SSHTemplateSession);
-//
-//        // push env files?
-//
-//        // accessory boot
-//
-//        // deploy
-//
-//        // "kamal:cli:build:pull"
-//
-//        // login into registry if needed
-//        // pull the image
-//        System.out.println("=================================");
-//        System.out.println("Pulling image " + config.image() + " ...\n");
-//
-//        // clean
-//        exec = SSHTemplateSession.exec( builderCommands.clean() );
-//
-//        // pull
-//        exec = SSHTemplateSession.exec( builderCommands.pull() );
-//
-//        // validate
-//        exec = SSHTemplateSession.exec( builderCommands.validateImage() );
-//
 //        // ensure traefik is runnning
 //        Traefik traefik = new Traefik();
 //        TraefikCommands traefikCommands = new TraefikCommands(traefik);
@@ -164,4 +165,11 @@ public class Deploy4j {
 //      configuration.version() : configuration.latestTag();
 //  }
 
+
+  @Override
+  public void close() throws Exception {
+
+    context.close();
+
+  }
 }
