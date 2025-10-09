@@ -1,0 +1,35 @@
+package dev.deploy4j.configuration;
+
+import dev.deploy4j.raw.RegistryConfig;
+
+public class Registry {
+
+  private final RegistryConfig registryConfig;
+
+  public Registry(Configuration config) {
+    this.registryConfig = config.rawConfig().registry();
+  }
+
+  public String server() {
+    return registryConfig.server();
+  }
+
+
+  public String username() {
+    return lookup( registryConfig.username() );
+  }
+
+  public String password() {
+    return lookup( registryConfig.password() );
+  }
+
+  private String lookup(String key) {
+    String env = System.getenv(key);
+    if (env != null) {
+      return env;
+    } else {
+      return key;
+    }
+  }
+
+}

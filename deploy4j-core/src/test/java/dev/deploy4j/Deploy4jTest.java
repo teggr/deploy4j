@@ -1,19 +1,18 @@
 package dev.deploy4j;
 
-import dev.deploy4j.configuration.*;
+import dev.deploy4j.cli.Cli;
+import dev.deploy4j.cli.Main;
+import dev.deploy4j.configuration.Configuration;
+import dev.deploy4j.raw.*;
 
 import java.util.List;
 import java.util.Map;
-
-import static dev.deploy4j.Commands.optionize;
 
 class Deploy4jTest {
 
   public static void main(String[] args) {
 
-    Deploy4jConfig config = new Deploy4jConfig(
-      "",
-      "0.0.1-SNAPSHOT",
+    Deploy4jConfig rawConfig = new Deploy4jConfig(
       "deploy4j-demo",
       "teggr/deploy4j-demo",
       new RegistryConfig(
@@ -21,28 +20,52 @@ class Deploy4jTest {
         "DOCKER_USERNAME",
         "DOCKER_PASSWORD"
       ),
-      List.of(new ServerConfig("localhost")),
+      List.of(new ServerConfig("localhost", List.of())),
+      Map.of(),
       new SshConfig(
         "root",
-        2222,
+        "2222",
         System.getenv("PRIVATE_KEY"),
         System.getenv("PRIVATE_KEY_PASSPHRASE"),
         false
       ),
       Map.of("DATABASE_HOST", "mysql-db"),
+      Map.of(),
       new TraefikConfig(
+        null,
+        null,
+        true,
+        Map.of(),
         Map.of(
           "publish", "8080:8080"
         ),
         Map.of(
-        "api.insecure", "true"
-      )),
-      null
+          "api.insecure", "true"
+        ),
+        Map.of()
+      ),
+      new HealthCheckConfig(null, null, 5, null, null)
     );
 
-    try (Deploy4j deploy4j = new Deploy4j(new Context(config));) {
+    Configuration config = new Configuration(
+      rawConfig,
+      "local",
+      "0.0.1-SNAPSHOT"
+    );
 
-      deploy4j.setup();
+    // TODO: CLI OPTIONS TO INFLUENCE THESE
+    Commander commander = new Commander(config);
+//    commander.setVerbosity();
+//    commander.configure( configFile, destination, version );
+//    commander.specificHosts();
+//    commander.specificRoles();
+//    commander.specificPrimary();
+
+    Cli cli = new Cli(commander);
+
+    try (Main main = cli.main()) {
+
+      main.setup();
 
     } catch (Exception e) {
 

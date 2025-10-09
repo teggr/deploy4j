@@ -1,9 +1,11 @@
 package dev.deploy4j;
 
-public class AppInstance {
-  private final Host host;
+import dev.deploy4j.ssh.SshHost;
 
-  public AppInstance(Host host) {
+public class AppInstance {
+  private final SshHost host;
+
+  public AppInstance(SshHost host) {
     this.host = host;
   }
 }

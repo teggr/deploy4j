@@ -5,7 +5,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import dev.deploy4j.Cmd;
-import dev.deploy4j.configuration.SshConfig;
+import dev.deploy4j.raw.SshConfig;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,27 +21,35 @@ public class SSHTemplate {
   private static final Logger log = LoggerFactory.getLogger(SSHTemplate.class);
 
   private final String host;
-  private final SshConfig ssh;
+  private final String username;
+  private final String port;
+  private final String privateKey;
+  private final String privateKeyPassphrase;
+  private final boolean strictHostChecking;
 
   private Session session;
 
-  public SSHTemplate(String host, SshConfig ssh) {
+  public SSHTemplate(String host, String username, String port, String privateKey, String privateKeyPassphrase, boolean strictHostChecking) {
     this.host = host;
-    this.ssh = ssh;
+    this.username = username;
+    this.port = port;
+    this.privateKey = privateKey;
+    this.privateKeyPassphrase = privateKeyPassphrase;
+    this.strictHostChecking = strictHostChecking;
   }
 
   private Session getSession() throws JSchException {
     if(session == null) {
 
-      log.info("Creating session for {}@{}:{}", ssh.userName(), host, ssh.port());
+      log.info("Creating session for {}@{}:{}", username, host, port);
 
       // setup ssh environment for host
       JSch jsch = new JSch();
-      jsch.addIdentity(ssh.privateKey(), ssh.privateKeyPassphrase());
+      jsch.addIdentity(privateKey, privateKeyPassphrase);
 
       // create a session
-      session = jsch.getSession(ssh.userName(), host, ssh.port());
-      if(!ssh.strictHostChecking()) {
+      session = jsch.getSession(username, host, Integer.parseInt( port ));
+      if(!strictHostChecking) {
         session.setConfig("StrictHostKeyChecking", "no");
       }
     }
