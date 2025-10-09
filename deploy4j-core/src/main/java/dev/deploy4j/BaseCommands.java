@@ -4,10 +4,10 @@ import dev.deploy4j.configuration.Deploy4jConfig;
 
 public class BaseCommands {
 
-  protected final Deploy4jConfig configuration;
+  protected final Deploy4jConfig config;
 
-  public BaseCommands(Deploy4jConfig configuration) {
-    this.configuration = configuration;
+  public BaseCommands(Deploy4jConfig config) {
+    this.config = config;
   }
 
   public Cmd containerIdFor(String containerName, boolean onlyRunning) {

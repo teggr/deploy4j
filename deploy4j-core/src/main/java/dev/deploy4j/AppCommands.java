@@ -13,106 +13,126 @@ import static dev.deploy4j.Commands.*;
 public class AppCommands extends BaseCommands {
 
   private static final List<String> ACTIVE_DOCKER_STATUSES = List.of("running", "restarting");
-  private final Role role;
-  private final String host;
 
-  public AppCommands(Deploy4jConfig configuration, Role role, String host) {
+  private final Host host;
+
+  public AppCommands(Deploy4jConfig configuration, Host host) {
     super(configuration);
-    this.role = role;
     this.host = host;
   }
-//
-//  public Cmd containerIdForVersion(String version) {
-//    return containerIdForVersion(version, false);
-//  }
-//
-//  public Cmd containerIdForVersion(String version, boolean onlyRunning) {
-//    return containerIdFor(containerName(version), onlyRunning);
-//  }
-//
-//  public String containerName() {
-//    return containerName(null);
-//  }
-//
-//  private String containerName(String version) {
-//    return Stream.of(
-//      role.containerPrefix(),
-//      version != null ? version : configuration.version()
-//    ).filter(Objects::nonNull).collect(Collectors.joining("-"));
-//  }
-//
-//  public Cmd renameContainer(String version, String newVersion) {
-//    return Cmd.cmd("docker", "rename",
-//      containerName(version),
-//      containerName(newVersion)
-//    );
-//  }
-//
-//  public Cmd currentRunningVersion() {
-//    return pipe(
-//      currentRunningContainer("--format '{{.Names}}'"),
-//      extractVersionFromName()
-//    );
-//  }
-//
-//  private Cmd extractVersionFromName() {
-//    return Cmd.cmd(
-//      "%(while read line; do echo ${line#" + role.containerPrefix() + "-}; done)"
-//    );
-//  }
-//
-//  public Cmd currentRunningContainer(String format) {
-//    return pipe(
-//      shell(
-//        chain(
-//          latestImageContainer(format),
-//          latestContainer(format)
-//        )
-//      ),
-//      Cmd.cmd("head", "-1")
-//    );
-//  }
-//
-//  public Cmd latestImageContainer(String format) {
-//    return latestContainer(format, List.of("ancestor=$( " + String.join(" ", latestImageId().build()) + " )"));
-//  }
-//
-//  private Cmd latestImageId() {
-//    return Cmd.cmd("docker", "image", "ls")
-//      .args(argumentize("--filter",
-//        List.of("reference=" + configuration.latestImage())
-//      )).
-//      args("--format", "'{{.ID}}'");
-//  }
-//
-//  private Cmd latestContainer(String format) {
-//    return latestContainer(format, List.of());
-//  }
-//
-//  private Cmd latestContainer(String format, List<String> filters) {
-//    return Cmd.cmd("docker", "ps", "--latest", format)
-//      .args(filterArgs(ACTIVE_DOCKER_STATUSES))
-//      .args(argumentize("filter", filters));
-//  }
-//
-//  private String[] filterArgs(List<String> statuses) {
-//    return argumentize(
-//      "--filter",
-//      filters(statuses)
-//    );
-//  }
-//
-//  private List<String> filters(List<String> statuses) {
-//    List<String> filters = new ArrayList<>();
-//    filters.add("label=service=" + configuration.service());
-//    filters.add("label=destination=" + configuration.destination());
-//    if (role != null) {
-//      filters.add("label=role=" + role.name());
-//    }
-//    statuses.forEach(s -> filters.add("status=" + s));
-//    return filters;
-//  }
-//
+
+  public Cmd listVersions() {
+    return pipe(
+      Cmd.cmd( "docker", "ps" )
+        .args( filterArgs(List.of()) )
+        .args( List.of() ) // TODO docker_args
+        .args( "--format", "\"{{.Names}}\"" ),
+      extractVersionFromName()
+    );
+  }
+
+  public Cmd containerIdForVersion(String version) {
+    return containerIdForVersion(version, false);
+  }
+
+  public Cmd containerIdForVersion(String version, boolean onlyRunning) {
+    return containerIdFor(containerName(version), onlyRunning);
+  }
+
+  public String containerName() {
+    return containerName(null);
+  }
+
+  private String containerName(String version) {
+    return Stream.of(
+      host.containerPrefix(),
+      version != null ? version : config.version()
+    ).filter(Objects::nonNull).collect(Collectors.joining("-"));
+  }
+
+  public Cmd renameContainer(String version, String newVersion) {
+    return Cmd.cmd("docker", "rename",
+      containerName(version),
+      containerName(newVersion)
+    );
+  }
+
+  public Cmd currentRunningVersion() {
+    return pipe(
+      currentRunningContainer("--format '{{.Names}}'"),
+      extractVersionFromName()
+    );
+  }
+
+  private Cmd extractVersionFromName() {
+    return Cmd.cmd(
+      "while read line; do echo ${line#" + host.containerPrefix() + "-}; done"
+    );
+  }
+
+  public Cmd currentRunningContainerId() {
+    return currentRunningContainer("--quiet");
+  }
+
+  public Cmd currentRunningContainer(String format) {
+    return pipe(
+      shell(
+        chain(
+          latestImageContainer(format),
+          latestContainer(format)
+        )
+      ),
+      Cmd.cmd("head", "-1")
+    );
+  }
+
+  public Cmd latestImageContainer(String format) {
+    return latestContainer(format, List.of("ancestor=$( " + String.join(" ", latestImageId().build()) + " )"));
+  }
+
+  private Cmd latestImageId() {
+    return Cmd.cmd("docker", "image", "ls")
+      .args(argumentize("--filter",
+        List.of("reference=" + config.latestImage())
+      )).
+      args("--format", "'{{.ID}}'");
+  }
+
+  private Cmd latestContainer(String format) {
+    return latestContainer(format, List.of());
+  }
+
+  private Cmd latestContainer(String format, List<String> filters) {
+    return Cmd.cmd("docker", "ps", "--latest", format)
+      .args(filterArgs(ACTIVE_DOCKER_STATUSES))
+      .args(argumentize("--filter", filters));
+  }
+
+  private String[] filterArgs(List<String> statuses) {
+    return argumentize(
+      "--filter",
+      filters(statuses)
+    );
+  }
+
+  private List<String> filters(List<String> statuses) {
+    List<String> filters = new ArrayList<>();
+    filters.add("label=service=" + config.service());
+    filters.add("label=destination=" + config.destination());
+    if (host.role() != null) {
+      filters.add("label=role=" + host.role());
+    }
+    statuses.forEach(s -> filters.add("status=" + s));
+    return filters;
+  }
+
+  public Cmd stop(String version) {
+    return pipe(
+      version != null ? containerIdForVersion(version) : currentRunningContainerId(),
+      config.stopWaitTime() != null ? Cmd.cmd("docker", "stop", "-t", config.stopWaitTime()) : Cmd.cmd("docker", "stop")
+    );
+  }
+
 //  public Cmd run(String hostName) {
 //    Cmd cmd = Cmd.cmd("docker", "run")
 //      .args("--detach")

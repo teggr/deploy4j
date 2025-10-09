@@ -47,6 +47,14 @@ public class Deploy4jConfig {
     this.healthCheck = healthCheck;
   }
 
+  public String service() {
+    return service;
+  }
+
+  public String destination() {
+    return destination;
+  }
+
   public List<ServerConfig> servers() {
     return servers;
   }
@@ -71,7 +79,7 @@ public class Deploy4jConfig {
     return "%s:%s".formatted(repository(), version());
   }
 
-  private String version() {
+  public String version() {
     // declared version || ENV version || git commit hash || "latest"
     if(StringUtils.isNotBlank(version)) {
       return version;
@@ -92,5 +100,18 @@ public class Deploy4jConfig {
   public String[] loggingArgs() {
     // TODO logging drivers and options
     return new String[]{};
+  }
+
+  public String latestImage() {
+    return "%s:%s".formatted(repository(), latestTag());
+  }
+
+  private String latestTag() {
+    return Stream.of( "latest", destination() )
+      .collect(Collectors.joining("-"));
+  }
+
+  public String stopWaitTime() {
+    return null;  // TODO: support stop wait time
   }
 }

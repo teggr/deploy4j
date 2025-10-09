@@ -161,8 +161,8 @@ public class Commands {
    */
   public static String[] argumentize(String argument, List<String> attributes) {
     List<String> list = attributes.stream()
-      .flatMap(attr -> Stream.of(argument, attr))
       .map( Commands::escapeShellValue )
+      .flatMap(attr -> Stream.of(argument, attr))
       .toList();
     return list.toArray(new String[0]);
   }

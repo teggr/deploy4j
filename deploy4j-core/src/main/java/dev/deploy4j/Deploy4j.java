@@ -46,7 +46,7 @@ public class Deploy4j implements AutoCloseable {
     // ensure Traefik is running...
     context.traefik().boot();
     // Detect stale containers...
-//    context.app().staleContainers();
+    context.app().staleContainers();
 //    context.app().boot();
 //    context.prune().all();
 

@@ -116,4 +116,9 @@ public class Context implements AutoCloseable {
   public TraefikCommands traefikCommands() {
     return traefikCommands;
   }
+
+  public AppCommands appCommands(Host host) {
+    return new AppCommands( config, host );
+  }
+
 }

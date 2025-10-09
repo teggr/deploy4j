@@ -12,7 +12,7 @@ class Deploy4jTest {
   public static void main(String[] args) {
 
     Deploy4jConfig config = new Deploy4jConfig(
-      null,
+      "",
       "0.0.1-SNAPSHOT",
       "deploy4j-demo",
       "teggr/deploy4j-demo",
