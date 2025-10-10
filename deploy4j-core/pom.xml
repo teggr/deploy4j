@@ -11,7 +11,6 @@
     </parent>
 
     <artifactId>deploy4j-core</artifactId>
-    <version>${project.version</version>
 
     <dependencies>
 
@@ -42,7 +41,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.9</version>
-            <scope>runtime</scope>
+            <scope>test</scope>
         </dependency>
 
         <!-- testing -->
@@ -57,6 +56,13 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <version>5.10.0</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- YAML parsing -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <version>2.19.0</version>
         </dependency>
 
     </dependencies>

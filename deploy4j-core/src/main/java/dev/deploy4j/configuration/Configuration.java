@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,9 +41,10 @@ public class Configuration {
     // TODO: validate config
     this.servers = new Servers(this);
     this.registry = new Registry(this);
-    this.accessories = rawConfig.accessories().keySet().stream().map(name -> {
-      return new Accessory(name, this);
-    }).toList();
+    this.accessories = Optional
+      .ofNullable(rawConfig.accessories())
+      .orElse(Map.of())
+      .keySet().stream().map(name -> new Accessory(name, this)).toList();
     this.boot = new Boot(this);
     this.builder = new Builder(this);
     this.env = new Env(rawConfig.env() != null ? rawConfig.env() : new HashMap<String, String>());

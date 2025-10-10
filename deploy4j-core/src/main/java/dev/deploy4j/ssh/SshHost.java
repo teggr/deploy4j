@@ -21,10 +21,18 @@ public class SshHost {
       hostName,
       ssh.user(),
       ssh.port(),
-      ssh.privateKeyPath(),
-      ssh.passphrase(),
+      lookup(ssh.privateKeyPath()),
+      lookup(ssh.passphrase()),
       ssh.strictHostKeyChecking()
     );
+  }
+
+  private String lookup(String key) {
+    String env = System.getenv(key);
+    if(env == null) {
+      return key;
+    }
+    return env;
   }
 
   public String hostName() {

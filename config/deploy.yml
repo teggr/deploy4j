@@ -1,0 +1,21 @@
+service: deploy4j-demo
+image: teggr/deploy4j-demo
+registry:
+  username: DOCKER_USERNAME
+  password: DOCKER_PASSWORD
+servers:
+  - host: localhost
+ssh:
+  user: root
+  port: 2222
+  privateKey: PRIVATE_KEY
+  privateKeyPassphrase: PRIVATE_KEY_PASSPHRASE
+  strictHostChecking: false
+env:
+  DATABASE_HOST: mysql-db
+traefik:
+  publish: true
+  args:
+    api.insecure: true
+  options:
+    publish: "8080:8080"

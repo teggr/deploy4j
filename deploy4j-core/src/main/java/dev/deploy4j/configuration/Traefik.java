@@ -36,7 +36,7 @@ public class Traefik {
   public Map<String, String> labels() {
     Map<String, String> labels = new HashMap<>();
     labels.putAll(DEFAULT_LABELS);
-    labels.putAll(traefikConfig.labels());
+    labels.putAll(traefikConfig.labels() != null ? traefikConfig.labels() : Map.of());
     return labels;
   }
 

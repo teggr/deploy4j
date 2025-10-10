@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static dev.deploy4j.Commands.argumentize;
-import static dev.deploy4j.Commands.optionize;
 import static java.util.Collections.emptyList;
 
 public class Role {
@@ -115,13 +114,13 @@ public class Role {
 //        )
 //      );
 //    } else {
-      return emptyList();
+    return emptyList();
 //    }
 
   }
 
   private HealthCheck healthcheck() {
-    if(runningTraefik()) {
+    if (runningTraefik()) {
       return config.healthcheck(); // merge specialised
     }
     return null; // specidalized healthcheck
@@ -160,17 +159,17 @@ public class Role {
   }
 
   private Map<String, String> traefikLabels() {
-    if(runningTraefik()) {
+    if (runningTraefik()) {
       String traefikService = traefikService();
       return Map.of(
-         // Setting a service property ensures that the generated service name will be consistent between versions
-        "traefik.http.services." + traefikService + ".loadbalancer.server.scheme" , "http",
+        // Setting a service property ensures that the generated service name will be consistent between versions
+        "traefik.http.services." + traefikService + ".loadbalancer.server.scheme", "http",
 
-        "traefik.http.routers." + traefikService + ".rule" , "PathPrefix(`/`)",
-        "traefik.http.routers." + traefikService + ".priority" , "2",
-        "traefik.http.middlewares." + traefikService + "-retry.retry.attempts" , "5",
-        "traefik.http.middlewares." + traefikService + "-retry.retry.initialinterval" , "500ms",
-        "traefik.http.routers." + traefikService + ".middlewares" , "" + traefikService + "-retry@docker"
+        "traefik.http.routers." + traefikService + ".rule", "PathPrefix(`/`)",
+        "traefik.http.routers." + traefikService + ".priority", "2",
+        "traefik.http.middlewares." + traefikService + "-retry.retry.attempts", "5",
+        "traefik.http.middlewares." + traefikService + "-retry.retry.initialinterval", "500ms",
+        "traefik.http.routers." + traefikService + ".middlewares", "" + traefikService + "-retry@docker"
       );
     }
     return Map.of();
@@ -181,11 +180,11 @@ public class Role {
   }
 
   private Map<String, String> defaultLabels() {
-    return Map.of(
-      "service", config.service(),
-      "role", name,
-      "destination", config.destination()
-    );
+    Map<String, String> defaultLabels = new HashMap<>();
+    defaultLabels.put("service", config.service());
+    defaultLabels.put("role", name);
+    defaultLabels.put("destination", config.destination());
+    return defaultLabels;
   }
 
   public List<String> optionArgs() {

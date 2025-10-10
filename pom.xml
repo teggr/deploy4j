@@ -10,6 +10,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>deploy4j-core</module>
+        <module>deploy4j-cli</module>
     </modules>
 
     <properties>
