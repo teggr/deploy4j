@@ -43,7 +43,7 @@ public class Role {
   }
 
   private boolean isPrimary() {
-    return name.equals(config.primaryRole());
+    return this.equals(config.primaryRole());
   }
 
   public List<Tag> envTags(String host) {
@@ -107,16 +107,16 @@ public class Role {
 
   private List<String> healthCheckArgs(boolean cord) {
 
-    if( runningTraefik() || healthcheck().setPortOrPath() ) {
-      // cord / using cord
-      return optionize(Map.of(
-          "health-cmd", healthcheck().cmd(),
-          "health-interval", healthcheck().interval()
-        )
-      );
-    } else {
+//    if( runningTraefik() || ( healthcheck() != null && healthcheck().setPortOrPath() ) ) {
+//      // cord / using cord
+//      return optionize(Map.of(
+//          "health-cmd", healthcheck().cmd(),
+//          "health-interval", healthcheck().interval()
+//        )
+//      );
+//    } else {
       return emptyList();
-    }
+//    }
 
   }
 

@@ -15,11 +15,11 @@ public class Builder {
   }
 
   public  Cmd clean() {
-    return Cmd.cmd("docker", "image", "rm", "--force", configuration.absoluteImage());
+    return Cmd.cmd("docker", "image", "rm", "--force", configuration.absoluteImage()).description("clean");
   }
 
   public  Cmd pull() {
-    return Cmd.cmd("docker", "pull", configuration.absoluteImage());
+    return Cmd.cmd("docker", "pull", configuration.absoluteImage()).description("pull");
   }
 
   public  Cmd validateImage() {
@@ -29,6 +29,6 @@ public class Builder {
         Cmd.cmd("grep", "-x", configuration.absoluteImage()),
         Cmd.cmd("(echo \"Image " + configuration.absoluteImage() + " is missing the 'service' label\" && exit 1)")
       )
-    );
+    ).description("validate image");
   }
 }

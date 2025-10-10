@@ -1,6 +1,6 @@
 package dev.deploy4j.configuration;
 
-import dev.deploy4j.raw.*;
+import dev.deploy4j.raw.Deploy4jConfig;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
@@ -40,7 +40,7 @@ public class Configuration {
     // TODO: validate config
     this.servers = new Servers(this);
     this.registry = new Registry(this);
-    this.accessories = rawConfig.accessories().keySet().stream().map( name -> {
+    this.accessories = rawConfig.accessories().keySet().stream().map(name -> {
       return new Accessory(name, this);
     }).toList();
     this.boot = new Boot(this);
@@ -78,11 +78,11 @@ public class Configuration {
 
   public String version() {
     // declared version || ENV version || git commit hash || "latest"
-    if(StringUtils.isNotBlank(declaredVersion)) {
+    if (StringUtils.isNotBlank(declaredVersion)) {
       return declaredVersion;
     }
     String env = System.getenv("VERSION");
-    if(env != null) {
+    if (env != null) {
       return env;
     }
     return null; // git version
@@ -151,15 +151,13 @@ public class Configuration {
       .collect(Collectors.joining("/"));
   }
 
-
-
   public Role primaryRole() {
     return role(primaryRoleName());
   }
 
   public Role role(String name) {
     return roles().stream()
-      .filter( r -> r.name().equals(name) )
+      .filter(r -> r.name().equals(name))
       .findFirst()
       .orElse(null);
   }
@@ -173,7 +171,7 @@ public class Configuration {
   }
 
   public String latestTag() {
-    return Stream.of( "latest", destination() )
+    return Stream.of("latest", destination())
       .collect(Collectors.joining("-"));
   }
 
@@ -186,13 +184,13 @@ public class Configuration {
   }
 
   public List<String> allHosts() {
-   // TODO acessories + unique
-   return roles().stream().flatMap( role -> role.hosts().stream() )
-     .distinct().toList();
+    // TODO acessories + unique
+    return roles().stream().flatMap(role -> role.hosts().stream())
+      .distinct().toList();
   }
 
   public String primaryHost() {
-    if(primaryRole() != null) {
+    if (primaryRole() != null) {
       return primaryRole().primaryHost();
     }
     return null;
@@ -207,13 +205,13 @@ public class Configuration {
 
   private List<Role> traefikRoles() {
     return roles().stream()
-      .filter( Role::runningTraefik )
+      .filter(Role::runningTraefik)
       .toList();
   }
 
   public List<Tag> envTag(String name) {
     return envTags().stream()
-      .filter( t -> t.name().equals(name) )
+      .filter(t -> t.name().equals(name))
       .toList();
   }
 
@@ -231,4 +229,14 @@ public class Configuration {
     return List.of();
   }
 
+  public int retainContainer() {
+    // add to raw config
+    return 5;
+  }
+
+  public String healthcheckService() {
+    return Stream.of("healthcheck", service(), destination())
+      .filter(StringUtils::isNotBlank)
+      .collect(Collectors.joining("-"));
+  }
 }

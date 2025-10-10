@@ -3,6 +3,7 @@ package dev.deploy4j.commands;
 import dev.deploy4j.Cmd;
 import dev.deploy4j.configuration.Configuration;
 import dev.deploy4j.configuration.Role;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,17 +27,18 @@ public class App extends BaseCommands {
   }
 
   public Cmd listVersions() {
-    return listVersions(List.of(), List.of());
+    return listVersions(List.of(), List.of())
+      .description("list versions");
   }
 
   public Cmd listVersions(List<String> dockerArgs, List<String> statuses) {
     return pipe(
-      Cmd.cmd( "docker", "ps" )
-        .args( filterArgs(statuses) )
-        .args( dockerArgs )
-        .args( "--format", "\"{{.Names}}\"" ),
+      Cmd.cmd("docker", "ps")
+        .args(filterArgs(statuses))
+        .args(dockerArgs)
+        .args("--format", "\"{{.Names}}\""),
       extractVersionFromName()
-    );
+    ).description("list versions");
   }
 
   public Cmd containerIdForVersion(String version) {
@@ -44,7 +46,8 @@ public class App extends BaseCommands {
   }
 
   public Cmd containerIdForVersion(String version, boolean onlyRunning) {
-    return containerIdFor(containerName(version), onlyRunning);
+    return containerIdFor(containerName(version), onlyRunning)
+      .description("container id for version");
   }
 
   public String containerName() {
@@ -53,29 +56,30 @@ public class App extends BaseCommands {
 
   private String containerName(String version) {
     return Stream.of(
-      role.containerPrefix(),
-      version != null ? version : config.version()
-    ).filter(Objects::nonNull).collect(Collectors.joining("-"));
+        role.containerPrefix(),
+        StringUtils.isNotBlank(version) ? version : config.version()
+      ).filter(Objects::nonNull)
+      .collect(Collectors.joining("-")).trim();
   }
 
   public Cmd renameContainer(String version, String newVersion) {
     return Cmd.cmd("docker", "rename",
       containerName(version),
       containerName(newVersion)
-    );
+    ).description("rename container");
   }
 
   public Cmd currentRunningVersion() {
     return pipe(
       currentRunningContainer("--format '{{.Names}}'"),
       extractVersionFromName()
-    );
+    ).description("current running version");
   }
 
   private Cmd extractVersionFromName() {
     return Cmd.cmd(
       "while read line; do echo ${line#" + role.containerPrefix() + "-}; done"
-    );
+    ).description("extract version from container name");
   }
 
   public Cmd currentRunningContainerId() {
@@ -91,11 +95,12 @@ public class App extends BaseCommands {
         )
       ),
       Cmd.cmd("head", "-1")
-    );
+    ).description("current running container");
   }
 
   public Cmd latestImageContainer(String format) {
-    return latestContainer(format, List.of("ancestor=$( " + String.join(" ", latestImageId().build()) + " )"));
+    return latestContainer(format, List.of("ancestor=$( " + String.join(" ", latestImageId().build()) + " )"))
+      .description("latest image container");
   }
 
   private Cmd latestImageId() {
@@ -103,7 +108,8 @@ public class App extends BaseCommands {
       .args(argumentize("--filter",
         List.of("reference=" + config.latestImage())
       )).
-      args("--format", "'{{.ID}}'");
+      args("--format", "'{{.ID}}'")
+      .description("latest image id");
   }
 
   private Cmd latestContainer(String format) {
@@ -113,7 +119,8 @@ public class App extends BaseCommands {
   private Cmd latestContainer(String format, List<String> filters) {
     return Cmd.cmd("docker", "ps", "--latest", format)
       .args(filterArgs(ACTIVE_DOCKER_STATUSES))
-      .args(argumentize("--filter", filters));
+      .args(argumentize("--filter", filters))
+      .description("latest container");
   }
 
   private String[] filterArgs(List<String> statuses) {
@@ -137,8 +144,8 @@ public class App extends BaseCommands {
   public Cmd stop(String version) {
     return pipe(
       version != null ? containerIdForVersion(version) : currentRunningContainerId(),
-      config.stopWaitTime() != null ? Cmd.cmd("docker", "stop", "-t", config.stopWaitTime()) : Cmd.cmd("docker", "stop")
-    );
+      xargs(config.stopWaitTime() != null ? Cmd.cmd("docker", "stop", "-t", config.stopWaitTime()) : Cmd.cmd("docker", "stop"))
+    ).description("stop container");
   }
 
   public Cmd run(String hostName) {
@@ -158,9 +165,16 @@ public class App extends BaseCommands {
       .args(role.labelArgs())
       .args(role.optionArgs())
       .args(config.absoluteImage())
-      .args(role.cmd());
+      .args(role.cmd())
+      .description("run container");
     return cmd;
 
   }
 
+  public Cmd tagLatestImage() {
+    return Cmd.cmd("docker", "tag")
+      .args(config.absoluteImage())
+      .args(config.latestImage())
+      .description("tag latest image");
+  }
 }

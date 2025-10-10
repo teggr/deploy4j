@@ -12,7 +12,7 @@ public class Server {
   }
 
   public Cmd ensureRunDirectory() {
-    return Cmd.cmd("mkdir", "-p", config.runDirectory() );
+    return Cmd.cmd("mkdir", "-p", config.runDirectory() ).description("ensure run directory");
   }
 
 }

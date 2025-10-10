@@ -9,10 +9,16 @@ public class Cmd {
   }
 
   private final List<String> cmd;
+  private String description = "";
 
   private Cmd(String... base) {
     this.cmd = new ArrayList<>();
     Collections.addAll(this.cmd, base);
+  }
+
+  public Cmd description(String description) {
+    this.description = description;
+    return this;
   }
 
   // Add one or more args
@@ -46,6 +52,10 @@ public class Cmd {
   // Build final immutable list
   public List<String> build() {
     return Collections.unmodifiableList(cmd);
+  }
+
+  public String description() {
+    return description;
   }
 
 }

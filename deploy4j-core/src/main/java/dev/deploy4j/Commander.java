@@ -1,11 +1,14 @@
 package dev.deploy4j;
 
+import dev.deploy4j.cli.app.Boot;
 import dev.deploy4j.commands.*;
 import dev.deploy4j.configuration.Configuration;
 import dev.deploy4j.configuration.Role;
 import dev.deploy4j.ssh.SshHost;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Context class to hold shared information and configurations for deployment processes.
@@ -14,22 +17,27 @@ public class Commander implements AutoCloseable {
 
   private final Configuration config;
 
-  private final Docker dockerCommands;
+  private final Docker docker;
   private final Server server;
   private final Registry registry;
   private final Builder builder;
   private final Traefik traefik;
+  private final Prune prune;
+
+  private final Map<String, SshHost> sshHosts = new HashMap<>();
   private final Specifics specifics;
 
   public Commander(Configuration config) {
     this.config = config;
     this.specifics = new Specifics(config, List.of(), List.of()); // TODT hosts and roles
 
-    this.dockerCommands =  new Docker(config);
+    this.docker = new Docker(config);
     this.server = new Server(config);
     this.registry = new Registry(config);
     this.builder = new Builder(config);
     this.traefik = new Traefik(config);
+    this.prune = new Prune(config);
+
   }
 
   private Specifics specifics() {
@@ -52,12 +60,12 @@ public class Commander implements AutoCloseable {
   public void close() throws Exception {
 
     // shutdown
-   // hosts.forEach(Host::close);
+    sshHosts.values().forEach(SshHost::close);
 
   }
 
   public App app(Role role, String host) {
-    return new App( config, role, host );
+    return new App(config, role, host);
   }
 
   // accesssory
@@ -68,7 +76,7 @@ public class Commander implements AutoCloseable {
   }
 
   public Docker docker() {
-    return dockerCommands;
+    return docker;
   }
 
   // healthcheck
@@ -93,15 +101,24 @@ public class Commander implements AutoCloseable {
   }
 
   public Boot boot(SshHost host, Role role, String version) {
-    return new Boot( this, config, host, role, version ); // barrier?
+    return new Boot(this, config, host, role, version); // barrier?
   }
 
   public SshHost host(String host) {
-    return  new SshHost( host, config.ssh() );
+    SshHost sshHost = sshHosts.get(host);
+    if (sshHost == null) {
+      sshHost = new SshHost(host, config.ssh());
+      sshHosts.put(host, sshHost);
+    }
+    return sshHost;
   }
 
   public List<Role> rolesOn(String host) {
     return specifics.rolesOn(host);
+  }
+
+  public Prune prune() {
+    return prune;
   }
 
 }

@@ -15,12 +15,14 @@ public class Registry {
     return Cmd.cmd("docker login")
       .args(config.registry().server())
       .args("-u", config.registry().username()) // redact
-      .args("-p", config.registry().password()); // redact
+      .args("-p", config.registry().password()) // redact
+      .description("login");
   }
 
   public Cmd logout() {
     return Cmd.cmd("docker logout")
-      .args(config.registry().server());
+      .args(config.registry().server())
+      .description("logout");
   }
 
 }

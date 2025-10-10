@@ -65,7 +65,7 @@ public class Commands {
   public static Cmd shell(Cmd command) {
     return Cmd.cmd(
       "sh", "-c",
-      "'" + Stream.of(command).flatMap( Cmd -> command.build().stream() ).collect(Collectors.joining(" ")).replace("'", "'\\\\''") + "'"
+      "'" + Stream.of(command).flatMap( Cmd -> command.build().stream() ).collect(Collectors.joining(" ")).replace("'", "'\\''") + "'"
     );
   }
 
@@ -161,7 +161,7 @@ public class Commands {
    */
   public static String[] argumentize(String argument, List<String> attributes) {
     List<String> list = attributes.stream()
-      .map( Commands::escapeShellValue )
+      //.map( Commands::escapeShellValue )
       .flatMap(attr -> Stream.of(argument, attr))
       .toList();
     return list.toArray(new String[0]);
@@ -195,6 +195,11 @@ public class Commands {
     }
 
     return args.toArray(new String[0]);
+  }
+
+  public static Cmd xargs(Cmd cmd) {
+    return Cmd.cmd("xargs")
+              .args(cmd.build());
   }
 
   private static final Pattern DOLLAR_SIGN_WITHOUT_SHELL_EXPANSION =

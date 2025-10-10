@@ -18,7 +18,7 @@ public class BaseCommands {
       "--filter",
       "name=^" + containerName + "$",
       "--quiet"
-    );
+    ).description("container id for");
     return cmd;
   }
 

@@ -54,16 +54,17 @@ class Deploy4jTest {
     );
 
     // TODO: CLI OPTIONS TO INFLUENCE THESE
-    Commander commander = new Commander(config);
+    try ( Commander commander = new Commander(config) ) {
+
 //    commander.setVerbosity();
 //    commander.configure( configFile, destination, version );
 //    commander.specificHosts();
 //    commander.specificRoles();
 //    commander.specificPrimary();
 
-    Cli cli = new Cli(commander);
+      Cli cli = new Cli(commander);
 
-    try (Main main = cli.main()) {
+      Main main = cli.main();
 
       main.setup();
 

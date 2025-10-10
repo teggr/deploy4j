@@ -1,10 +1,12 @@
-package dev.deploy4j.commands;
+package dev.deploy4j.cli.app;
 
 import dev.deploy4j.Commander;
+import dev.deploy4j.RandomHex;
+import dev.deploy4j.commands.App;
+import dev.deploy4j.configuration.Configuration;
 import dev.deploy4j.configuration.Role;
 import dev.deploy4j.ssh.SshHost;
-import dev.deploy4j.RandomHex;
-import dev.deploy4j.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
 
 public class Boot {
 
@@ -26,37 +28,39 @@ public class Boot {
 
   public void run() {
 
-        // boot -> host, role, self, version, barrier
-        // Kamal::Cli::App::Boot.new(host, role, self, version, barrier).run
-        String oldVersion = oldVersionRenamedIfClashing();
+    // boot -> host, role, self, version, barrier
+    // Kamal::Cli::App::Boot.new(host, role, self, version, barrier).run
+    String oldVersion = oldVersionRenamedIfClashing();
 
-        // wait_at_barrier
+    // wait_at_barrier
 
-        // start_new_version
-      try {
-        startNewVersion();
-      }catch(Exception e) {
-        stopNewVersion();
-        throw e;
-      }
+    // start_new_version
+    try {
+      startNewVersion();
+    } catch (Exception e) {
+      e.printStackTrace();
+      stopNewVersion();
+      throw e;
+    }
 
-      // release barrier
-      if(oldVersion != null) {
-        stopOldVersion(oldVersion);
-      }
+    // release barrier
+    if (StringUtils.isNotBlank(oldVersion)) {
+      stopOldVersion(oldVersion);
+    }
 
   }
 
   private void stopOldVersion(String version) {
+
     // cord///
-    host.execute( app.stop(version) );
+    host.execute(app.stop(version));
 
     // app clean up assets
 
   }
 
   private void stopNewVersion() {
-    host.execute( app.stop(version) );
+    host.execute(app.stop(version));
   }
 
   private void startNewVersion() {
@@ -71,19 +75,20 @@ public class Boot {
 
     String hostName = prefix + "-" + suffix;
 
-    host.execute( app.run(hostName) );
+    host.execute(app.run(hostName));
 
     // poller
 
   }
 
   private String oldVersionRenamedIfClashing() {
-   String containerIdForVersion = host.capture(app.containerIdForVersion(version));
-    if( containerIdForVersion != null ) {
+    String containerIdForVersion = host.capture(app.containerIdForVersion(version));
+    if (StringUtils.isNotBlank(containerIdForVersion)) {
       String renamedVersion = version + "_replaced_" + RandomHex.randomHex(8);
       host.execute(app.renameContainer(version, renamedVersion));
     }
 
+    // TODO: not yet returning the renamed version
     return host.capture(app.currentRunningVersion());
   }
 

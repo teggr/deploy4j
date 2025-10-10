@@ -1,9 +1,9 @@
 package dev.deploy4j.cli;
 
 import dev.deploy4j.Commander;
+import dev.deploy4j.cli.app.Boot;
 import dev.deploy4j.configuration.Role;
 import dev.deploy4j.ssh.SshHost;
-import dev.deploy4j.commands.Boot;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -74,6 +74,14 @@ public class App {
         appBoot.run();
 
       }
+
+    }
+
+    for(SshHost host : cli.on( commander.hosts() ) ) {
+
+      // execute audit tagging
+      host.execute( commander.app(null, null)
+        .tagLatestImage() );
 
     }
 

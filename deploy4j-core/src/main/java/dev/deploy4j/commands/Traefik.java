@@ -29,7 +29,8 @@ public class Traefik {
       .args(dockerOptionsArgs())
       .args(config.traefik().image())
       .args("--providers.docker")
-      .args(cmdOptionArgs());
+      .args(cmdOptionArgs())
+      .description("run traefik");
   }
 
   private List<String> cmdOptionArgs() {
@@ -58,29 +59,29 @@ public class Traefik {
   }
 
   public Cmd start() {
-    return Cmd.cmd("docker", "container", "start", "traefik");
+    return Cmd.cmd("docker", "container", "start", "traefik").description("start traefik");
   }
 
   public Cmd stop() {
-    return Cmd.cmd("docker", "container", "stop", "traefik");
+    return Cmd.cmd("docker", "container", "stop", "traefik").description("stop traefik");
   }
 
   public Cmd startOrRun() {
     return any(
       start(),
       run()
-    );
+    ).description("start or run");
   }
 
   public Cmd info() {
-    return Cmd.cmd("docker", "ps", "--filter", "name=^traefik$");
+    return Cmd.cmd("docker", "ps", "--filter", "name=^traefik$").description("info");
   }
 
   public Cmd logs(String since, String lines, String grep, String grepOptions) {
     return pipe(
       Cmd.cmd("docker", "logs", "traefik", since != null ? "--since " + since : null, lines != null ? "--tail " + lines : null, "--timestamps", "2>&1"),
       grep != null ? Cmd.cmd("grep", "\"" + grep + "\"" + (grepOptions != null ? " " + grepOptions : "")) : null
-    );
+    ).description("logs");
   }
 
   public Cmd followLogs() {
@@ -88,11 +89,11 @@ public class Traefik {
   }
 
   public Cmd removeContainer() {
-    return Cmd.cmd("docker", "container", "prune", "--force", "--filter", "label=org.opencontainers.image.title=Traefik");
+    return Cmd.cmd("docker", "container", "prune", "--force", "--filter", "label=org.opencontainers.image.title=Traefik").description("remove traefik");
   }
 
   public Cmd removeImage() {
-    return Cmd.cmd("docker", "image", "prune", "--force", "--filter", "label=org.opencontainers.image.title=Traefik");
+    return Cmd.cmd("docker", "image", "prune", "--force", "--filter", "label=org.opencontainers.image.title=Traefik").description("remove traefik image");
   }
 
 }

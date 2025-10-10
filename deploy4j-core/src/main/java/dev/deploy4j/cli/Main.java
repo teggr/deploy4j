@@ -2,14 +2,14 @@ package dev.deploy4j.cli;
 
 import dev.deploy4j.Commander;
 
-public class Main implements AutoCloseable {
+public class Main {
 
   private final Cli cli;
-  private final Commander context;
+  private final Commander commander;
 
-  public Main(Cli cli, Commander context) {
+  public Main(Cli cli, Commander commander) {
     this.cli = cli;
-    this.context = context;
+    this.commander = commander;
   }
 
   /**
@@ -52,15 +52,7 @@ public class Main implements AutoCloseable {
     // Detect stale containers...
     cli.app().staleContainers();
     cli.app().boot();
-//    context.prune().all();
-
-  }
-
-
-  @Override
-  public void close() throws Exception {
-
-    context.close();
+    cli.prune().all();
 
   }
 

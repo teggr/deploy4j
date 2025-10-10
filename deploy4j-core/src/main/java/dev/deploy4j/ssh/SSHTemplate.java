@@ -4,8 +4,6 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import dev.deploy4j.Cmd;
-import dev.deploy4j.raw.SshConfig;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class SSHTemplate {
 
@@ -56,7 +52,7 @@ public class SSHTemplate {
     return session;
   }
 
-  public ExecResult exec(Cmd command) {
+  public ExecResult exec(String command) {
 
     int exitStatus = -1;
     ByteArrayOutputStream capturedInputStream = new ByteArrayOutputStream();
@@ -72,9 +68,8 @@ public class SSHTemplate {
       }
 
       channel = (ChannelExec) session.openChannel("exec");
-      String collect = Stream.of(command).flatMap(cmd -> cmd.build().stream()).collect(Collectors.joining(" "));
-      log.info("exec__: {}", collect);
-      channel.setCommand(collect);
+      log.info("exec__: {}", command);
+      channel.setCommand(command);
       channel.setInputStream(null);
       channel.setErrStream(capturedErrorStream);
 
@@ -126,4 +121,5 @@ public class SSHTemplate {
       }
     }
   }
+
 }
