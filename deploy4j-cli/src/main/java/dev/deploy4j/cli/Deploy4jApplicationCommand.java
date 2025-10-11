@@ -8,7 +8,8 @@ import java.util.concurrent.Callable;
   name = "deploy4j",
   mixinStandardHelpOptions = true,
   subcommands = {
-    Setup.class
+    Setup.class,
+    Deploy.class,
   }
 )
 public class Deploy4jApplicationCommand implements Callable<Integer> {

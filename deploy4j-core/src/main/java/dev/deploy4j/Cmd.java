@@ -1,6 +1,7 @@
 package dev.deploy4j;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class Cmd {
 
@@ -51,7 +52,7 @@ public class Cmd {
 
   // Build final immutable list
   public List<String> build() {
-    return Collections.unmodifiableList(cmd);
+    return cmd.stream().filter(Objects::nonNull).toList();
   }
 
   public String description() {

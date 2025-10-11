@@ -25,5 +25,4 @@ public abstract class Deploy4jCommand implements Callable<Integer> {
   @CommandLine.Option(names = {"-H", "--skip-hooks"}, description = "Don't run hooks, Default: false")
   boolean skipHooks;
 
-
 }

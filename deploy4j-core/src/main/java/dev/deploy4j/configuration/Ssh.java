@@ -1,5 +1,6 @@
 package dev.deploy4j.configuration;
 
+import dev.deploy4j.env.ENV;
 import dev.deploy4j.raw.SshConfig;
 import org.apache.commons.lang.StringUtils;
 
@@ -16,7 +17,7 @@ public class Ssh {
   }
 
   public String user() {
-    return StringUtils.isNotBlank(sshConfig.user()) ? sshConfig.user() : "root";
+    return StringUtils.isNotBlank(sshConfig.user()) ? ENV.lookup( sshConfig.user() ) : "root";
   }
 
   public String port() {
@@ -24,13 +25,12 @@ public class Ssh {
   }
 
   public String privateKeyPath() {
-    return sshConfig.privateKey();
+    return ENV.lookup( sshConfig.privateKey() );
   }
 
   public String passphrase() {
-    return sshConfig.privateKeyPassphrase();
+    return ENV.lookup( sshConfig.privateKeyPassphrase() );
   }
-
 
   public boolean strictHostKeyChecking() {
     return sshConfig.strictHostChecking();

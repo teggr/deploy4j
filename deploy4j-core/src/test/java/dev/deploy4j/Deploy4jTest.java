@@ -54,7 +54,7 @@ class Deploy4jTest {
     );
 
     // TODO: CLI OPTIONS TO INFLUENCE THESE
-    try ( Commander commander = new Commander(config) ) {
+    try ( Commander commander = new Commander(dotenv, config) ) {
 
 //    commander.setVerbosity();
 //    commander.configure( configFile, destination, version );
@@ -66,7 +66,7 @@ class Deploy4jTest {
 
       Main main = cli.main();
 
-      main.setup();
+      main.setup(skipPush);
 
     } catch (Exception e) {
 

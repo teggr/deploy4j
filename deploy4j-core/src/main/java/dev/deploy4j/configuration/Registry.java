@@ -1,5 +1,6 @@
 package dev.deploy4j.configuration;
 
+import dev.deploy4j.env.ENV;
 import dev.deploy4j.raw.RegistryConfig;
 
 public class Registry {
@@ -14,22 +15,12 @@ public class Registry {
     return registryConfig.server();
   }
 
-
   public String username() {
-    return lookup( registryConfig.username() );
+    return ENV.lookup( registryConfig.username() );
   }
 
   public String password() {
-    return lookup( registryConfig.password() );
-  }
-
-  private String lookup(String key) {
-    String env = System.getenv(key);
-    if (env != null) {
-      return env;
-    } else {
-      return key;
-    }
+    return ENV.lookup( registryConfig.password() );
   }
 
 }

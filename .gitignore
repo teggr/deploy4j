@@ -33,7 +33,7 @@ build/
 !**/src/test/**/build/
 
 ### Project ###
-
+.env
 external/
 
 

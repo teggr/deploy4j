@@ -4,19 +4,15 @@ import dev.deploy4j.Commander;
 import dev.deploy4j.configuration.Configuration;
 import dev.deploy4j.raw.Deploy4jConfig;
 import dev.deploy4j.raw.Deploy4jConfigReader;
-import io.github.cdimascio.dotenv.Dotenv;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(
-  name = "setup",
+  name = "deploy",
   mixinStandardHelpOptions = false,
-  description = "Setup all accessories, push the env, and deploy app to servers")
-public class Setup extends Deploy4jCommand implements Callable<Integer> {
-
-  @CommandLine.Option(names = "-P", description = "Skip image build and push", defaultValue = "false")
-  private boolean skipPush;
+  description = "Deploy app to servers")
+public class Deploy extends Deploy4jCommand implements Callable<Integer> {
 
   @Override
   public Integer call() throws Exception {
@@ -29,9 +25,7 @@ public class Setup extends Deploy4jCommand implements Callable<Integer> {
       version
     );
 
-    Dotenv dotenv = Dotenv.configure()
-      .load();
-
+    // TODO: CLI OPTIONS TO INFLUENCE THESE
     try ( Commander commander = new Commander(config) ) {
 
 //    commander.setVerbosity();
@@ -44,7 +38,7 @@ public class Setup extends Deploy4jCommand implements Callable<Integer> {
 
       Main main = cli.main();
 
-      main.setup(skipPush);
+      main.deploy();
 
     } catch (Exception e) {
 

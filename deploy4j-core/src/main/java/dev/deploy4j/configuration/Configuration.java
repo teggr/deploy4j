@@ -1,5 +1,6 @@
 package dev.deploy4j.configuration;
 
+import dev.deploy4j.env.ENV;
 import dev.deploy4j.raw.Deploy4jConfig;
 import org.apache.commons.lang.StringUtils;
 
@@ -83,7 +84,7 @@ public class Configuration {
     if (StringUtils.isNotBlank(declaredVersion)) {
       return declaredVersion;
     }
-    String env = System.getenv("VERSION");
+    String env = ENV.fetch("VERSION");
     if (env != null) {
       return env;
     }

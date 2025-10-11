@@ -5,6 +5,7 @@ import dev.deploy4j.commands.*;
 import dev.deploy4j.configuration.Configuration;
 import dev.deploy4j.configuration.Role;
 import dev.deploy4j.ssh.SshHost;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.HashMap;
 import java.util.List;
