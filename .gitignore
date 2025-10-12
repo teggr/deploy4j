@@ -32,11 +32,14 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### Project ###
+.env
+external/
+
+
 ### VS Code ###
 .vscode/
 
 ### Mac OS ###
 .DS_Store
-
-# deplpy4j
-.deploy4j/
+/deploy4j-cli/dependency-reduced-pom.xml

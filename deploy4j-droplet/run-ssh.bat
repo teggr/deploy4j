@@ -1,0 +1,1 @@
+docker run --detach -v /var/run/docker.sock:/var/run/docker.sock --rm --name my-ubuntu-ssh --publish 2222:22 ubuntu-ssh
