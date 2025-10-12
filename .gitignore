@@ -42,3 +42,4 @@ external/
 
 ### Mac OS ###
 .DS_Store
+/deploy4j-cli/dependency-reduced-pom.xml

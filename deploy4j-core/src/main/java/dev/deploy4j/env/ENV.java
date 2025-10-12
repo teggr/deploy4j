@@ -25,6 +25,7 @@ public class ENV {
       .forEach(envFile -> {
         Dotenv dotenv = Dotenv.configure()
           .filename(envFile)
+          .ignoreIfMissing()
           .load();
         envs.add(dotenv);
       });
