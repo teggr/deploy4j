@@ -35,7 +35,7 @@ public class SSHTemplate {
   }
 
   private Session getSession() throws JSchException {
-    if(session == null) {
+    if (session == null) {
 
       log.info("Creating session for {}@{}:{}", username, host, port);
 
@@ -44,8 +44,8 @@ public class SSHTemplate {
       jsch.addIdentity(privateKey, privateKeyPassphrase);
 
       // create a session
-      session = jsch.getSession(username, host, Integer.parseInt( port ));
-      if(!strictHostChecking) {
+      session = jsch.getSession(username, host, Integer.parseInt(port));
+      if (!strictHostChecking) {
         session.setConfig("StrictHostKeyChecking", "no");
       }
     }
@@ -63,7 +63,7 @@ public class SSHTemplate {
 
       Session session = getSession();
 
-      if(!session.isConnected()) {
+      if (!session.isConnected()) {
         session.connect();
       }
 
@@ -114,7 +114,7 @@ public class SSHTemplate {
   }
 
   public void close() {
-    if(session != null && session.isConnected()) {
+    if (session != null && session.isConnected()) {
       try {
         session.disconnect();
       } catch (Exception e) {
@@ -122,4 +122,22 @@ public class SSHTemplate {
     }
   }
 
+  public void upload(String local, String remote) {
+    ChannelExec channel = null;
+    try {
+      Session session = getSession();
+      if (!session.isConnected()) {
+        session.connect();
+      }
+      // Use SFTP channel for file upload
+      com.jcraft.jsch.ChannelSftp sftp = (com.jcraft.jsch.ChannelSftp) session.openChannel("sftp");
+      sftp.connect();
+      sftp.put(local, remote);
+      sftp.disconnect();
+      log.info("Uploaded file from {} to {}", local, remote);
+    } catch (Exception e) {
+      log.error("Failed to upload file from {} to {}", local, remote, e);
+      throw new RuntimeException(e);
+    }
+  }
 }

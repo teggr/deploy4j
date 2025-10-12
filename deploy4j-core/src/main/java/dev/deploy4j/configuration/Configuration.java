@@ -242,4 +242,12 @@ public class Configuration {
       .filter(StringUtils::isNotBlank)
       .collect(Collectors.joining("-"));
   }
+
+  public Accessory accessory(String name) {
+    return accessories.stream()
+      .filter( a -> a.name().equals(name) )
+      .findFirst()
+      .orElse(null);
+  }
+
 }

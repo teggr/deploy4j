@@ -13,7 +13,7 @@ import java.util.concurrent.Callable;
   name = "setup",
   mixinStandardHelpOptions = false,
   description = "Setup all accessories, push the env, and deploy app to servers")
-public class Setup extends Deploy4jCommand implements Callable<Integer> {
+public class SetupCommand extends Deploy4jCommand implements Callable<Integer> {
 
   @CommandLine.Option(names = "-P", description = "Skip image build and push", defaultValue = "false")
   private boolean skipPush;

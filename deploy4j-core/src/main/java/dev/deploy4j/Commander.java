@@ -2,11 +2,12 @@ package dev.deploy4j;
 
 import dev.deploy4j.cli.app.Boot;
 import dev.deploy4j.commands.*;
+import dev.deploy4j.configuration.Accessory;
 import dev.deploy4j.configuration.Configuration;
 import dev.deploy4j.configuration.Role;
 import dev.deploy4j.ssh.SshHost;
-import io.github.cdimascio.dotenv.Dotenv;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,9 @@ public class Commander implements AutoCloseable {
   private final Builder builder;
   private final Traefik traefik;
   private final Prune prune;
+
+  private final List<String> specificHosts = new ArrayList<>();
+  private final List<String> specificRoles = new ArrayList<>();
 
   private final Map<String, SshHost> sshHosts = new HashMap<>();
   private final Specifics specifics;
@@ -122,4 +126,13 @@ public class Commander implements AutoCloseable {
     return prune;
   }
 
+  public List<String> accessoryNames() {
+    return config.accessories().stream()
+      .map(Accessory::name)
+      .toList();
+  }
+
+  public List<String> specificHosts() {
+    return specificHosts;
+  }
 }

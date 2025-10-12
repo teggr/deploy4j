@@ -14,6 +14,8 @@ public class Cli {
   private final Traefik traefik;
   private final App app;
   private final Prune prune;
+  private final Accessory accesssory;
+
   private final Commander commander;
 
   public Cli(Commander commander) {
@@ -26,6 +28,7 @@ public class Cli {
     this.traefik = new Traefik(this, commander);
     this.app = new App(this, commander);
     this.prune = new Prune(this, commander);
+    this.accesssory = new Accessory(this, commander);
 
     this.commander = commander;
   }
@@ -58,6 +61,10 @@ public class Cli {
     return prune;
   }
 
+  public Accessory accesssory() {
+    return accesssory;
+  }
+
   public List<SshHost> on(List<String> hosts) {
 
     return hosts.stream()
@@ -65,5 +72,4 @@ public class Cli {
       .toList();
 
   }
-
 }

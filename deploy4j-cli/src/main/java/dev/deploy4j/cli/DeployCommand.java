@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
   name = "deploy",
   mixinStandardHelpOptions = false,
   description = "Deploy app to servers")
-public class Deploy extends Deploy4jCommand implements Callable<Integer> {
+public class DeployCommand extends Deploy4jCommand implements Callable<Integer> {
 
   @Override
   public Integer call() throws Exception {

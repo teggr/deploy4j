@@ -31,11 +31,10 @@ public class Main {
 
     try {
 
+      log.info("Ensure Docker is installed...");
       cli.server().bootstrap();
 
-      envify(skipPush);
-      // context.getEnv().push();
-      // context.accesssory().boot();
+      cli.accesssory().boot();
 
       deploy();
 
@@ -47,25 +46,6 @@ public class Main {
       System.out.println("Deployed in " + (end - start) / 1000 + " seconds");
 
     }
-
-  }
-
-  /**
-   * Create .env by evaluating .env.erb (or .env.staging.erb -> .env.staging when using -d staging)
-   *
-   * @param skipPush Skip .env file push
-   */
-  public void envify(boolean skipPush) {
-
-    String envTemplatePath = ".env.thyme";
-    String envPath = ".env";
-    if( commander.getConfig().destination() != null ) {
-      envTemplatePath = ".env.%s.thyme".formatted(commander.getConfig().destination());
-      envPath = ".env.%s".formatted(commander.getConfig().destination());
-    }
-
-    File envTemplate = new File(envTemplatePath);
-    boolean exists = envTemplate.exists();
 
   }
 

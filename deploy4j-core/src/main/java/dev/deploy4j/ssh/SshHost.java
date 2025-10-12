@@ -53,4 +53,7 @@ public class SshHost {
       .execOutput();
   }
 
+  public void upload(String local, String remote) {
+    sshTemplate.upload(local, remote);
+  }
 }

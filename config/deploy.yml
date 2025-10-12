@@ -13,6 +13,12 @@ ssh:
   strictHostChecking: false
 env:
   DATABASE_HOST: mysql-db
+accessories:
+  database:
+    serviceName: database
+    image: oscarfonts/h2:latest
+    host: localhost
+    port: 1521
 traefik:
   publish: true
   args:
