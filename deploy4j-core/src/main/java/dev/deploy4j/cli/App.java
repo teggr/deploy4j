@@ -4,11 +4,15 @@ import dev.deploy4j.Commander;
 import dev.deploy4j.cli.app.Boot;
 import dev.deploy4j.configuration.Role;
 import dev.deploy4j.ssh.SshHost;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.stream.Stream;
 
 public class App {
+
+  private static final Logger log = LoggerFactory.getLogger(App.class);
 
   private final Cli cli;
   private final Commander commander;
@@ -88,6 +92,85 @@ public class App {
   }
 
   private String versionOrLatest() {
-    return commander.getConfig().version() != null ? commander.getConfig().version() : commander.getConfig().latestTag();
+    return commander.config().version() != null ? commander.config().version() : commander.config().latestTag();
   }
+
+  /**
+   * Show details about app containers
+   */
+  public void details() {
+    for (SshHost host : cli.on( commander.hosts() ) ) {
+
+      for(Role role : commander.rolesOn(host.hostName())) {
+
+        System.out.println( host.capture( commander.app(role, host.hostName()).info() ) );
+
+      }
+
+    }
+  }
+
+  /**
+   * Remove app containers and images from servers
+   */
+  public void remove() {
+    stop();
+    removeContainers();
+    removeImages();
+  }
+
+  /**
+   * Remove all app images from servers
+   */
+  private void removeImages() {
+
+    for (SshHost host : cli.on( commander.hosts() ) ) {
+
+      for(Role role : commander.rolesOn(host.hostName())) {
+
+        host.execute( commander.auditor().record("Removed all app images") );
+        host.execute( commander.app(role, host.hostName()).removeImages() );
+
+      }
+
+    }
+
+  }
+
+  /**
+   * Remove all app containers from servers
+   */
+  private void removeContainers() {
+
+    for (SshHost host : cli.on( commander.hosts() ) ) {
+
+      for(Role role : commander.rolesOn(host.hostName())) {
+
+        host.execute( commander.auditor().record("Removed all app containers") );
+        host.execute( commander.app(role, host.hostName()).removeContainers() );
+
+      }
+
+    }
+
+  }
+
+  /**
+   * Stop app container on servers
+   */
+  private void stop() {
+
+    for (SshHost host : cli.on( commander.hosts() ) ) {
+
+      for(Role role : commander.rolesOn(host.hostName())) {
+
+        host.execute( commander.auditor().record("Stopped app") );
+        host.execute( commander.app(role, host.hostName()).stop() );
+
+      }
+
+    }
+
+  }
+
 }

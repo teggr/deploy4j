@@ -31,6 +31,7 @@ public class Commander implements AutoCloseable {
 
   private final Map<String, SshHost> sshHosts = new HashMap<>();
   private final Specifics specifics;
+  private final Auditor auditor;
 
   public Commander(Configuration config) {
     this.config = config;
@@ -42,6 +43,7 @@ public class Commander implements AutoCloseable {
     this.builder = new Builder(config);
     this.traefik = new Traefik(config);
     this.prune = new Prune(config);
+    this.auditor = new Auditor(config);
 
   }
 
@@ -57,7 +59,7 @@ public class Commander implements AutoCloseable {
     return specifics().accessoryHosts();
   }
 
-  public Configuration getConfig() {
+  public Configuration config() {
     return config;
   }
 
@@ -73,8 +75,9 @@ public class Commander implements AutoCloseable {
     return new App(config, role, host);
   }
 
-  // accesssory
-  // auditor
+  public Auditor auditor() {
+    return auditor;
+  }
 
   public Builder builder() {
     return builder;
@@ -87,7 +90,6 @@ public class Commander implements AutoCloseable {
   // healthcheck
   // hook
   // lock
-  // prune
 
   public Registry registry() {
     return registry;
@@ -135,4 +137,7 @@ public class Commander implements AutoCloseable {
   public List<String> specificHosts() {
     return specificHosts;
   }
+
+
+
 }

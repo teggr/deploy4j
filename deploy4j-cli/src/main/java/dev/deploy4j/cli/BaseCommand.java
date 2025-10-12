@@ -5,7 +5,6 @@ import dev.deploy4j.configuration.Configuration;
 import dev.deploy4j.env.ENV;
 import dev.deploy4j.raw.Deploy4jConfig;
 import dev.deploy4j.raw.Deploy4jConfigReader;
-import io.github.cdimascio.dotenv.Dotenv;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
@@ -24,7 +23,7 @@ public abstract class BaseCommand implements Callable<Integer> {
   String[] hosts;
   @CommandLine.Option(names = {"-r", "--roles"}, paramLabel = "ROLES", description = "Run commands on these roles instead of all (separate by comma, supports wildcards with *)")
   String[] roles;
-  @CommandLine.Option(names = {"-c", "--config-file"}, paramLabel = "CONFIG_FILE", description = "Path to config file. Default: config/deploy.yml", defaultValue = "config/deploy.yml" )
+  @CommandLine.Option(names = {"-c", "--config-file"}, paramLabel = "CONFIG_FILE", description = "Path to config file. Default: config/deploy.yml", defaultValue = "config/deploy.yml")
   String configFile;
   @CommandLine.Option(names = {"-d", "--destination"}, paramLabel = "DESTINATION", description = "Specify destination to be used for config file (staging -> deploy.staging.yml)")
   String destination;
@@ -50,7 +49,7 @@ public abstract class BaseCommand implements Callable<Integer> {
 
   private void loadEnv() {
 
-    if( destination != null ) {
+    if (destination != null) {
       ENV.overload(".env", ".env." + destination);
     } else {
       ENV.overload(".env");
@@ -60,6 +59,8 @@ public abstract class BaseCommand implements Callable<Integer> {
 
   @Override
   public Integer call() throws Exception {
+
+    long start = System.currentTimeMillis();
 
     try {
 
@@ -93,6 +94,13 @@ public abstract class BaseCommand implements Callable<Integer> {
 
     } catch (Exception e) {
       throw new RuntimeException(e);
+    } finally {
+
+      long end = System.currentTimeMillis();
+
+      System.out.println("=================================");
+      System.out.println("Finished all in  in " + (end - start) / 1000 + " seconds");
+
     }
 
   }

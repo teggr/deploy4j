@@ -20,7 +20,7 @@ public class Prune {
 
   private void containers() {
 
-    int retain = commander.getConfig().retainContainer();
+    int retain = commander.config().retainContainer();
 
     for (SshHost host : cli.on( commander.hosts() ) ) {
       // audit records

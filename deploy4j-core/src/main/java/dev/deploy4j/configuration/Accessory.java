@@ -240,5 +240,32 @@ public class Accessory {
   }
 
 
+  public Cmd info() {
+    return Cmd.cmd("docker", "ps")
+      .args(serviceFilter());
+  }
 
+  private String[] serviceFilter() {
+    return new String[]{
+      "--filter",
+      "label=service=" +  serviceName()
+    };
+  }
+
+  public Cmd stop() {
+    return Cmd.cmd( "docker", "container", "stop", serviceName() );
+  }
+
+  public Cmd removeContainer() {
+    return Cmd.cmd( "docker", "container", "prune", "--force")
+      .args( serviceName() );
+  }
+
+  public Cmd removeImage() {
+    return Cmd.cmd( "docker", "image", "rm", "--force", image() );
+  }
+
+  public Cmd removeServiceDirectory() {
+    return Cmd.cmd("rm", "-rf", serviceName() );
+  }
 }

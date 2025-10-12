@@ -17,7 +17,7 @@ public class Configuration {
 
   private final Deploy4jConfig rawConfig;
   private final String destination;
-  private final String declaredVersion;
+  private String declaredVersion;
 
   private final Servers servers;
   private final Registry registry;
@@ -249,5 +249,41 @@ public class Configuration {
       .findFirst()
       .orElse(null);
   }
+
+  public void setVersion(String version) {
+    this.declaredVersion  = version;
+  }
+
+  public List<String> roleNames() {
+    if( !rawConfig.servers().isEmpty() ) {
+      return List.of("web");
+    } else {
+      return rawConfig.serverRoles().keySet().stream().sorted().toList();
+    }
+  }
+
+  @Override
+  public String toString() {
+    return "Configuration{" +
+           "roles=" + roleNames() +
+           ", hosts='" + allHosts() + '\'' +
+           ", primaryHost='" + primaryHost() + '\'' +
+           ", version=" + version() +
+           ", repository=" + repository() +
+           ", absoluteImage=" + absoluteImage() +
+           ", serviceWithVersion=" + serviceWithVersion() +
+           ", volumeArgs=" + volumeArgs() +
+           ", sshOptions=" + ssh() +
+           ", builder=" + builder() +
+           ", accessories=" + rawConfig().accessories() +
+           ", logging=" + loggingArgs() +
+           ", healthCheck=" + healthcheck() +
+           '}';
+  }
+
+  private String serviceWithVersion() {
+    return "%s-%s".formatted(service(), version());
+  }
+
 
 }

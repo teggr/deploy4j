@@ -141,6 +141,10 @@ public class App extends BaseCommands {
     return filters;
   }
 
+  public Cmd stop() {
+    return stop(null);
+  }
+
   public Cmd stop(String version) {
     return pipe(
       version != null ? containerIdForVersion(version) : currentRunningContainerId(),
@@ -177,4 +181,20 @@ public class App extends BaseCommands {
       .args(config.latestImage())
       .description("tag latest image");
   }
+
+  public Cmd info() {
+    return Cmd.cmd("docker", "ps")
+      .args(filterArgs(List.of()));
+  }
+
+  public Cmd removeContainers() {
+    return Cmd.cmd("docker", "container", "prune", "--force")
+      .args(filterArgs(List.of()));
+  }
+
+  public Cmd removeImages() {
+    return Cmd.cmd("docker", "image", "prune", "--all", "--force")
+      .args(filterArgs(List.of()));
+  }
+
 }
