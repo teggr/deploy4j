@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -197,4 +198,40 @@ public class App extends BaseCommands {
       .args(filterArgs(List.of()));
   }
 
+  public Cmd start() {
+    return Cmd.cmd("start", containerName());
+  }
+
+  public Cmd executeInExistingContainer(String command, Map<String, String> env) {
+    return Cmd.cmd("docker", "exec")
+      // TODO interactive mode
+      .args(argumentize("--env", env))
+      .args(containerName())
+      .args(command);
+  }
+
+  public Cmd listContainers() {
+    return Cmd.cmd("docker", "ls", "--all")
+      .args(filterArgs(List.of()));
+  }
+
+  public Cmd listImages() {
+    return Cmd.cmd("docker", "image", "ls")
+      .args(config.repository());
+  }
+
+  public Cmd logs(String version, String since, String lines, String grep, String grepOptions) {
+    return pipe(
+
+      Cmd.cmd("docker", "logs", "traefik", since != null ? "--since " + since : null, lines != null ? "--tail " + lines : null, "--timestamps", "2>&1"),
+      grep != null ? Cmd.cmd("grep", "\"" + grep + "\"" + (grepOptions != null ? " " + grepOptions : "")) : null
+    ).description("logs");
+  }
+
+  public Cmd removeContainer(String version) {
+    return pipe(
+      containerIdFor(containerName(version), false),
+      xargs(Cmd.cmd("docker", "container", "rm"))
+    );
+  }
 }
