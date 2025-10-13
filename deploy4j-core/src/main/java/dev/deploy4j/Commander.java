@@ -25,13 +25,14 @@ public class Commander implements AutoCloseable {
   private final Builder builder;
   private final Traefik traefik;
   private final Prune prune;
+  private final Auditor auditor;
+  private final Lock lock;
 
   private final List<String> specificHosts = new ArrayList<>();
   private final List<String> specificRoles = new ArrayList<>();
 
   private final Map<String, SshHost> sshHosts = new HashMap<>();
   private final Specifics specifics;
-  private final Auditor auditor;
 
   public Commander(Configuration config) {
     this.config = config;
@@ -44,6 +45,7 @@ public class Commander implements AutoCloseable {
     this.traefik = new Traefik(config);
     this.prune = new Prune(config);
     this.auditor = new Auditor(config);
+    this.lock = new Lock(config);
 
   }
 
@@ -139,5 +141,11 @@ public class Commander implements AutoCloseable {
   }
 
 
+  public String primaryHost() {
+    return specifics.primaryHost();
+  }
 
+  public Lock lock() {
+    return lock;
+  }
 }

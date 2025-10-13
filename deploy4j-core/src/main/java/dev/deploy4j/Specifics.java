@@ -37,6 +37,10 @@ public class Specifics {
 
   }
 
+  public String primaryHost() {
+    return primaryHost;
+  }
+
   public List<Role> rolesOn(String host) {
     return roles().stream().filter(role ->
       {

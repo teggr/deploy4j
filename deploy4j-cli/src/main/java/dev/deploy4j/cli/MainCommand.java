@@ -49,7 +49,11 @@ public class MainCommand extends BaseCommand {
 
       printRuntime(() -> {
 
-        cli.main().setup(skipPush);
+        cli.lock().withLock(() -> {
+
+          cli.main().setup(skipPush);
+
+        });
 
       });
 

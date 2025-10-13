@@ -17,6 +17,7 @@ public class Cli {
   private final Accessory accesssory;
 
   private final Commander commander;
+  private final Lock lock;
 
   public Cli(Commander commander) {
 
@@ -30,7 +31,10 @@ public class Cli {
     this.prune = new Prune(this, commander);
     this.accesssory = new Accessory(this, commander);
 
+    this.lock = new Lock(this, commander);
+
     this.commander = commander;
+
   }
 
   public Server server() {
@@ -71,5 +75,9 @@ public class Cli {
       .map(h -> commander.host( h ) )
       .toList();
 
+  }
+
+  public Lock lock() {
+    return lock;
   }
 }
