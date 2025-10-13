@@ -51,4 +51,30 @@ public class Prune {
       "--filter", "label=service=" + config.healthcheckService()
     };
   }
+
+  public Cmd danglingImages() {
+    return Cmd.cmd("docker", "image")
+      .args("prune", "--force", "--filter", "label=service=" + config.service())
+      .description("dangling images");
+  }
+
+  public Cmd taggedImages() {
+    return pipe(
+      Cmd.cmd("docker", "image", "ls")
+      .args( serviceFilter() )
+      .args("--format", "'{{.ID}} {{.Repository}}:{{.Tag}}'")
+      .description("tagged images"),
+      Cmd.cmd("grep", "-v", "-w")
+        .args("\"" + activeImageList() + "\""),
+      Cmd.cmd("while read image tag; do docker rmi $tag; done")
+      );
+  }
+
+  private String activeImageList() {
+    // Pull the images that are used by any containers
+    // Append repo:latest - to avoid deleting the latest tag
+    // Append repo:<none> - to avoid deleting dangling images that are in use. Unused dangling images are deleted separately
+    return "$(docker container ls -a --format '{{.Image}}\\|' --filter label=service="+config.service()+" | tr -d '\\n')"+config.latestImage()+"\\|"+config.repository()+":<none>";
+  }
+
 }

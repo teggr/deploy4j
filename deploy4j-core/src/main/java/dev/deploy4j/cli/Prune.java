@@ -13,17 +13,48 @@ public class Prune {
     this.commander = commander;
   }
 
+  /**
+   * Prune unused images and stopped containers
+   */
   public void all() {
     containers();
-//    images();
+    images();
   }
 
-  private void containers() {
-
-    int retain = commander.config().retainContainer();
+  /**
+   * Prune unused images
+   */
+  public void images() {
 
     for (SshHost host : cli.on( commander.hosts() ) ) {
-      // audit records
+      host.execute( commander.auditor().record("Pruned images") );
+      host.execute( commander.prune().danglingImages() );
+      host.execute( commander.prune().taggedImages() );
+    }
+
+  }
+
+  public void containers() {
+    containers(null);
+  }
+
+  /**
+   * Prune all stopped containers, except the last n (default 5)
+   *
+   * @param retain Number of containers to retain
+   */
+  public void containers( Integer retain ) {
+
+    if(retain == null) {
+      retain =  commander.config().retainContainer();
+    }
+
+    if(retain < 1) {
+      throw new RuntimeException("retain must be at least 1");
+    }
+
+    for (SshHost host : cli.on( commander.hosts() ) ) {
+      host.execute( commander.auditor().record("Pruned containers") );
       host.execute( commander.prune().appContainers(retain) );
       host.execute( commander.prune().healthcheckContainers() );
     }

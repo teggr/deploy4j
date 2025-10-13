@@ -148,7 +148,7 @@ public class Configuration {
   }
 
 
-  private String repository() {
+  public String repository() {
     return Stream.of(registry().server(), image())
       .filter(StringUtils::isNotBlank)
       .collect(Collectors.joining("/"));
