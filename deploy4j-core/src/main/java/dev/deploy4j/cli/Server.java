@@ -22,6 +22,27 @@ public class Server {
   }
 
   /**
+   * Run a custom command on the server (use --help to show options)
+   *
+   * @param interactive Run the command interactively (use for console/bash)
+   */
+  public void exec(boolean interactive, String cmd) {
+
+    List<String> hosts = new ArrayList<>();
+    hosts.addAll(commander.hosts());
+    hosts.addAll(commander.accessoryHosts());
+
+    // TODO: interactive mode
+    System.out.println( "Running '"+cmd+"' on " + String.join(",", hosts) +  "..." );
+
+    for(SshHost host : cli.on(hosts)) {
+      host.execute( commander.auditor().record( "Executed cmd '" + cmd + "' on " + host.hostName() ) );
+      System.out.println( host.capture( cmd ) );
+    }
+
+  }
+
+  /**
    * Set up Docker to run Kamal apps
    */
   public void bootstrap() {

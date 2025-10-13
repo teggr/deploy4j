@@ -53,6 +53,12 @@ public class SshHost {
       .execOutput();
   }
 
+  public String capture(String cmd) {
+    return sshTemplate
+      .exec(cmd)
+      .execOutput();
+  }
+
   public void upload(String local, String remote) {
     sshTemplate.upload(local, remote);
   }
