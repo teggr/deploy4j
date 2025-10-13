@@ -1,7 +1,7 @@
 package dev.deploy4j.cli;
 
 import dev.deploy4j.Commander;
-import dev.deploy4j.Deploy4j;
+import dev.deploy4j.Version;
 import dev.deploy4j.configuration.Role;
 import dev.deploy4j.ssh.SshHost;
 import org.apache.commons.io.FileUtils;
@@ -186,7 +186,7 @@ public class Main {
   }
 
   public void version() {
-    System.out.println( Deploy4j.VERSION );
+    System.out.println( Version.VERSION );
   }
 
 

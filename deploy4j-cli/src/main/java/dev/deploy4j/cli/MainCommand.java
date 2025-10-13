@@ -46,7 +46,13 @@ public class MainCommand extends BaseCommand {
 
     @Override
     protected void execute(Cli cli) {
-      cli.main().setup(skipPush);
+
+      printRuntime(() -> {
+
+        cli.main().setup(skipPush);
+
+      });
+
     }
 
   }
@@ -61,7 +67,13 @@ public class MainCommand extends BaseCommand {
 
     @Override
     protected void execute(Cli cli) {
-      cli.main().deploy(skipPush);
+
+      printRuntime(() -> {
+
+        cli.main().deploy(skipPush);
+
+      });
+
     }
 
   }
@@ -76,7 +88,13 @@ public class MainCommand extends BaseCommand {
 
     @Override
     protected void execute(Cli cli) {
-      cli.main().redeploy(skipPush);
+
+      printRuntime(() -> {
+
+        cli.main().redeploy(skipPush);
+
+      });
+
     }
 
   }
@@ -88,7 +106,13 @@ public class MainCommand extends BaseCommand {
 
     @Override
     protected void execute(Cli cli) {
-      cli.main().rollback(version);
+
+      printRuntime(() -> {
+
+        cli.main().rollback(version);
+
+      });
+
     }
 
   }

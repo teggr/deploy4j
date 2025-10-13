@@ -60,19 +60,15 @@ public abstract class BaseCommand implements Callable<Integer> {
   @Override
   public Integer call() throws Exception {
 
-    long start = System.currentTimeMillis();
+    Deploy4jConfig deploy4jConfig = Deploy4jConfigReader.readYaml(configFile);
 
-    try {
+    Configuration config = new Configuration(
+      deploy4jConfig,
+      destination,
+      version
+    );
 
-      Deploy4jConfig deploy4jConfig = Deploy4jConfigReader.readYaml(configFile);
-
-      Configuration config = new Configuration(
-        deploy4jConfig,
-        destination,
-        version
-      );
-
-      try (Commander commander = new Commander(config)) {
+    try (Commander commander = new Commander(config)) {
 
 //    commander.setVerbosity();
 //    commander.configure( configFile, destination, version );
@@ -80,17 +76,27 @@ public abstract class BaseCommand implements Callable<Integer> {
 //    commander.specificRoles();
 //    commander.specificPrimary();
 
-        Cli cli = new Cli(commander);
+      Cli cli = new Cli(commander);
 
-        execute(cli);
+      execute(cli);
 
-      } catch (Exception e) {
+    } catch (Exception e) {
 
-        throw new RuntimeException(e);
+      throw new RuntimeException(e);
 
-      }
+    }
 
-      return 0;
+    return 0;
+
+  }
+
+  protected void printRuntime(Runnable function ) {
+
+    long start = System.currentTimeMillis();
+
+    try {
+
+      function.run();
 
     } catch (Exception e) {
       throw new RuntimeException(e);
