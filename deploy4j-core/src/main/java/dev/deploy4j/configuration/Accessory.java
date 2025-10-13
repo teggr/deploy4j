@@ -6,8 +6,7 @@ import dev.deploy4j.raw.AccessoryConfig;
 import java.io.File;
 import java.util.*;
 
-import static dev.deploy4j.Commands.argumentize;
-import static dev.deploy4j.Commands.optionize;
+import static dev.deploy4j.Commands.*;
 
 public class Accessory {
   private final String name;
@@ -267,5 +266,28 @@ public class Accessory {
 
   public Cmd removeServiceDirectory() {
     return Cmd.cmd("rm", "-rf", serviceName() );
+  }
+
+  public Cmd start() {
+    return Cmd.cmd("docker", "container", "start", serviceName() );
+  }
+
+  public Cmd executeInExistingContainer(String command) {
+    return Cmd.cmd( "docker", "exec" )
+      .args( serviceName() )
+      .args( command );
+  }
+
+  public Cmd logs(String since, String lines, String grep, String grepOptions) {
+    return pipe(
+        Cmd.cmd("docker", "logs")
+          .args(serviceName())
+          .args(since != null ? List.of("--since", since) : List.of())
+          .args(lines != null ? List.of("--tail", lines) : List.of())
+          .args("--timestamps")
+          .args("2>&1"),
+        grep != null ? Cmd.cmd("grep", "'" + grep + "'")
+          .args( grepOptions ) : null
+    );
   }
 }
