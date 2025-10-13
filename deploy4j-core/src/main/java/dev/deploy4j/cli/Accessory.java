@@ -99,7 +99,7 @@ public class Accessory {
   /**
    * Reboot existing accessory on host (stop container, remove container, start new container; use NAME=all to boot all accessories)
    */
-  private void reboot(String name) {
+  public void reboot(String name) {
 
     if( "all".equalsIgnoreCase( name ) ) {
 
@@ -128,7 +128,7 @@ public class Accessory {
   /**
    * Start existing accessory container on host
    */
-  private void start(String name) {
+  public void start(String name) {
 
     AccessoryHosts accessoryHosts = withAccessory(name);
 
@@ -145,7 +145,7 @@ public class Accessory {
   /**
    * Stop existing accessory container on host
    */
-  private void stop(String name) {
+  public void stop(String name) {
 
     AccessoryHosts accessoryHosts = withAccessory(name);
 
@@ -161,7 +161,7 @@ public class Accessory {
   /**
    * Restart existing accessory container on host
    */
-  private void restart(String name) {
+  public void restart(String name) {
 
     AccessoryHosts accessoryHosts = withAccessory(name);
 
@@ -277,7 +277,7 @@ public class Accessory {
   /**
    * Remove accessory container from host
    */
-  private void removeContainer(String name) {
+  public void removeContainer(String name) {
 
     AccessoryHosts accessoryHosts = withAccessory(name);
 
@@ -294,7 +294,7 @@ public class Accessory {
   /**
    * Remove accessory image from host
    */
-  private void removeImage(String name) {
+  public void removeImage(String name) {
 
     AccessoryHosts accessoryHosts = withAccessory(name);
 
@@ -311,7 +311,7 @@ public class Accessory {
   /**
    * Remove accessory directory used for uploaded files and data directories from host
    */
-  private void removeServiceDirectory(String name) {
+  public void removeServiceDirectory(String name) {
 
     AccessoryHosts accessoryHosts = withAccessory(name);
 

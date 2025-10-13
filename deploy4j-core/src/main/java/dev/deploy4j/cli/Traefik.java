@@ -153,7 +153,7 @@ public class Traefik {
   /**
    * Remove Traefik container from servers
    */
-  private void removeContainer() {
+  public void removeContainer() {
 
     for(SshHost host : cli.on( commander.traefikHosts() ) ) {
 
@@ -167,7 +167,7 @@ public class Traefik {
   /**
    * Remove Traefik image from servers
    */
-  private void removeImage() {
+  public void removeImage() {
 
     for (SshHost host : cli.on( commander.traefikHosts() ) ) {
 

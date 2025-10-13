@@ -245,7 +245,7 @@ public class App {
   /**
    * Remove app container with given version from servers
    */
-  private void removeContainer(String version) {
+  public void removeContainer(String version) {
 
     for (SshHost host : cli.on( commander.hosts() ) ) {
 
@@ -264,7 +264,7 @@ public class App {
   /**
    * Remove all app containers from servers
    */
-  private void removeContainers() {
+  public void removeContainers() {
 
     for (SshHost host : cli.on( commander.hosts() ) ) {
 
@@ -283,7 +283,7 @@ public class App {
   /**
    * Remove all app images from servers
    */
-  private void removeImages() {
+  public void removeImages() {
 
     for (SshHost host : cli.on( commander.hosts() ) ) {
 
