@@ -35,7 +35,7 @@ build/
 ### Project ###
 .env
 external/
-
+config/
 
 ### VS Code ###
 .vscode/
