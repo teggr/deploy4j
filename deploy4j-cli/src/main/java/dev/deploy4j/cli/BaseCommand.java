@@ -1,8 +1,8 @@
 package dev.deploy4j.cli;
 
 import dev.deploy4j.Commander;
+import dev.deploy4j.Environment;
 import dev.deploy4j.configuration.Configuration;
-import dev.deploy4j.env.ENV;
 import dev.deploy4j.raw.Deploy4jConfig;
 import dev.deploy4j.raw.Deploy4jConfigReader;
 import picocli.CommandLine;
@@ -30,6 +30,7 @@ public abstract class BaseCommand implements Callable<Integer> {
   @CommandLine.Option(names = {"-H", "--skip-hooks"}, description = "Don't run hooks, Default: false")
   boolean skipHooks;
 
+
   /**
    * This ensures the init method is called after the command line is parsed (so all options and positional parameters are assigned) but before the user-specified subcommand is executed.
    */
@@ -39,26 +40,18 @@ public abstract class BaseCommand implements Callable<Integer> {
   }
 
   public void initialize() {
-    loadEnv();
     initializeCommander();
   }
 
   private void initializeCommander() {
     // delegated to the call() method
-  }
-
-  private void loadEnv() {
-
-    if (destination != null) {
-      ENV.overload(".env", ".env." + destination);
-    } else {
-      ENV.overload(".env");
-    }
 
   }
 
   @Override
   public Integer call() throws Exception {
+
+    Environment environment = new Environment(destination);
 
     Deploy4jConfig deploy4jConfig = Deploy4jConfigReader.readYaml(configFile);
 
@@ -76,7 +69,7 @@ public abstract class BaseCommand implements Callable<Integer> {
 //    commander.specificRoles();
 //    commander.specificPrimary();
 
-      Cli cli = new Cli(commander);
+      Cli cli = new Cli(environment, commander);
 
       execute(cli);
 
@@ -90,7 +83,7 @@ public abstract class BaseCommand implements Callable<Integer> {
 
   }
 
-  protected void printRuntime(Runnable function ) {
+  protected void printRuntime(Runnable function) {
 
     long start = System.currentTimeMillis();
 
@@ -112,5 +105,6 @@ public abstract class BaseCommand implements Callable<Integer> {
   }
 
   protected abstract void execute(Cli cli);
+
 
 }

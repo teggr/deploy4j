@@ -13,7 +13,7 @@ public record AccessoryConfig (
   String port,
   Map<String, String> labels,
   Map<String, String> options,
-  Map<String, String> env,
+  EnvironmentConfig env,
   List<String> files,
   List<String> directories,
   List<String> volumes

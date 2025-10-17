@@ -8,10 +8,10 @@ public record Deploy4jConfig(
   String service,
   String image,
   RegistryConfig registry,
-  List<ServerConfig> servers,
+  ServersConfig servers,
   Map<String, ServerRoleConfig> serverRoles,
   SshConfig ssh,
-  Map<String, String> env,
+  EnvironmentConfig env,
   Map<String, AccessoryConfig> accessories,
   TraefikConfig traefik,
   HealthCheckConfig healthCheck

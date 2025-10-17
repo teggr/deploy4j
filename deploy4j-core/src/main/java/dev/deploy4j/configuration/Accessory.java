@@ -1,10 +1,14 @@
 package dev.deploy4j.configuration;
 
 import dev.deploy4j.Cmd;
+import dev.deploy4j.file.Deploy4jFile;
 import dev.deploy4j.raw.AccessoryConfig;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static dev.deploy4j.Commands.*;
 
@@ -18,7 +22,11 @@ public class Accessory {
     this.name = name;
     this.config = config;
     this.accessoryConfig = config.rawConfig().accessories().get(name);
-    this.env = new Env(accessoryConfig.env());
+    this.env = new Env(
+      accessoryConfig.env(),
+      Deploy4jFile.join( config.hostEnvDirectory(), "accessories", serviceName() + ".env" ),
+      "accessories/%s/env".formatted(name)
+    );
   }
 
   public String name() {
@@ -70,7 +78,7 @@ public class Accessory {
     return argumentize("--label", labels());
   }
 
-  public String[] envArgs() {
+  public List<String> envArgs() {
     return env.args();
   }
 

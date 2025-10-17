@@ -20,7 +20,7 @@ class Deploy4jTest {
         "DOCKER_USERNAME",
         "DOCKER_PASSWORD"
       ),
-      List.of(new ServerConfig("localhost", List.of())),
+      List.of(new HostListConfig("localhost", List.of())),
       Map.of(),
       new SshConfig(
         "root",
@@ -62,7 +62,9 @@ class Deploy4jTest {
 //    commander.specificRoles();
 //    commander.specificPrimary();
 
-      Cli cli = new Cli(commander);
+      Environment environment = new Environment(config.destination());
+
+      Cli cli = new Cli(environment, commander);
 
       Main main = cli.main();
 

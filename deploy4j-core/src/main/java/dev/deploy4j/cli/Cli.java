@@ -1,12 +1,14 @@
 package dev.deploy4j.cli;
 
 import dev.deploy4j.Commander;
+import dev.deploy4j.Environment;
 import dev.deploy4j.ssh.SshHost;
 
 import java.util.List;
 
 public class Cli {
 
+  private final Environment environment;
   private final Main main;
   private final Server server;
   private final Registry registry;
@@ -18,8 +20,12 @@ public class Cli {
 
   private final Commander commander;
   private final Lock lock;
+  private final Env env;
 
-  public Cli(Commander commander) {
+  public Cli(Environment environment, Commander commander) {
+
+    this.environment = environment;
+    this.commander = commander;
 
     this.main = new Main(this, commander);
     this.server = new Server(this, commander);
@@ -32,9 +38,16 @@ public class Cli {
     this.accesssory = new Accessory(this, commander);
 
     this.lock = new Lock(this, commander);
+    this.env = new Env(this,commander);
 
-    this.commander = commander;
+  }
 
+  public Env env() {
+    return env;
+  }
+
+  public Environment environment() {
+    return environment;
   }
 
   public Server server() {

@@ -1,6 +1,7 @@
 package dev.deploy4j.configuration;
 
 import dev.deploy4j.env.ENV;
+import dev.deploy4j.file.Deploy4jFile;
 import dev.deploy4j.raw.Deploy4jConfig;
 import org.apache.commons.lang.StringUtils;
 
@@ -48,7 +49,7 @@ public class Configuration {
       .keySet().stream().map(name -> new Accessory(name, this)).toList();
     this.boot = new Boot(this);
     this.builder = new Builder(this);
-    this.env = new Env(rawConfig.env() != null ? rawConfig.env() : new HashMap<String, String>());
+    this.env = new Env(rawConfig.env());
 
     this.healthcheck = new HealthCheck(rawConfig.healthCheck());
     this.logging = new Logging(rawConfig.logging());
@@ -286,4 +287,7 @@ public class Configuration {
   }
 
 
+  public String hostEnvDirectory() {
+    return Deploy4jFile.join(runDirectory(), "env");
+  }
 }

@@ -1,6 +1,7 @@
 package dev.deploy4j.configuration;
 
-import dev.deploy4j.raw.ServerConfig;
+import dev.deploy4j.file.Deploy4jFile;
+import dev.deploy4j.raw.HostListConfig;
 import dev.deploy4j.raw.ServerRoleConfig;
 
 import java.util.HashMap;
@@ -16,15 +17,29 @@ import static java.util.Collections.emptyList;
 public class Role {
   private final String name;
   private final Configuration config;
+  private final Env specializedEnv;
 
   public Role(String name, Configuration config) {
     this.name = name;
     this.config = config;
 
+    this.specializedEnv = new Env(
+      specializations() != null ? specializations().env() : null,
+      Deploy4jFile.join(config.hostEnvDirectory(), "roles", containerPrefix() + ".env"),
+      "servers/%s/env".formatted(name)
+    );
+
     // TODO: validate roleName
 
     // TODO: specialized roles
 
+  }
+
+  private ServerRoleConfig specializations() {
+    if( config.rawConfig().servers() != null && !config.rawConfig().servers().isEmpty() ) {
+      return null;
+    }
+    return config.rawConfig().serverRoles().get( name );
   }
 
   public String name() {
@@ -56,19 +71,19 @@ public class Role {
     Map<String, List<String>> taggedHosts = extractHostsFromConfig()
       .stream()
       .collect(Collectors.toMap(
-        ServerConfig::host,
+        HostListConfig::host,
         hostConfig -> hostConfig.tags() != null ? hostConfig.tags() : emptyList()
       ));
     return taggedHosts;
 
   }
 
-  private List<ServerConfig> extractHostsFromConfig() {
+  private List<HostListConfig> extractHostsFromConfig() {
     if (!config.rawConfig().servers().isEmpty()) {
       return config.rawConfig().servers();
     } else {
       ServerRoleConfig servers = config.rawConfig().serverRoles().get(name);
-      return List.of(servers.serverConfig());
+      return List.of(servers.hostListConfig());
     }
   }
 
@@ -90,7 +105,7 @@ public class Role {
     return env(host).args();
   }
 
-  private Env env(String host) {
+  public Env env(String host) {
     return Stream.concat(
         Stream.of(config.env()),
         //sepecialized env (role based

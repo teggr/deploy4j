@@ -16,11 +16,21 @@ public class Registry {
   }
 
   public String username() {
-    return ENV.lookup( registryConfig.username() );
+    return lookup( registryConfig.username() );
   }
 
   public String password() {
-    return ENV.lookup( registryConfig.password() );
+    return lookup( registryConfig.password() );
+  }
+
+  private String lookup(String key) {
+    // array of lookups or direct value
+    String fetched = ENV.fetch(key);
+    if(fetched == null) {
+      return key;
+    } else {
+      return fetched;
+    }
   }
 
 }

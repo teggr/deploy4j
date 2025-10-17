@@ -1,157 +1,76 @@
 package dev.deploy4j.env;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class ENVTest {
 
-  static String systemEnvironmentVariableName;
-  static String systemEnvironmentVariableValue;
+  @Test
+  void testFetchOfSystemEnvironmentVariables() {
 
-  @BeforeAll
-  static void setup() {
+    // given
+    Map.Entry<String, String> aSystemEnvironmentVariables = pickRandomSystemEnvironmentVariable();
 
-    System.getenv()
-      .entrySet().stream()
-      .forEach(System.out::println);
+    // when
+    String fetchedValue = ENV.fetch(aSystemEnvironmentVariables.getKey());
 
-    // Pick a random system environment variable to use in tests
-    java.util.Map.Entry<String, String> randomEnv = System.getenv()
-      .entrySet().stream()
-      .findAny().orElse(null);
-    if (randomEnv != null) {
-      systemEnvironmentVariableName = randomEnv.getKey();
-      systemEnvironmentVariableValue = randomEnv.getValue();
-    } else {
-      systemEnvironmentVariableName = "DUMMY_ENV_KEY";
-      systemEnvironmentVariableValue = "DUMMY_ENV_VALUE";
-    }
-  }
-
-  @Nested
-  class DefaultEnv {
-
-    @Test
-    void shouldFetchTheMatchingSystemEnvValue() {
-      String value = ENV.fetch(systemEnvironmentVariableName);
-      assertEquals(systemEnvironmentVariableValue, value);
-    }
-
-    @Test
-    void shouldFetchNoValueIfSystemEnvDoesNotExist() {
-      String value = ENV.fetch("UNKNOWN");
-      assertEquals(null, value);
-    }
-
-    @Test
-    void shouldLookupTheMatchingSystemEnvValue() {
-      String value = ENV.lookup(systemEnvironmentVariableName);
-      assertEquals(systemEnvironmentVariableValue, value);
-    }
-
-    @Test
-    void shouldLookupKeyIfSystemEnvDoesNotExist() {
-      String value = ENV.lookup("UNKNOWN");
-      assertEquals("UNKNOWN", value);
-    }
+    // then
+    assertEquals(aSystemEnvironmentVariables.getValue(), fetchedValue);
 
   }
 
-  @Nested
-  class SingleOverridingEnv {
+  @Test
+  void testAllVariablesCleared() {
 
-    @BeforeEach
-    void setup() {
-      ENV.overload(new String[]{ "src/test/resources/envs/test.env" });
-    }
+    // given
+    Map.Entry<String, String> aSystemEnvironmentVariables = pickRandomSystemEnvironmentVariable();
 
-    @Test
-    void shouldFetchTheMatchingSystemEnvValue() {
-      String value = ENV.fetch(systemEnvironmentVariableName);
-      assertEquals(systemEnvironmentVariableValue, value);
-    }
+    // when
+    ENV.clear();
+    String fetchedValue = ENV.fetch(aSystemEnvironmentVariables.getKey());
 
-    @Test
-    void shouldFetchTheOverridingSystemValue() {
-      String value = ENV.fetch("Path");
-      assertNotEquals("OVERRIDING_VALUE", value);
-    }
-
-    @Test
-    void shouldFetchNoValueIfDoesNotExistInAnyEnv() {
-      String value = ENV.fetch("UNKNOWN");
-      assertEquals(null, value);
-    }
-
-    @Test
-    void shouldLookupTheMatchingSystemEnvValue() {
-      String value = ENV.lookup(systemEnvironmentVariableName);
-      assertEquals(systemEnvironmentVariableValue, value);
-    }
-
-    @Test
-    void shouldLookupTheOveridingValue() {
-      String value = ENV.lookup("Path");
-      assertNotEquals("OVERRIDING_VALUE", value);
-    }
-
-    @Test
-    void shouldLookupKeyIfDoesNotExistInAnyEnv() {
-      String value = ENV.lookup("UNKNOWN");
-      assertEquals("UNKNOWN", value);
-    }
+    // then
+    assertNull(fetchedValue);
 
   }
 
-  @Nested
-  class MultipleOverridingEnv {
+  @Test
+  void testFetchOfUpdatedSystemEnvironmentVariables() {
 
-    @BeforeEach
-    void setup() {
-      ENV.overload(new String[]{ "src/test/resources/envs/test.env", "src/test/resources/envs/destination-test.env" });
-    }
+    // given
+    Map.Entry<String, String> aSystemEnvironmentVariables = pickRandomSystemEnvironmentVariable();
+    String overridingValue = "OVERRIDING_VALUE";
 
-    @Test
-    void shouldFetchTheMatchingSystemEnvValue() {
-      String value = ENV.fetch(systemEnvironmentVariableName);
-      assertEquals(systemEnvironmentVariableValue, value);
-    }
+    // when
+    ENV.update( Map.of( aSystemEnvironmentVariables.getKey(), overridingValue) );
+    String fetchedValue = ENV.fetch(aSystemEnvironmentVariables.getKey());
 
-    @Test
-    void shouldFetchTheOverridingSystemValue() {
-      String value = ENV.fetch("Path");
-      assertNotEquals("OVERRIDING_VALUE", value);
-    }
+    // then
+    assertEquals(overridingValue, fetchedValue);
 
-    @Test
-    void shouldFetchNoValueIfDoesNotExistInAnyEnv() {
-      String value = ENV.fetch("UNKNOWN");
-      assertEquals(null, value);
-    }
+  }
 
-    @Test
-    void shouldLookupTheMatchingSystemEnvValue() {
-      String value = ENV.lookup(systemEnvironmentVariableName);
-      assertEquals(systemEnvironmentVariableValue, value);
-    }
+  @Test
+  void testVariablesDeleted() {
 
-    @Test
-    void shouldLookupTheOveridingValue() {
-      String value = ENV.lookup("Path");
-      assertNotEquals("OVERRIDING_VALUE", value);
-    }
+    // given
+    Map.Entry<String, String> aSystemEnvironmentVariables = pickRandomSystemEnvironmentVariable();
 
-    @Test
-    void shouldLookupKeyIfDoesNotExistInAnyEnv() {
-      String value = ENV.lookup("UNKNOWN");
-      assertEquals("UNKNOWN", value);
-    }
+    // when
+    ENV.delete(aSystemEnvironmentVariables.getKey());
+    String fetchedValue = ENV.fetch(aSystemEnvironmentVariables.getKey());
 
+    // then
+    assertNull(fetchedValue);
+
+  }
+
+  private Map.Entry<String, String> pickRandomSystemEnvironmentVariable() {
+    return System.getenv().entrySet().stream().findAny().orElseThrow();
   }
 
 }

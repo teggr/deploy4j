@@ -1,15 +1,15 @@
 package dev.deploy4j.env;
 
-import io.github.cdimascio.dotenv.Dotenv;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
-
+/**
+ * ENV provides access to environment variables. These are initially loaded from the system environment.
+ * <p/>
+ * You can also load environment variables
+ */
 public class ENV {
 
-  private final static List<Dotenv> envs = new ArrayList<>();
+  private static final Map<String, String> env = new HashMap<>();
 
   static {
     Dotenv dotenv = Dotenv
@@ -19,32 +19,24 @@ public class ENV {
     envs.add(dotenv);
   }
 
-  public static void overload(String... envFiles) {
-    envs.clear();
-    Stream.of(envFiles)
-      .forEach(envFile -> {
-        Dotenv dotenv = Dotenv.configure()
-          .filename(envFile)
-          .ignoreIfMissing()
-          .load();
-        envs.add(dotenv);
-      });
+  public static Map<String, String> toHash() {
+    return Map.copyOf( env );
+  }
+
+  public static void clear() {
+    env.clear();
+  }
+
+  public static void update(Map<String, String> newEnv) {
+    env.putAll( newEnv );
   }
 
   public static String fetch(String key) {
-    return envs.stream()
-      .map( env -> env.get(key) )
-      .filter(Objects::nonNull) // value will be null if not found
-      .reduce((first, second) -> second)
-      .orElse(null);
+    return env.get(key);
   }
 
-  public static String lookup(String key) {
-    return envs.stream()
-      .map( env -> env.get(key) )
-      .filter(Objects::nonNull) // value will be null if not found
-      .reduce((first, second) -> second)
-      .orElse(key);
+  public static void delete(String key) {
+    env.remove(key);
   }
 
 }

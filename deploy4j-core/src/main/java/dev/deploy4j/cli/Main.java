@@ -3,6 +3,8 @@ package dev.deploy4j.cli;
 import dev.deploy4j.Commander;
 import dev.deploy4j.Version;
 import dev.deploy4j.configuration.Role;
+import dev.deploy4j.env.ENV;
+import dev.deploy4j.erb.ERB;
 import dev.deploy4j.ssh.SshHost;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -10,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 
 public class Main {
@@ -174,6 +178,46 @@ public class Main {
   }
 
   /**
+   * Create .env by evaluating .env.thyme (or .env.staging.thyme -> .env.staging when using -d staging)
+   *
+   * @param skipPush Skip .env file push
+   * @param destination
+   */
+  public void envify(boolean skipPush, String destination) {
+
+      String envTemplatePath;
+      String envPath;
+    if(destination != null) {
+      envTemplatePath = ".env.%s.thyme".formatted(destination);
+      envPath = ".env.%s".formatted(destination);
+    } else {
+      envTemplatePath = ".env.thyme";
+      envPath = ".env";
+    }
+
+    File envTemplateFile = new File(envTemplatePath);
+    if(envTemplateFile.exists()) {
+      String content = cli.environment()
+        .withOriginalEnv(() -> new ERB( envTemplateFile ).result() );
+      try {
+        FileUtils.writeStringToFile( new File(envPath), content, StandardCharsets.UTF_8);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+
+      if(skipPush) {
+        cli.environment().reloadEnv();
+        cli.env().push();
+      }
+
+    } else {
+      System.out.println("Skipping envify (no "+ envTemplatePath +" exists)");
+    }
+
+  }
+
+
+  /**
    * Remove Traefik, app, accessories, and registry session from servers
    */
   public void remove() {
@@ -188,7 +232,6 @@ public class Main {
   public void version() {
     System.out.println( Version.VERSION );
   }
-
 
   private boolean containerAvailable(String version) {
 

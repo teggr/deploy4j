@@ -1,6 +1,6 @@
 package dev.deploy4j.configuration;
 
-import dev.deploy4j.raw.ServerConfig;
+import dev.deploy4j.raw.HostListConfig;
 import dev.deploy4j.raw.ServerRoleConfig;
 
 import java.util.List;
@@ -10,7 +10,7 @@ public class Servers {
 
   public static final String DEFAULT_ROLE_NAME = "web";
   private final Configuration config;
-  private final List<ServerConfig> serversConfig;
+  private final List<HostListConfig> serversConfig;
   private final Map<String, ServerRoleConfig> serverRolesConfig;
   private final List<Role> roles;
 

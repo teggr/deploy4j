@@ -17,7 +17,7 @@ public class Ssh {
   }
 
   public String user() {
-    return StringUtils.isNotBlank(sshConfig.user()) ? ENV.lookup( sshConfig.user() ) : "root";
+    return StringUtils.isNotBlank(sshConfig.user()) ? lookup( sshConfig.user() ) : "root";
   }
 
   public String port() {
@@ -25,15 +25,25 @@ public class Ssh {
   }
 
   public String privateKeyPath() {
-    return ENV.lookup( sshConfig.privateKey() );
+    return lookup( sshConfig.privateKey() );
   }
 
   public String passphrase() {
-    return ENV.lookup( sshConfig.privateKeyPassphrase() );
+    return lookup( sshConfig.privateKeyPassphrase() );
   }
 
   public boolean strictHostKeyChecking() {
     return sshConfig.strictHostChecking();
+  }
+
+  private String lookup(String key) {
+    // array of lookups or direct value
+    String fetched = ENV.fetch(key);
+    if(fetched == null) {
+      return key;
+    } else {
+      return fetched;
+    }
   }
 
 }

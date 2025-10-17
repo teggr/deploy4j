@@ -234,4 +234,13 @@ public class App extends BaseCommands {
       xargs(Cmd.cmd("docker", "container", "rm"))
     );
   }
+
+  public Cmd makeEnvDirectory() {
+    return makeDirectory( role.env(host).secretsDirectory() );
+  }
+
+  public Cmd makeDirectory(String path) {
+    return Cmd.cmd("mkdir", "-p", path);
+  }
+
 }

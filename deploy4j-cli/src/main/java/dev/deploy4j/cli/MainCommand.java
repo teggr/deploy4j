@@ -15,6 +15,7 @@ import picocli.CommandLine;
     MainCommand.AuditCommand.class,
     MainCommand.ConfigCommand.class,
     MainCommand.InitCommand.class,
+    MainCommand.EnvifyCommand.class,
     MainCommand.RemoveCommand.class,
     MainCommand.VersionCommand.class,
     // subcommands
@@ -168,6 +169,21 @@ public class MainCommand extends BaseCommand {
     @Override
     protected void execute(Cli cli) {
       cli.main().init(bundle);
+    }
+
+  }
+
+  @CommandLine.Command(
+    name = "envify",
+    description = "Create .env by evaluating .env.thyme (or .env.staging.thyme -> .env.staging when using -d staging)")
+  public static class EnvifyCommand extends BaseCommand {
+
+    @CommandLine.Option(names = "-P", description = "Skip .env file push", defaultValue = "false")
+    private boolean skipPush;
+
+    @Override
+    protected void execute(Cli cli) {
+      cli.main().envify(skipPush, destination);
     }
 
   }
