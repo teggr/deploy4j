@@ -12,11 +12,14 @@ public class ENV {
   private static final Map<String, String> env = new HashMap<>();
 
   static {
-    Dotenv dotenv = Dotenv
-      .configure()
-      .ignoreIfMissing()
-      .load();
-    envs.add(dotenv);
+
+    // load system envs first time
+    loadSystemEnv();
+
+  }
+
+  private static void loadSystemEnv() {
+    env.putAll( System.getenv() );
   }
 
   public static Map<String, String> toHash() {
