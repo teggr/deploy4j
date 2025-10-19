@@ -1,17 +1,65 @@
 package dev.deploy4j.raw;
 
-public record HealthCheckConfig(
-  String cmd,
-  String interval,
-  int maxAttempts,
-  String port,
-  String path
-) {
-  public HealthCheckConfig {
-    if (cmd == null || cmd.isBlank()) cmd = "curl -f http://localhost:8080/actuator/health";
-    if (interval == null || interval.isBlank()) interval = "10s";
-    if (maxAttempts <= 0) maxAttempts = 3;
-    if (port == null || port.isBlank()) port = "8080";
-    if (path == null || path.isBlank()) path = "/actuator/health";
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class HealthCheckConfig {
+
+  private final String cmd;
+  private final String interval;
+  private final int maxAttempts;
+  private final String port;
+  private final String path;
+  private final String cord;
+  private final Integer logLines;
+
+  @JsonCreator
+  public HealthCheckConfig(
+    @JsonProperty("cmd") String cmd,
+    @JsonProperty("interval") String interval,
+    @JsonProperty("max_attempts") int maxAttempts,
+    @JsonProperty("port") String port,
+    @JsonProperty("path") String path,
+    @JsonProperty("cord") String cord,
+    @JsonProperty("log_lines") Integer logLines
+  ) {
+    this.cmd = cmd;
+    this.interval = interval;
+    this.maxAttempts = maxAttempts;
+    this.port = port;
+    this.path = path;
+    this.cord = cord;
+    this.logLines = logLines;
   }
+
+  public String cmd() {
+    return cmd;
+  }
+
+  public String interval() {
+    return interval;
+  }
+
+  public int maxAttempts() {
+    return maxAttempts;
+  }
+
+  public String port() {
+    return port;
+  }
+
+  public String path() {
+    return path;
+  }
+
+  public String cord() {
+    return cord;
+  }
+
+  public Integer logLines() {
+    return logLines;
+  }
+
 }

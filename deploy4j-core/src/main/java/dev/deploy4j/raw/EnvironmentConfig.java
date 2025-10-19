@@ -1,14 +1,60 @@
 package dev.deploy4j.raw;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 import java.util.Map;
 
-public record EnvironmentConfig(
-  Map<String, String> clear,
-  List<String> secrets,
-  Map<String, EnvironmentConfig> tags,
-  @JsonAnySetter Map<String, String> additionalVariables // root level treated like additional properties
-) {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class EnvironmentConfig {
+
+  private final Map<String, String> map;
+  private final Map<String, String> clear;
+  private final List<String> secrets;
+  private final Map<String, EnvironmentConfig> tags;
+
+  @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+  public EnvironmentConfig(
+    @JsonProperty("clear") Map<String, String> clear,
+    @JsonProperty("secret") List<String> secret,
+    @JsonProperty("tags") Map<String, EnvironmentConfig> tags,
+    @JsonAnySetter Map<String, String> map
+  ) {
+    this.map = map;
+    this.clear = clear;
+    this.secrets = secret;
+    this.tags = tags;
+  }
+
+  public boolean isClearAndSecrets() {
+    return clear != null || secrets != null;
+  }
+
+  public boolean isAMap() {
+    return map != null;
+  }
+
+  public boolean isTags() {
+    return tags != null;
+  }
+
+  public Map<String, String> map() {
+    return map;
+  }
+
+  public Map<String, String> clear() {
+    return clear;
+  }
+
+  public List<String> secrets() {
+    return secrets;
+  }
+
+  public Map<String, EnvironmentConfig> tags() {
+    return tags;
+  }
+
 }

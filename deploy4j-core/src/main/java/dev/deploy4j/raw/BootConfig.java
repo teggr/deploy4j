@@ -1,0 +1,30 @@
+package dev.deploy4j.raw;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class BootConfig {
+
+  private final String limit;
+  private final String wait;
+
+  @JsonCreator
+  public BootConfig(
+    @JsonProperty("limit") String limit,
+    @JsonProperty("wait") String wait
+  ) {
+    this.limit = limit;
+    this.wait = wait;
+  }
+
+  public String limit() {
+    return limit;
+  }
+
+  public String waiter() {
+    return wait;
+  }
+
+}
