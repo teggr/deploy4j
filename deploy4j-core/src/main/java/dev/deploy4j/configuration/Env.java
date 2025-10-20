@@ -5,6 +5,7 @@ import dev.deploy4j.env.ENV;
 import dev.deploy4j.raw.EnvironmentConfig;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -24,15 +25,8 @@ public class Env {
   }
 
   public Env(EnvironmentConfig config, String secretsFile, String context) {
-    if( config == null ) {
-      this.clear = new HashMap<>();
-      this.secretsKeys = new ArrayList<>();
-    } else {
-      this.clear = config.clear() != null ?
-        config.clear() :
-        (config.secrets() != null || config.tags() != null) ? Map.of() : config.additionalVariables();
-      this.secretsKeys = config.secrets() != null ? config.secrets() : List.of();
-    }
+    this.clear = config.isAMap() ? config.map() : config.isClearAndSecrets() ? config.clear() : Map.of();
+    this.secretsKeys = config.secrets() != null ? config.secrets() : List.of();
     this.secretsFile = secretsFile;
     this.context = context;
     // TODO: context to be used with validation/error messages
@@ -61,7 +55,7 @@ public class Env {
   }
 
   public String secretsDirectory() {
-    return new File(secretsFile()).getParent();
+    return Paths.get(secretsFile()).getParent().toString();
   }
 
   public Env merge(Env other) {
@@ -84,6 +78,7 @@ public class Env {
       secretsFile() != null ? this.secretsFile() : other.secretsFile(),
       "env"
     );
+
   }
 
   // attributes

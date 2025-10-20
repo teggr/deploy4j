@@ -136,15 +136,25 @@ public class Role {
 
   private List<String> healthCheckArgs(boolean cord) {
 
-    if( runningTraefik() || ( healthcheck() != null && healthcheck().setPortOrPath() ) ) {
-      // cord / using cord
-      return optionize(Map.of(
-          "health-cmd", healthcheck().cmd(),
+    if( runningTraefik() || healthcheck().setPortOrPath() ) {
+      if( cord && usesCord() ) {
+        List<String> optionize = optionize(Map.of(
+          "health-cmd", healthCheckCmdWithCord(),
           "health-interval", healthcheck().interval()
-        )
-      );
+        ));
+        return Stream.concat(
+          optionize.stream(),
+          Stream.of( cordVolume().dockerArgs() )
+        ).toList();
+      } else {
+        return optionize(Map.of(
+            "health-cmd", healthcheck().cmd(),
+            "health-interval", healthcheck().interval()
+          )
+        );
+      }
     } else {
-    return emptyList();
+      return emptyList();
     }
 
   }
@@ -202,12 +212,10 @@ public class Role {
     return Deploy4jFile.join( cordVolume().hostPath(), CORD_FILE );
   }
 
-  public String cordContainerDirectory() {
-    // TODO: wjat
-    return null;
-//    return healthCheckOptions().cord() != null ?
-//      healthCheckOptions().cord() :  null;
-  }
+  // TODO: unused?
+//  public String cordContainerDirectory() {
+//    return  healthcheck().options().get("cord");
+//  }
 
   public String cordContainerFile() {
     return Deploy4jFile.join( cordVolume().containerPath(), CORD_FILE );

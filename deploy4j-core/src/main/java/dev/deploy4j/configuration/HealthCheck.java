@@ -74,4 +74,5 @@ public class HealthCheck {
   public HealthCheckConfig healthCheckConfig() {
     return healthCheckConfig;
   }
+
 }

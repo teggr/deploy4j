@@ -85,9 +85,14 @@ public class Ssh {
 //  }
 
   // private
-  public String logger() {
+
+  private String logger() {
     // TODO: LOGGER
     return null;
+  }
+
+  private String logLevel() {
+    return sshConfig().logLevel();
   }
 
   // attributes

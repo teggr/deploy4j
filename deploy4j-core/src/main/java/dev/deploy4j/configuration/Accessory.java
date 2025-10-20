@@ -4,10 +4,8 @@ import dev.deploy4j.file.Deploy4jFile;
 import dev.deploy4j.raw.AccessoryConfig;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Paths;
+import java.util.*;
 
 import static dev.deploy4j.Commands.argumentize;
 import static dev.deploy4j.Commands.optionize;
@@ -25,17 +23,18 @@ public class Accessory {
     this.config = config;
     this.accessoryConfig = config.rawConfig().accessories().get(name);
 
+    // TODO: validate
+
     this.env = new Env(
       accessoryConfig.env() != null ? accessoryConfig.env() : new dev.deploy4j.raw.EnvironmentConfig(),
-      Deploy4jFile.join( config.hostEnvDirectory(), "accessories", serviceName() + ".env" ),
+      Deploy4jFile.join(config.hostEnvDirectory(), "accessories", serviceName() + ".env"),
       "accessories/%s/env".formatted(name)
     );
   }
 
   public String serviceName() {
-    return accessoryConfig().service() != null ?
-      accessoryConfig().service() :
-      "%s-%s".formatted( config().service(), name() );
+    return Optional.ofNullable(accessoryConfig().service())
+      .orElseGet(() -> "%s-%s".formatted(config().service(), name()));
   }
 
   public String image() {
@@ -47,23 +46,30 @@ public class Accessory {
     if (hosts == null) {
       hosts = hostsFromHosts();
     }
-    if( hosts == null ) {
+    if (hosts == null) {
       hosts = hostsFromRoles();
     }
     return hosts;
   }
 
   public String port() {
-    String port = accessoryConfig().port();
-    if(port.contains(":")) {
-      return port;
-    } else {
-      return "%s:%s".formatted(port, port);
+    String port = accessoryConfig().port() != null ? accessoryConfig().port() : null;
+    if( port != null ) {
+      if (port.contains(":")) {
+        return port;
+      } else {
+        return "%s:%s".formatted(port, port);
+      }
     }
+    return null;
   }
 
   public String[] publishArgs() {
-    return argumentize("--publish", List.of(port()));
+    if(port() != null) {
+      return argumentize("--publish", port());
+    } else {
+      return new String[]{};
+    }
   }
 
   public Map<String, String> labels() {
@@ -83,19 +89,21 @@ public class Accessory {
 
   public Map<String, String> files() {
     List<String> files = accessoryConfig().files();
-    if(files == null) {
+    if (files == null) {
       return new HashMap<>();
     } else {
       return files.stream()
-        .map( localToRemoteMapping -> {
+        .map(localToRemoteMapping -> {
           return localToRemoteMapping.split(":");
-        } )
+        })
         .collect(
           HashMap::new,
-          (map, arr) -> { map.put(
-            expandLocalFile(arr[0]),
-            expandRemoteFile(arr[1])
-          ); },
+          (map, arr) -> {
+            map.put(
+              expandLocalFile(arr[0]),
+              expandRemoteFile(arr[1])
+            );
+          },
           HashMap::putAll
         );
 
@@ -104,25 +112,27 @@ public class Accessory {
 
   public Map<String, String> directories() {
     List<String> directories = accessoryConfig().directories();
-    if( directories == null ) {
+    if (directories == null) {
       return new HashMap<>();
     } else {
       return directories.stream()
-        .map( hostToContainerMapping -> {
+        .map(hostToContainerMapping -> {
           return hostToContainerMapping.split(":");
-        } )
+        })
         .collect(
           HashMap::new,
-          (map, arr) -> { map.put(
-            expandHostPath(arr[0]),
-            arr[1]
-          ); },
+          (map, arr) -> {
+            map.put(
+              expandHostPath(arr[0]),
+              arr[1]
+            );
+          },
           HashMap::putAll
         );
     }
   }
 
-  public  List<String> volumes() {
+  public List<String> volumes() {
     List<String> volumes = new ArrayList<>();
     volumes.addAll(specificVolumes());
     volumes.addAll(remoteFilesAsVolumes());
@@ -136,7 +146,7 @@ public class Accessory {
 
   public List<String> optionArgs() {
     Map<String, String> options = accessoryConfig().options();
-    if(options != null) {
+    if (options != null) {
       return optionize(options);
     } else {
       return List.of();
@@ -150,7 +160,7 @@ public class Accessory {
   // private
 
   private Map<String, String> defaultLabels() {
-    return Map.of( "service", serviceName() );
+    return Map.of("service", serviceName());
   }
 
   private String expandLocalFile(String localFile) {
@@ -171,7 +181,7 @@ public class Accessory {
 
   private List<String> remoteFilesAsVolumes() {
     List<String> files = accessoryConfig().files();
-    if( files == null ) {
+    if (files == null) {
       return new ArrayList<>();
     } else {
       return files.stream().map(localToRemoteMapping -> {
@@ -184,7 +194,7 @@ public class Accessory {
 
   private List<String> remoteDirectoriesAsVolumes() {
     List<String> directories = accessoryConfig().directories();
-    if( directories == null ) {
+    if (directories == null) {
       return new ArrayList<>();
     } else {
       return directories.stream().map(hostToContainerMapping -> {
@@ -197,16 +207,15 @@ public class Accessory {
   }
 
   private String expandHostPath(String hostPath) {
-    if(absolutePath(hostPath)) {
+    if (absolutePath(hostPath)) {
       return hostPath;
     } else {
-      File join = new File( serviceDataDirectory(), hostPath );
-      return join.getAbsolutePath();
+      return Deploy4jFile.join(serviceDataDirectory(), hostPath);
     }
   }
 
   public boolean absolutePath(String path) {
-    return new File(path).isAbsolute();
+    return Paths.get(path).isAbsolute();
   }
 
   private String serviceDataDirectory() {
@@ -223,7 +232,7 @@ public class Accessory {
 
   private List<String> hostsFromRoles() {
     return accessoryConfig().roles().stream()
-      .flatMap( role -> {
+      .flatMap(role -> {
         return config().role(role).hosts().stream();
       })
       .toList();

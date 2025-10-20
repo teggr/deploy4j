@@ -13,16 +13,18 @@ public class Tag {
     this.config = config;
   }
 
+  public Env env() {
+    return new Env(config);
+  }
+
+  // attributes
+
   public String name() {
     return name;
   }
 
   public EnvironmentConfig config() {
     return config;
-  }
-
-  public Env env() {
-    return new Env(config);
   }
 
 }

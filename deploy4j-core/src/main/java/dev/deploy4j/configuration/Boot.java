@@ -12,6 +12,7 @@ public class Boot {
       ? config.rawConfig().boot()
       : new dev.deploy4j.raw.BootConfig();
     this.hostCount = config.allHosts().size();
+    // TODO: validate
   }
 
   public Integer limit() {

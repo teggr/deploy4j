@@ -1,10 +1,8 @@
 package dev.deploy4j.configuration;
 
-import dev.deploy4j.raw.ServerConfig;
 import dev.deploy4j.raw.ServersConfig;
 
 import java.util.List;
-import java.util.Map;
 
 public class Servers {
 

@@ -76,8 +76,8 @@ public class Configuration {
     this.builder = new Builder(this);
     this.env = new Env(rawConfig.env());
 
-    this.healthcheck = new HealthCheck(rawConfig.healthCheck());
-    this.logging = new Logging(rawConfig.logging());
+    this.healthcheck = new HealthCheck(rawConfig.healthCheck(), null);
+    this.logging = new Logging(rawConfig.logging(), null);
     this.traefik = new Traefik(this);
     this.ssh = new Ssh(this);
 
