@@ -133,7 +133,7 @@ public abstract class Base {
     return git;
   }
 
-  protected Tags tags(List<Map<String,String>> details) {
+  protected Tags tags(Map<String,String> details) {
     return Tags.fromConfig(config(), details);
   }
 

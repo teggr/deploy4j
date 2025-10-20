@@ -1,18 +1,13 @@
 package dev.deploy4j.cli;
 
 import dev.deploy4j.Commander;
-import dev.deploy4j.ssh.SshHost;
 
 import java.util.List;
 
-public class Build {
-
-  private final Cli cli;
-  private final Commander commander;
+public class Build extends Base {
 
   public Build(Cli cli, Commander commander) {
-    this.cli = cli;
-    this.commander = commander;
+    super(cli, commander);
   }
 
   /**
@@ -20,16 +15,21 @@ public class Build {
    */
   public void pull() {
     // TODO: mirror hosts
-    pullOnHosts(commander.hosts());
+    pullOnHosts(commander().hosts());
   }
 
-  private void pullOnHosts(List<String> hosts) {
-    for (SshHost host : cli.on(hosts)) {
-      // auditor record
-      host.execute(commander.builder().clean());
-      host.execute(commander.builder().pull());
-      host.execute(commander.builder().validateImage());
+  // private
 
-    }
+  private void pullOnHosts(List<String> hosts) {
+
+    on(hosts, host -> {
+
+      host.execute(commander().auditor().record("Pulled image with version " + commander().config().version()));
+      host.execute(commander().builder().clean());
+      host.execute(commander().builder().pull());
+      host.execute(commander().builder().validateImage());
+
+    });
+
   }
 }

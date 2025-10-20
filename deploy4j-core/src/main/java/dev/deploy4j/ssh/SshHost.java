@@ -21,8 +21,8 @@ public class SshHost {
       hostName,
       ssh.user(),
       ssh.port(),
-      ssh.privateKeyPath(),
-      ssh.passphrase(),
+      ssh.keyPath(),
+      ssh.keyPassphrase(),
       ssh.strictHostKeyChecking()
     );
   }
@@ -59,7 +59,7 @@ public class SshHost {
       .execOutput();
   }
 
-  public void upload(String local, String remote) {
+  public void upload(String local, String remote, int mode) {
     sshTemplate.upload(local, remote);
   }
 }

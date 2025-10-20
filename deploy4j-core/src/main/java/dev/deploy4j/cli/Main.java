@@ -3,9 +3,7 @@ package dev.deploy4j.cli;
 import dev.deploy4j.Commander;
 import dev.deploy4j.Version;
 import dev.deploy4j.configuration.Role;
-import dev.deploy4j.env.ENV;
 import dev.deploy4j.erb.ERB;
-import dev.deploy4j.ssh.SshHost;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,16 +14,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 
-public class Main {
+public class Main extends Base {
 
   private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-  private final Cli cli;
-  private final Commander commander;
-
   public Main(Cli cli, Commander commander) {
-    this.cli = cli;
-    this.commander = commander;
+    super(cli, commander);
   }
 
   /**
@@ -35,12 +29,21 @@ public class Main {
    */
   public void setup(boolean skipPush) {
 
-      System.out.println("Ensure Docker is installed...");
-      cli.server().bootstrap();
+    withLock(() -> {
 
-      cli.accesssory().boot();
+      System.out.println("Ensure Docker is installed...");
+      cli().server().bootstrap();
+
+      System.out.println("Evaluate and push env files...");
+      cli().main().envify(false, null);
+      cli().env().push();
+
+      cli().accessory().boot("all", true);
 
       deploy(skipPush);
+
+    });
+
 
   }
 
@@ -52,23 +55,27 @@ public class Main {
   public void deploy(boolean skipPush) {
 
     System.out.println("Log into image registry...");
-    cli.registry().login();
+    cli().registry().login();
 
-    if(skipPush) {
+    if (skipPush) {
       System.out.println("Pull app image...");
-      cli.build().pull();
+      cli().build().pull();
     }
 
-    System.out.println("Ensure Traefik is running...");
-    cli.traefik().boot();
+    withLock(() -> {
 
-    System.out.println("Detect stale containers...");
-    cli.app().staleContainers();
+      System.out.println("Ensure Traefik is running...");
+      cli().traefik().boot();
 
-    cli.app().boot();
+      System.out.println("Detect stale containers...");
+      cli().app().staleContainers();
 
-    System.out.println("Prune old containers and images...");
-    cli.prune().all();
+      cli().app().boot();
+
+      System.out.println("Prune old containers and images...");
+      cli().prune().all();
+
+    });
 
   }
 
@@ -79,15 +86,20 @@ public class Main {
    */
   public void redeploy(boolean skipPush) {
 
-    if(skipPush) {
+    if (skipPush) {
       System.out.println("Pull app image...");
-      cli.build().pull();
+      cli().build().pull();
     }
 
-    System.out.println("Detect stale containers...");
-    cli.app().staleContainers();
+    withLock(() -> {
 
-    cli.app().boot();
+      System.out.println("Detect stale containers...");
+      cli().app().staleContainers();
+
+      cli().app().boot();
+
+    });
+
 
   }
 
@@ -96,18 +108,22 @@ public class Main {
    */
   public void rollback(String version) {
 
-    boolean rolledBack = false;
+    withLock(() -> {
 
-     commander.config().setVersion(version);
-     String oldVersion = null;
+      boolean rolledBack = false;
 
-     if(containerAvailable(version)) {
+      commander().config().version(version);
+      String oldVersion = null;
 
-       cli.app().boot();
-       rolledBack = true;
-     } else {
-       System.err.println("The app version '%s' is not available as a container (use 'deploy4j app containers' for available versions)".formatted( version ));
-     }
+      if (containerAvailable(version)) {
+
+        cli().app().boot();
+        rolledBack = true;
+      } else {
+        System.err.println("The app version '%s' is not available as a container (use 'deploy4j app containers' for available versions)".formatted(version));
+      }
+
+    });
 
   }
 
@@ -115,27 +131,29 @@ public class Main {
    * Show details about all containers
    */
   public void details() {
-    cli.traefik().details();
-    cli.app().details();
-    cli.accesssory().details("all");
+    cli().traefik().details();
+    cli().app().details();
+    cli().accessory().details("all");
   }
 
   /**
    * Show audit log from servers
    */
   public void audit() {
-    for( SshHost host : cli.on(commander.hosts()) ) {
-      System.out.println(host.capture(commander.auditor().reveal()));
-    }
+    on(commander().hosts(), host -> {
+      System.out.println(host.capture(commander().auditor().reveal()));
+    });
   }
 
   /**
    * Show combined config (including secrets!)
    */
   public void config() {
-    System.out.println(commander.config());
+    // TODO: run locallu
+    System.out.println(commander().config());
   }
 
+  // TODO: docs
 
   /**
    * Create config stub in config/deploy.yml and env stub in .env
@@ -143,7 +161,7 @@ public class Main {
   public void init(boolean bundle) {
 
     File deployFile = new File("config/deploy.yml");
-    if(deployFile.exists()) {
+    if (deployFile.exists()) {
       System.out.println("Config file already exists in config/deploy.yml (remove first to create a new one)");
     } else {
       deployFile.getParentFile().mkdirs();
@@ -159,7 +177,7 @@ public class Main {
     }
 
     deployFile = new File(".env");
-    if(!deployFile.exists()) {
+    if (!deployFile.exists()) {
       try {
         FileUtils.copyInputStreamToFile(
           getClass().getClassLoader().getResourceAsStream("templates/template.env"),
@@ -180,14 +198,14 @@ public class Main {
   /**
    * Create .env by evaluating .env.thyme (or .env.staging.thyme -> .env.staging when using -d staging)
    *
-   * @param skipPush Skip .env file push
+   * @param skipPush    Skip .env file push
    * @param destination
    */
   public void envify(boolean skipPush, String destination) {
 
-      String envTemplatePath;
-      String envPath;
-    if(destination != null) {
+    String envTemplatePath;
+    String envPath;
+    if (destination != null) {
       envTemplatePath = ".env.%s.thyme".formatted(destination);
       envPath = ".env.%s".formatted(destination);
     } else {
@@ -196,22 +214,22 @@ public class Main {
     }
 
     File envTemplateFile = new File(envTemplatePath);
-    if(envTemplateFile.exists()) {
-      String content = cli.environment()
-        .withOriginalEnv(() -> new ERB( envTemplateFile ).result() );
+    if (envTemplateFile.exists()) {
+      String content = cli().environment()
+        .withOriginalEnv(() -> new ERB(envTemplateFile).result());
       try {
-        FileUtils.writeStringToFile( new File(envPath), content, StandardCharsets.UTF_8);
+        FileUtils.writeStringToFile(new File(envPath), content, StandardCharsets.UTF_8);
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
 
-      if(skipPush) {
-        cli.environment().reloadEnv();
-        cli.env().push();
+      if (skipPush) {
+        cli().environment().reloadEnv();
+        cli().env().push();
       }
 
     } else {
-      System.out.println("Skipping envify (no "+ envTemplatePath +" exists)");
+      System.out.println("Skipping envify (no " + envTemplatePath + " exists)");
     }
 
   }
@@ -222,37 +240,44 @@ public class Main {
    */
   public void remove() {
 
-    cli.traefik().remove();
-    cli.app().remove();
-    cli.accesssory().remove("all");
-    cli.registry().logout();
+    withLock(() -> {
+
+      cli().traefik().remove();
+      cli().app().remove();
+      cli().accessory().remove("all");
+      cli().registry().logout();
+
+    });
 
   }
 
   public void version() {
-    System.out.println( Version.VERSION );
+    System.out.println(Version.VERSION);
   }
+
+  // private
 
   private boolean containerAvailable(String version) {
 
     try {
 
-      for (SshHost host : cli.on(commander.hosts())) {
+      on(commander().hosts(), host -> {
 
-        for (Role role : commander.rolesOn(host.hostName())) {
+        for (Role role : commander().rolesOn(host.hostName())) {
 
-          String containerId = host.capture(commander.app(role, host.hostName()).containerIdForVersion(version));
+          String containerId = host.capture(commander().app(role, host.hostName()).containerIdForVersion(version));
           if (containerId == null) {
             throw new RuntimeException("Container not found");
           }
 
         }
 
-      }
+
+      });
 
     } catch (RuntimeException e) {
-      if( e.getMessage().equalsIgnoreCase( "Container not found" ) ) {
-        System.err.println("Error looking for container version %s: %s".formatted( version, e.getMessage() ));
+      if (e.getMessage().equalsIgnoreCase("Container not found")) {
+        System.err.println("Error looking for container version %s: %s".formatted(version, e.getMessage()));
         return false;
       } else {
         throw e;
@@ -260,6 +285,13 @@ public class Main {
     }
 
     return true;
+  }
+
+  private Map<String, String> deployOptions() {
+    return Map.of(
+      "version", commander().config().version()
+    );
+    // TODO: merge with options
   }
 
 }

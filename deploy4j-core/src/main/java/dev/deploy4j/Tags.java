@@ -14,7 +14,7 @@ public class Tags {
 
   public static Tags fromConfig(Configuration config, Map<String, String> extra) {
     Map<String, String> merged = new HashMap<>(defaultTags(config));
-    merged.putAll(extra);
+    if (extra != null) merged.putAll(extra);
     return new Tags(merged);
   }
 

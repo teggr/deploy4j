@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SshConfig {
 
@@ -14,10 +12,9 @@ public class SshConfig {
   private final String proxy;
   private final String proxyCommand;
   private final String logLevel;
-  private final Boolean keysOnly;
-  private final List<String> keys;
-  private final List<String> keyData;
-  private final List<PlainValueOrSecretKey> keyPassphrase;
+  private final String keyPath;
+  private final PlainValueOrSecretKey keyPassphrase;
+  private final Boolean strictHostKeyChecking;
 
   @JsonCreator
   public SshConfig(
@@ -26,20 +23,18 @@ public class SshConfig {
     @JsonProperty("proxy") String proxy,
     @JsonProperty("proxy_command") String proxyCommand,
     @JsonProperty("log_level") String logLevel,
-    @JsonProperty("keys_only") Boolean keysOnly,
-    @JsonProperty("keys") List<String> keys,
-    @JsonProperty("key_data") List<String> keyData,
-    @JsonProperty("key_passphrases") List<PlainValueOrSecretKey> keyPassphrase
+    @JsonProperty("key_path") String keyPath,
+    @JsonProperty("key_passphrase") PlainValueOrSecretKey keyPassphrase,
+    @JsonProperty("strict_host_key_checking") Boolean strictHostKeyChecking
   ) {
     this.user = user;
     this.port = port;
     this.proxy = proxy;
     this.proxyCommand = proxyCommand;
     this.logLevel = logLevel;
-    this.keysOnly = keysOnly;
-    this.keys = keys;
-    this.keyData = keyData;
+    this.keyPath = keyPath;
     this.keyPassphrase = keyPassphrase;
+    this.strictHostKeyChecking = strictHostKeyChecking;
   }
 
   public SshConfig() {
@@ -48,10 +43,9 @@ public class SshConfig {
     this.proxy = null;
     this.proxyCommand = null;
     this.logLevel = null;
-    this.keysOnly = null;
-    this.keys = null;
-    this.keyData = null;
+    this.keyPath = null;
     this.keyPassphrase = null;
+    this.strictHostKeyChecking = null;
   }
 
   public String user() {
@@ -74,20 +68,16 @@ public class SshConfig {
     return logLevel;
   }
 
-  public Boolean keysOnly() {
-    return keysOnly;
+  public String keyPath() {
+    return keyPath;
   }
 
-  public List<String> keys() {
-    return keys;
-  }
-
-  public List<String> keyData() {
-    return keyData;
-  }
-
-  public List<PlainValueOrSecretKey> keyPassphrase() {
+  public PlainValueOrSecretKey keyPassphrase() {
     return keyPassphrase;
+  }
+
+  public Boolean strictHostKeyChecking() {
+    return strictHostKeyChecking;
   }
 
 }

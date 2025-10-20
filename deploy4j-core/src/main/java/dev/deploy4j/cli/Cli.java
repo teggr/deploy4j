@@ -2,9 +2,6 @@ package dev.deploy4j.cli;
 
 import dev.deploy4j.Commander;
 import dev.deploy4j.Environment;
-import dev.deploy4j.ssh.SshHost;
-
-import java.util.List;
 
 public class Cli {
 
@@ -16,16 +13,14 @@ public class Cli {
   private final Traefik traefik;
   private final App app;
   private final Prune prune;
-  private final Accessory accesssory;
+  private final Accessory accessory;
 
-  private final Commander commander;
   private final Lock lock;
   private final Env env;
 
   public Cli(Environment environment, Commander commander) {
 
     this.environment = environment;
-    this.commander = commander;
 
     this.main = new Main(this, commander);
     this.server = new Server(this, commander);
@@ -35,7 +30,7 @@ public class Cli {
     this.traefik = new Traefik(this, commander);
     this.app = new App(this, commander);
     this.prune = new Prune(this, commander);
-    this.accesssory = new Accessory(this, commander);
+    this.accessory = new Accessory(this, commander);
 
     this.lock = new Lock(this, commander);
     this.env = new Env(this,commander);
@@ -78,19 +73,12 @@ public class Cli {
     return prune;
   }
 
-  public Accessory accesssory() {
-    return accesssory;
-  }
-
-  public List<SshHost> on(List<String> hosts) {
-
-    return hosts.stream()
-      .map(h -> commander.host( h ) )
-      .toList();
-
+  public Accessory accessory() {
+    return accessory;
   }
 
   public Lock lock() {
     return lock;
   }
+
 }

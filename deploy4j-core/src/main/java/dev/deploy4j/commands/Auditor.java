@@ -5,15 +5,13 @@ import dev.deploy4j.Tags;
 import dev.deploy4j.configuration.Configuration;
 import dev.deploy4j.file.Deploy4jFile;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static dev.deploy4j.Commands.append;
-
-public class Auditor extends Base{
+public class Auditor extends Base {
 
   private final Map<String, String> details;
 
@@ -22,12 +20,16 @@ public class Auditor extends Base{
     this.details = details;
   }
 
+  public Cmd record(String line) {
+    return record(line, null);
+  }
+
   public Cmd record(String line, Map<String, String> details) {
     return append(
       Cmd.cmd("echo")
         .args(auditTags(details).except("version", "service_version", "service").toTagString())
         .args(line),
-      Cmd.cmd( auditLogFile() )
+      Cmd.cmd(auditLogFile())
     );
   }
 
@@ -39,16 +41,19 @@ public class Auditor extends Base{
 
   private String auditLogFile() {
     String file = Stream.of(
-      config.service(),
-      config.destination(),
-      "audit.log"
-    ).filter(Objects::nonNull)
+        config.service(),
+        config.destination(),
+        "audit.log"
+      ).filter(Objects::nonNull)
       .collect(Collectors.joining("-"));
-    return Deploy4jFile.join( config.runDirectory() , file );
+    return Deploy4jFile.join(config.runDirectory(), file);
   }
 
   private Tags auditTags(Map<String, String> details) {
-    return tags(List.of(details(), details));
+    Map<String, String> merged = new HashMap<>();
+    if (details() != null) merged.putAll(details());
+    if (details != null) merged.putAll(details);
+    return tags(merged);
   }
 
   // attributes
@@ -56,7 +61,6 @@ public class Auditor extends Base{
   public Map<String, String> details() {
     return details;
   }
-
 
 
 }

@@ -1,24 +1,25 @@
 package dev.deploy4j.cli;
 
 import dev.deploy4j.Commander;
-import dev.deploy4j.ssh.SshHost;
 
-public class Prune {
-
-  private final Cli cli;
-  private final Commander commander;
+public class Prune extends Base {
 
   public Prune(Cli cli, Commander commander) {
-    this.cli = cli;
-    this.commander = commander;
+    super(cli, commander);
   }
 
   /**
    * Prune unused images and stopped containers
    */
   public void all() {
-    containers();
-    images();
+
+    withLock(() -> {
+
+      containers();
+      images();
+
+    });
+
   }
 
   /**
@@ -26,11 +27,18 @@ public class Prune {
    */
   public void images() {
 
-    for (SshHost host : cli.on( commander.hosts() ) ) {
-      host.execute( commander.auditor().record("Pruned images") );
-      host.execute( commander.prune().danglingImages() );
-      host.execute( commander.prune().taggedImages() );
-    }
+    withLock(() -> {
+
+      on(commander().hosts(), host -> {
+
+        host.execute(commander().auditor().record("Pruned images"));
+        host.execute(commander().prune().danglingImages());
+        host.execute(commander().prune().taggedImages());
+
+
+      });
+
+    });
 
   }
 
@@ -43,21 +51,28 @@ public class Prune {
    *
    * @param retain Number of containers to retain
    */
-  public void containers( Integer retain ) {
+  public void containers(Integer retain) {
 
-    if(retain == null) {
-      retain =  commander.config().retainContainer();
+    if (retain == null) {
+      retain = commander().config().retainContainer();
     }
+    Integer finalRetain = retain;
 
-    if(retain < 1) {
+    if (finalRetain < 1) {
       throw new RuntimeException("retain must be at least 1");
     }
 
-    for (SshHost host : cli.on( commander.hosts() ) ) {
-      host.execute( commander.auditor().record("Pruned containers") );
-      host.execute( commander.prune().appContainers(retain) );
-      host.execute( commander.prune().healthcheckContainers() );
-    }
+    withLock(() -> {
+
+      on(commander().hosts(), host -> {
+
+        host.execute(commander().auditor().record("Pruned containers"));
+        host.execute(commander().prune().appContainers(finalRetain));
+        host.execute(commander().prune().healthcheckContainers());
+
+      });
+
+    });
 
   }
 }

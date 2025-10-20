@@ -1,12 +1,10 @@
 package dev.deploy4j;
 
 import org.junit.jupiter.api.Test;
-import java.util.Map;
-import java.io.StringReader;
-import java.io.BufferedReader;
-import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EnvFileTest {
 

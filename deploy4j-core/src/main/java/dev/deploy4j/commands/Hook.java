@@ -12,7 +12,7 @@ public class Hook extends Base {
     super(config);
   }
 
-  public List<?> run(String hook, List<Map<String, String>> details) {
+  public List<?> run(String hook, Map<String, String> details) {
     return List.of( hookFile(hook), tags(details).env() );
   }
 

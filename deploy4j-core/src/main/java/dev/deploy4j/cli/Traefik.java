@@ -1,22 +1,15 @@
 package dev.deploy4j.cli;
 
 import dev.deploy4j.Commander;
-import dev.deploy4j.ssh.SshHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
-public class Traefik {
+public class Traefik extends Base {
 
   private static final Logger log = LoggerFactory.getLogger(Traefik.class);
 
-  private final Cli cli;
-  private final Commander commander;
-
   public Traefik(Cli cli, Commander commander) {
-    this.cli = cli;
-    this.commander = commander;
+    super(cli, commander);
   }
 
   /**
@@ -24,14 +17,20 @@ public class Traefik {
    */
   public void boot() {
 
-    for(SshHost host : cli.on( commander.traefikHosts() ) ) {
+    withLock(() -> {
 
-      host.execute( commander.registry().login() );
-      host.execute( commander.traefik().startOrRun() );
+      on(commander().traefikHosts(), host -> {
 
-    }
+        host.execute(commander().registry().login());
+        host.execute(commander().traefik().startOrRun());
+
+      });
+
+    });
+
 
   }
+
 
   /**
    * Reboot Traefik on servers (stop container, remove container, start new container)
@@ -40,18 +39,19 @@ public class Traefik {
    */
   public void reboot(boolean rolling) {
 
-    // TODO: seq vs parallel
-    List<String> hosts = rolling ? commander.traefikHosts() : commander.traefikHosts();
+    withLock(() -> {
 
-    for(SshHost host : cli.on( hosts ) ) {
+      on(commander().traefikHosts(), host -> {
 
-      host.execute( commander.auditor().record( "Rebooted traefik" ) );
-      host.execute( commander.registry().login() );
-      host.execute( commander.traefik().stop() );
-      host.execute( commander.traefik().removeContainer() );
-      host.execute( commander.traefik().run() );
+        host.execute(commander().auditor().record("Rebooted traefik"));
+        host.execute(commander().registry().login());
+        host.execute(commander().traefik().stop());
+        host.execute(commander().traefik().removeContainer());
+        host.execute(commander().traefik().run());
 
-    }
+      });
+
+    });
 
   }
 
@@ -60,12 +60,17 @@ public class Traefik {
    */
   public void start() {
 
-    for(SshHost host : cli.on( commander.traefikHosts() ) ) {
+    withLock(() -> {
 
-      host.execute( commander.auditor().record( "Started traefik" ) );
-      host.execute( commander.traefik().start() );
+      on(commander().traefikHosts(), host -> {
 
-    }
+        host.execute(commander().auditor().record("Started traefik"));
+        host.execute(commander().traefik().start());
+
+
+      });
+
+    });
 
   }
 
@@ -74,12 +79,17 @@ public class Traefik {
    */
   public void stop() {
 
-    for(SshHost host : cli.on( commander.traefikHosts() ) ) {
+    withLock(() -> {
 
-      host.execute( commander.auditor().record( "Stopped traefik" ) );
-      host.execute( commander.traefik().stop() );
+      on(commander().traefikHosts(), host -> {
 
-    }
+        host.execute(commander().auditor().record("Stopped traefik"));
+        host.execute(commander().traefik().stop());
+
+
+      });
+
+    });
 
   }
 
@@ -88,8 +98,12 @@ public class Traefik {
    */
   public void restart() {
 
-    stop();
-    start();
+    withLock(() -> {
+
+      stop();
+      start();
+
+    });
 
   }
 
@@ -98,22 +112,22 @@ public class Traefik {
    */
   public void details() {
 
-    for( SshHost host : cli.on( commander.traefikHosts() ) ) {
+    on(commander().traefikHosts(), host -> {
 
-      System.out.println( host.capture( commander.traefik().info() ) );
+      System.out.println(host.capture(commander().traefik().info()));
 
-    }
+    });
 
   }
 
   /**
    * Show log lines from Traefik on servers
    *
-   * @param since Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)
-   * @param lines Number of log lines to pull from each server
-   * @param grep Show lines with grep match only (use this to fetch specific requests by id)
+   * @param since       Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)
+   * @param lines       Number of log lines to pull from each server
+   * @param grep        Show lines with grep match only (use this to fetch specific requests by id)
    * @param grepOptions Additional options supplied to grep
-   * @param follow Follow logs on primary server (or specific host set by --hosts)
+   * @param follow      Follow logs on primary server (or specific host set by --hosts)
    */
   public void logs(
     String since,
@@ -124,17 +138,17 @@ public class Traefik {
   ) {
 
     // TODO: follow
-    if(lines != null || ( since != null || grep != null )) {
+//    if (lines != null || (since != null || grep != null)) {
+//
+//    } else {
+//      lines = 100;
+//    }
 
-    } else {
-      lines = 100;
-    }
+    on(commander().traefikHosts(), host -> {
 
-    for (SshHost host : cli.on( commander.traefikHosts() ) ) {
+      System.out.println(host.capture(commander().traefik().logs(since, lines != null ? lines.toString() : null, grep, grepOptions)));
 
-      System.out.println( host.capture( commander.traefik().logs( since, lines != null ? lines.toString() : null, grep, grepOptions ) ) );
-
-    }
+    });
 
   }
 
@@ -143,9 +157,13 @@ public class Traefik {
    */
   public void remove() {
 
-    stop();
-    removeContainer();
-    removeImage();
+    withLock(() -> {
+
+      stop();
+      removeContainer();
+      removeImage();
+
+    });
 
   }
 
@@ -155,12 +173,16 @@ public class Traefik {
    */
   public void removeContainer() {
 
-    for(SshHost host : cli.on( commander.traefikHosts() ) ) {
+    withLock(() -> {
 
-      host.execute( commander.auditor().record("Removed traefik container") );
-      host.execute( commander.traefik().removeContainer() );
+      on(commander().traefikHosts(), host -> {
 
-    }
+        host.execute(commander().auditor().record("Removed traefik container"));
+        host.execute(commander().traefik().removeContainer());
+
+      });
+
+    });
 
   }
 
@@ -169,12 +191,16 @@ public class Traefik {
    */
   public void removeImage() {
 
-    for (SshHost host : cli.on( commander.traefikHosts() ) ) {
+    withLock(() -> {
 
-      host.execute( commander.auditor().record("Removed traefik image") );
-      host.execute( commander.traefik().removeImage() );
+      on(commander().traefikHosts(), host -> {
 
-    }
+        host.execute(commander().auditor().record("Removed traefik image"));
+        host.execute(commander().traefik().removeImage());
+
+      });
+
+    });
 
   }
 

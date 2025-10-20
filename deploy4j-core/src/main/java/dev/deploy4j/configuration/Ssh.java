@@ -1,6 +1,9 @@
 package dev.deploy4j.configuration;
 
+import dev.deploy4j.env.ENV;
+import dev.deploy4j.raw.PlainValueOrSecretKey;
 import dev.deploy4j.raw.SshConfig;
+import org.apache.commons.io.output.ClosedOutputStream;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,16 +32,16 @@ public class Ssh {
     return sshConfig().proxy();
   }
 
-  public Boolean keysOnly() {
-    return sshConfig().keysOnly();
+  public String keyPath() {
+    return sshConfig().keyPath();
   }
 
-  public List<String> keys() {
-    return sshConfig().keys();
+  public String keyPassphrase() {
+    return lookup( sshConfig().keyPassphrase() );
   }
 
-  public List<String> keyData() {
-    return sshConfig().keyData();
+  public Boolean strictHostKeyChecking() {
+    return sshConfig().strictHostKeyChecking();
   }
 
   public Map<String, String> options() {
@@ -52,39 +55,17 @@ public class Ssh {
     // TODO: proxy
     options.put("keepalive", "true");
     options.put("keepalive_interval", "30");
-    if (keysOnly() != null) {
-      options.put("keys_only", keysOnly().toString());
-    }
-    if (keys() != null) {
-      options.put("keys", keys().toString());
-    }
-    if (keyData() != null) {
-      options.put("key_data", keyData().toString());
-    }
+//    if (keysOnly() != null) {
+//      options.put("keys_only", keysOnly().toString());
+//    }
+//    if (keys() != null) {
+//      options.put("keys", keys().toString());
+//    }
+//    if (keyData() != null) {
+//      options.put("key_data", keyData().toString());
+//    }
     return options;
   }
-
-//  public String privateKeyPath() {
-//    return lookup(sshConfig.privateKey());
-//  }
-//
-//  public String passphrase() {
-//    return lookup(sshConfig.privateKeyPassphrase());
-//  }
-//
-//  public boolean strictHostKeyChecking() {
-//    return sshConfig.strictHostChecking();
-//  }
-//
-//  private String lookup(String key) {
-//    // array of lookups or direct value
-//    String fetched = ENV.fetch(key);
-//    if (fetched == null) {
-//      return key;
-//    } else {
-//      return fetched;
-//    }
-//  }
 
   // private
 
@@ -95,6 +76,14 @@ public class Ssh {
 
   private String logLevel() {
     return sshConfig().logLevel();
+  }
+
+  private String lookup(PlainValueOrSecretKey key) {
+    if (key.isKey()) {
+      return ENV.fetch(key.key());
+    } else {
+      return key.value();
+    }
   }
 
   // attributes

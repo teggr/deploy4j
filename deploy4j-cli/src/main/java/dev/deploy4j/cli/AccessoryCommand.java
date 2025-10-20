@@ -35,7 +35,7 @@ public class AccessoryCommand {
 
     @Override
     protected void execute(Cli cli) {
-      cli.accesssory().boot(name, login);
+      cli.accessory().boot(name, login);
     }
 
   }
@@ -52,7 +52,7 @@ public class AccessoryCommand {
 
     @Override
     protected void execute(Cli cli) {
-      cli.accesssory().upload(name);
+      cli.accessory().upload(name);
     }
 
   }
@@ -69,7 +69,7 @@ public class AccessoryCommand {
 
     @Override
     protected void execute(Cli cli) {
-      cli.accesssory().directories(name);
+      cli.accessory().directories(name);
     }
 
   }
@@ -86,7 +86,7 @@ public class AccessoryCommand {
 
     @Override
     protected void execute(Cli cli) {
-      cli.accesssory().reboot(name);
+      cli.accessory().reboot(name);
     }
 
   }
@@ -103,7 +103,7 @@ public class AccessoryCommand {
 
     @Override
     protected void execute(Cli cli) {
-      cli.accesssory().start(name);
+      cli.accessory().start(name);
     }
 
   }
@@ -120,7 +120,7 @@ public class AccessoryCommand {
 
     @Override
     protected void execute(Cli cli) {
-      cli.accesssory().stop(name);
+      cli.accessory().stop(name);
     }
 
   }
@@ -137,7 +137,7 @@ public class AccessoryCommand {
 
     @Override
     protected void execute(Cli cli) {
-      cli.accesssory().restart(name);
+      cli.accessory().restart(name);
     }
 
   }
@@ -154,7 +154,7 @@ public class AccessoryCommand {
 
     @Override
     protected void execute(Cli cli) {
-      cli.accesssory().details(name);
+      cli.accessory().details(name);
     }
 
   }
@@ -178,7 +178,7 @@ public class AccessoryCommand {
 
     @Override
     protected void execute(Cli cli) {
-      cli.accesssory().exec(interactive, reuse, name, cmd);
+      cli.accessory().exec(interactive, reuse, name, cmd);
     }
 
   }
@@ -229,7 +229,7 @@ public class AccessoryCommand {
     @Override
     protected void execute(Cli cli) {
       // TODO: confirmation
-      cli.accesssory().remove(name);
+      cli.accessory().remove(name);
     }
 
   }
@@ -246,7 +246,7 @@ public class AccessoryCommand {
 
     @Override
     protected void execute(Cli cli) {
-      cli.accesssory().removeContainer(name);
+      cli.accessory().removeContainer(name);
     }
 
   }
@@ -263,7 +263,7 @@ public class AccessoryCommand {
 
     @Override
     protected void execute(Cli cli) {
-      cli.accesssory().removeImage(name);
+      cli.accessory().removeImage(name);
     }
 
   }
@@ -280,7 +280,7 @@ public class AccessoryCommand {
 
     @Override
     protected void execute(Cli cli) {
-      cli.accesssory().removeServiceDirectory(name);
+      cli.accessory().removeServiceDirectory(name);
     }
 
   }

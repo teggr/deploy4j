@@ -2,45 +2,58 @@ package dev.deploy4j.cli.app;
 
 import dev.deploy4j.Commander;
 import dev.deploy4j.RandomHex;
+import dev.deploy4j.cli.healthcheck.Barrier;
+import dev.deploy4j.cli.healthcheck.Poller;
 import dev.deploy4j.commands.App;
-import dev.deploy4j.configuration.Configuration;
+import dev.deploy4j.commands.Auditor;
 import dev.deploy4j.configuration.Role;
 import dev.deploy4j.ssh.SshHost;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Boot {
 
-  private final Configuration config;
-  private final SshHost host;
-  private final Role role;
-  private final String version;
-  private final App app;
+  private static final Logger log = LoggerFactory.getLogger(Boot.class);
 
-  public Boot(Commander commander, Configuration config, SshHost host, Role role, String version) {
-    this.config = config;
+  private final String host;
+  private final Role role;
+  private final SshHost sshHost;
+  private final String version;
+  private final Barrier barrier;
+  private final Commander commander;
+  private App app;
+
+  public Boot(String host, Role role, SshHost sshHost, String version, Barrier barrier, Commander commander) {
     this.host = host;
     this.role = role;
+    this.sshHost = sshHost;
     this.version = version;
-
-    this.app = commander.app(role, host.hostName());
-
+    this.barrier = barrier;
+    this.commander = commander;
   }
 
   public void run() {
 
-    // boot -> host, role, self, version, barrier
-    // Kamal::Cli::App::Boot.new(host, role, self, version, barrier).run
     String oldVersion = oldVersionRenamedIfClashing();
 
-    // wait_at_barrier
+    if (queuer()) {
+      waitAtBarrier();
+    }
 
     // start_new_version
     try {
       startNewVersion();
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (RuntimeException e) {
+      if (gatekeeper()) {
+        closeBarrier();
+      }
       stopNewVersion();
       throw e;
+    }
+
+    if (gatekeeper()) {
+      releaseBarrier();
     }
 
     // release barrier
@@ -50,22 +63,31 @@ public class Boot {
 
   }
 
-  private void stopOldVersion(String version) {
+  // private
 
-    // cord///
-    host.execute(app.stop(version));
+  private String oldVersionRenamedIfClashing() {
+    String containerIdForVersion = sshHost().capture(app().containerIdForVersion(version()));
+    if (StringUtils.isNotBlank(containerIdForVersion)) {
+      String renamedVersion = version() + "_replaced_" + RandomHex.randomHex(8);
+      log.info( "Renaming container {} to {} as already deployed on {}", version(), renamedVersion, host() );
+      audit("Renaming container " + version() + " to " + renamedVersion);
+      sshHost().execute(app().renameContainer(version, renamedVersion));
+    }
 
-    // app clean up assets
-
+    return sshHost().capture(app().currentRunningVersion());
   }
 
-  private void stopNewVersion() {
-    host.execute(app.stop(version));
-  }
 
   private void startNewVersion() {
+
+    audit("Booted app version " + version());
+
+    if(usesCord()) {
+      sshHost().execute( app().tieCord( role().cordHostFile() ) );
+    }
+
     // 1. Convert to string & truncate to 51 chars
-    String prefix = host.hostName().length() > 51 ? host.hostName().substring(0, 51) : host.hostName();
+    String prefix = host().length() > 51 ? host().substring(0, 51) : host();
 
     // 2. Remove trailing dots
     prefix = prefix.replaceAll("\\.+$", "");
@@ -75,21 +97,125 @@ public class Boot {
 
     String hostName = prefix + "-" + suffix;
 
-    host.execute(app.run(hostName));
+    sshHost().execute(app().run(hostName));
 
-    // poller
+    new Poller(commander).waitForHealthy(true, () -> sshHost().capture( app().status(version()) ) );
 
   }
 
-  private String oldVersionRenamedIfClashing() {
-    String containerIdForVersion = host.capture(app.containerIdForVersion(version));
-    if (StringUtils.isNotBlank(containerIdForVersion)) {
-      String renamedVersion = version + "_replaced_" + RandomHex.randomHex(8);
-      host.execute(app.renameContainer(version, renamedVersion));
+  private void stopNewVersion() {
+    sshHost().execute(app().stop(version()));
+  }
+
+  private void stopOldVersion(String version) {
+
+    if(usesCord()) {
+      String cord = sshHost().capture(app().cord(version));
+      if(StringUtils.isNotBlank(cord)) {
+        sshHost().execute( app().cutCord(cord) );
+        new Poller(commander).waitForUnhealthy(true, () -> sshHost().capture( app().status(version()) ) );
+      }
     }
 
-    // TODO: not yet returning the renamed version
-    return host.capture(app.currentRunningVersion());
+    sshHost().execute(app().stop(version));
+
+    if(assets()) {
+      sshHost().execute(app().cleanUpAssets());
+    }
+
+  }
+
+  private void releaseBarrier() {
+    if (barrier().open()) {
+      log.info("First " + commander.primaryRole() + " container is healthy on " + host + ", booting any other roles");
+    }
+  }
+
+  private void waitAtBarrier() {
+
+    try {
+      log.info("Waiting for the first healthy " + commander.primaryRole() + " container before booting " + role() + " on " + host + "...");
+      barrier().waitFor();
+      log.info("First " + commander.primaryRole() + " container is healthy, booting " + role() + " on " + host + "...");
+    } catch (RuntimeException e) {
+      log.info("First " + commander.primaryRole() + " container is unhealthy, not booting " + role() + " on " + host + "...");
+      throw e;
+    }
+
+  }
+
+  private void closeBarrier() {
+
+    if (barrier().close()) {
+
+      log.info("First " + commander.primaryRole() + " container is unhealthy on " + host + ", not booting any other roles");
+      log.error(sshHost.capture(app().logs(version(), null, null, null, null)));
+      log.error(sshHost.capture(app().containerHealthLog(version())));
+    }
+
+  }
+
+  private boolean barrierRole() {
+    return role() == commander.primaryRole();
+  }
+
+  private App app() {
+    if (app == null) {
+      app = commander.app(role(), host());
+    }
+    return app;
+  }
+
+  private Auditor auditor() {
+    return commander.auditor();
+  }
+
+  private void audit(String message) {
+    sshHost().execute( auditor().record(message) );
+  }
+
+  private boolean gatekeeper() {
+    return barrier() != null && barrierRole();
+  }
+
+  public boolean queuer() {
+    return barrier() != null && !barrierRole();
+  }
+
+  // attributes
+
+  public String host() {
+    return host;
+  }
+
+  public Role role() {
+    return role;
+  }
+
+  public String version() {
+    return version;
+  }
+
+  public Barrier barrier() {
+    return barrier;
+  }
+
+  public SshHost sshHost() {
+    return sshHost;
+  }
+
+  // delegates
+
+  public boolean usesCord() {
+    return role().usesCord();
+  }
+
+  public boolean assets() {
+    return role().assets();
+  }
+
+  public boolean runningTraefik() {
+    return role().runningTraefik();
   }
 
 }

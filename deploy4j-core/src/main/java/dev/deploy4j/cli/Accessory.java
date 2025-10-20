@@ -2,30 +2,25 @@ package dev.deploy4j.cli;
 
 import dev.deploy4j.Cmd;
 import dev.deploy4j.Commander;
-import dev.deploy4j.configuration.Role;
-import dev.deploy4j.ssh.SshHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
-public class Accessory {
+public class Accessory extends Base {
 
   private static final Logger log = LoggerFactory.getLogger(Accessory.class);
 
-
-  private record AccessoryHosts(dev.deploy4j.configuration.Accessory accessory, List<String> hosts) {}
-
-  private final Cli cli;
-  private final Commander commander;
-
   public Accessory(Cli cli, Commander commander) {
-    this.cli = cli;
-    this.commander = commander;
+    super(cli, commander);
   }
 
+  /**
+   * Boot new accessory service on host (use NAME=all to boot all accessories)
+   */
   public void boot() {
 
     boot(null, true);
@@ -35,34 +30,40 @@ public class Accessory {
   /**
    * Boot new accessory service on host
    *
-   * @param name (use NAME=all to boot all accessories)
+   * @param name  (use NAME=all to boot all accessories)
    * @param login
    */
   public void boot(String name, boolean login) {
 
-    if( "all".equalsIgnoreCase( name ) ) {
+    withLock(() -> {
 
-      commander.accessoryNames()
-        .forEach(  accessoryName -> boot(accessoryName, login) );
+      if ("all".equalsIgnoreCase(name)) {
 
-    } else {
+        commander().accessoryNames()
+          .forEach(accessoryName -> boot(accessoryName, login));
 
-      AccessoryHosts accessoryHosts = withAccessory(name);
+      } else {
 
-      directories(name);
-      upload(name);
+        withAccessory(name, (accessory, hosts) -> {
 
-      for(SshHost host : cli.on(accessoryHosts.hosts()) ) {
+          directories(name);
+          upload(name);
 
-        if(login) {
-          host.execute(commander.registry().login());
-        }
-        // *KAMAL.auditor.record("Booted #{name} accessory"), verbosity: :debug
-        host.execute(accessoryHosts.accessory().run());
+          on(hosts, host -> {
+
+            if (login) {
+              host.execute(commander().registry().login());
+            }
+            host.execute(commander().auditor().record("Booted " + name + " accessory"));
+            host.execute(accessory.run());
+
+          });
+
+        });
 
       }
 
-    }
+    });
 
   }
 
@@ -70,30 +71,51 @@ public class Accessory {
    * Upload accessory files to host
    */
   public void upload(String name) {
-    AccessoryHosts accessoryHosts = withAccessory(name);
-    for(SshHost host : cli.on(accessoryHosts.hosts()) ) {
-      accessoryHosts.accessory().files().forEach((local, remote) -> {
-        accessoryHosts.accessory().ensureLocalFilePresent(local);
 
-        host.execute( cli.accesssory().makeDirectoryFor(remote) );
-        host.upload( local, remote );
-        host.execute( Cmd.cmd("chmod", "755", remote ) );
+    withLock(() -> {
+
+      withAccessory(name, (accessory, hosts) -> {
+
+        on(hosts, host -> {
+
+          accessory.files().forEach((local, remote) -> {
+            accessory.ensureLocalFilePresent(local);
+
+            host.execute(accessory.makeDirectoryFor(remote));
+            host.upload(local, remote, 0);
+            host.execute(Cmd.cmd("chmod", "755", remote));
+
+          });
+
+        });
 
       });
-    }
-  }
 
+    });
+
+  }
 
   /**
    * Create accessory directories on host
    */
   public void directories(String name) {
-    AccessoryHosts accessoryHosts = withAccessory(name);
-    for(SshHost host : cli.on(accessoryHosts.hosts()) ) {
-      for( String hostPath : accessoryHosts.accessory().directories().keySet() ) {
-        host.execute(accessoryHosts.accessory().makeDirectory(hostPath));
-      }
-    }
+
+    withLock(() -> {
+
+      withAccessory(name, (accessory, hosts) -> {
+
+        on(hosts, host -> {
+
+          for (String hostPath : accessory.directories().keySet()) {
+            host.execute(accessory.makeDirectory(hostPath));
+          }
+
+        });
+
+      });
+
+    });
+
   }
 
   /**
@@ -101,60 +123,76 @@ public class Accessory {
    */
   public void reboot(String name) {
 
-    if( "all".equalsIgnoreCase( name ) ) {
+    withLock(() -> {
 
-      commander.accessoryNames()
-        .forEach(  accessoryName -> reboot(accessoryName) );
+      if ("all".equalsIgnoreCase(name)) {
 
-    } else {
+        commander().accessoryNames()
+          .forEach(accessoryName -> reboot(accessoryName));
 
-      AccessoryHosts accessoryHosts = withAccessory(name);
+      } else {
 
-      for(SshHost host : cli.on(accessoryHosts.hosts()) ) {
+        withAccessory(name, (accessory, hosts) -> {
 
-        host.execute(commander.registry().login() );
+          on(hosts, host -> {
+
+            host.execute(commander().registry().login());
+
+          });
+
+        });
+
+        stop(name);
+        removeContainer(name);
+        boot(name, false);
 
       }
 
-      stop(name);
-      removeContainer(name);
-      boot(name, false);
-
-    }
+    });
 
   }
-
 
   /**
    * Start existing accessory container on host
    */
   public void start(String name) {
 
-    AccessoryHosts accessoryHosts = withAccessory(name);
+    withLock(() -> {
 
-    for(SshHost host : cli.on(accessoryHosts.hosts()) ) {
+      withAccessory(name, (accessory, hosts) -> {
 
-      host.execute(commander.auditor().record("Started " + name + " accessory"));
-      host.execute(accessoryHosts.accessory().start());
+        on(hosts, host -> {
 
-    }
+          host.execute(commander().auditor().record("Started " + name + " accessory"));
+          host.execute(accessory.start());
+
+        });
+
+      });
+
+    });
 
   }
-
 
   /**
    * Stop existing accessory container on host
    */
   public void stop(String name) {
 
-    AccessoryHosts accessoryHosts = withAccessory(name);
+    withLock(() -> {
 
-    for(SshHost host : cli.on(accessoryHosts.hosts()) ) {
+      withAccessory(name, (accessory, hosts) -> {
 
-      host.execute(commander.auditor().record("Stopped " + name + " accessory"));
-      host.execute(accessoryHosts.accessory().stop());
+        on(hosts, host -> {
 
-    }
+          host.execute(commander().auditor().record("Stopped " + name + " accessory"));
+          host.execute(accessory.stop());
+
+        });
+
+      });
+
+    });
 
   }
 
@@ -163,10 +201,16 @@ public class Accessory {
    */
   public void restart(String name) {
 
-    AccessoryHosts accessoryHosts = withAccessory(name);
+    withLock(() -> {
 
-    stop(name);
-    start(name);
+      withAccessory(name, (accessory, hosts) -> {
+
+        stop(name);
+        start(name);
+
+      });
+
+    });
 
   }
 
@@ -175,21 +219,24 @@ public class Accessory {
    */
   public void details(String name) {
 
-    if( "all".equalsIgnoreCase( name ) ) {
+    if ("all".equalsIgnoreCase(name)) {
 
-      commander.accessoryNames()
-        .forEach(  accessoryName -> details(accessoryName) );
+      commander().accessoryNames()
+        .forEach(accessoryName -> details(accessoryName));
 
     } else {
 
       String type = "Accessory " + name;
-      AccessoryHosts accessoryHosts = withAccessory(name);
 
-      for(SshHost host : cli.on(accessoryHosts.hosts()) ) {
+      withAccessory(type, (accessory, hosts) -> {
 
-        System.out.println( host.capture( accessoryHosts.accessory().info() ) );
+        on(hosts, host -> {
 
-      }
+          System.out.println(host.capture(accessory.info()));
+
+        });
+
+      });
 
     }
 
@@ -199,7 +246,7 @@ public class Accessory {
    * Execute a custom command on servers (use --help to show options)
    *
    * @param interactive Execute command over ssh for an interactive shell (use for console/bash)
-   * @param reuse Reuse currently running container instead of starting a new one
+   * @param reuse       Reuse currently running container instead of starting a new one
    * @param name
    * @param cmd
    */
@@ -207,27 +254,28 @@ public class Accessory {
 
     // TODO: interactive and not reuse
 
-    AccessoryHosts accessoryHosts = withAccessory(name);
+    withAccessory(name, (accessory, hosts) -> {
 
+      System.out.println("Launching command from existing container...");
+      on(hosts, host -> {
 
-    System.out.println( "Launching command from existing container..." );
-    for (SshHost host : cli.on( accessoryHosts.hosts() ) ) {
+        host.execute(commander().auditor().record("Executed cmd '" + cmd + "' on " + name + " accessory"));
+        host.capture(accessory.executeInExistingContainer(cmd));
 
-     host.execute( commander.auditor().record( "Executed cmd '" + cmd + "' on "+name+" accessory" ) );
-     host.capture( accessoryHosts.accessory().executeInExistingContainer( cmd ) );
+      });
 
-    }
+    });
 
   }
 
   /**
    * Show log lines from accessory on host (use --help to show options)
    *
-   * @param since Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)
-   * @param lines Number of log lines to pull from each server
-   * @param grep Show lines with grep match only (use this to fetch specific requests by id)
+   * @param since       Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)
+   * @param lines       Number of log lines to pull from each server
+   * @param grep        Show lines with grep match only (use this to fetch specific requests by id)
    * @param grepOptions Additional options supplied to grep
-   * @param follow Follow logs on primary server (or specific host set by --hosts)
+   * @param follow      Follow logs on primary server (or specific host set by --hosts)
    */
   public void logs(
     String since,
@@ -238,20 +286,23 @@ public class Accessory {
     String name
   ) {
 
-    AccessoryHosts accessoryHosts = withAccessory(name);
+    withAccessory(name, (accessory, hosts) -> {
 
-    // TODO: follow
-    if(lines != null || ( since != null || grep != null )) {
+//      // TODO: follow
+//      if (lines != null || (since != null || grep != null)) {
+//
+//      } else {
+//        lines = 100;
+//      }
+//
+//      Integer finalLines = lines;
+      on(hosts, host -> {
 
-    } else {
-      lines = 100;
-    }
+        System.out.println(host.capture(accessory.logs(since, lines != null ? lines.toString() : null, grep, grepOptions)));
 
-    for (SshHost host : cli.on( accessoryHosts.hosts() ) ) {
+      });
 
-        System.out.println(host.capture(accessoryHosts.accessory().logs(since, lines != null ? lines.toString() : null, grep, grepOptions)));
-
-    }
+    });
 
   }
 
@@ -260,16 +311,20 @@ public class Accessory {
    */
   public void remove(String name) {
 
-    if( "all".equalsIgnoreCase( name ) ) {
+    withLock(() -> {
 
-      commander.accessoryNames()
-        .forEach(  accessoryName -> remove(accessoryName) );
+      if ("all".equalsIgnoreCase(name)) {
 
-    } else {
+        commander().accessoryNames()
+          .forEach(accessoryName -> remove(accessoryName));
 
-      removeAccessory(name);
+      } else {
 
-    }
+        removeAccessory(name);
+
+      }
+
+    });
 
   }
 
@@ -279,14 +334,20 @@ public class Accessory {
    */
   public void removeContainer(String name) {
 
-    AccessoryHosts accessoryHosts = withAccessory(name);
+    withLock(() -> {
 
-    for(SshHost host : cli.on(accessoryHosts.hosts()) ) {
+      withAccessory(name, (accessory, hosts) -> {
 
-      host.execute(commander.auditor().record("Remove " + name + " accessory container"));
-      host.execute(accessoryHosts.accessory().removeContainer());
+        on(hosts, host -> {
 
-    }
+          host.execute(commander().auditor().record("Remove " + name + " accessory container"));
+          host.execute(accessory.removeContainer());
+
+        });
+
+      });
+
+    });
 
   }
 
@@ -296,74 +357,81 @@ public class Accessory {
    */
   public void removeImage(String name) {
 
-    AccessoryHosts accessoryHosts = withAccessory(name);
+    withLock(() -> {
 
-    for(SshHost host : cli.on(accessoryHosts.hosts()) ) {
+      withAccessory(name, (accessory, hosts) -> {
 
-      host.execute(commander.auditor().record("Removed " + name + " accessory image"));
-      host.execute(accessoryHosts.accessory().removeImage());
+        on(hosts, host -> {
 
-    }
+          host.execute(commander().auditor().record("Removed " + name + " accessory image"));
+          host.execute(accessory.removeImage());
+
+        });
+
+      });
+
+    });
 
   }
-
 
   /**
    * Remove accessory directory used for uploaded files and data directories from host
    */
   public void removeServiceDirectory(String name) {
 
-    AccessoryHosts accessoryHosts = withAccessory(name);
+    withLock(() -> {
 
-    for(SshHost host : cli.on(accessoryHosts.hosts()) ) {
+      withAccessory(name, (accessory, hosts) -> {
 
-      host.execute(commander.auditor().record("Removed " + name + " accessory image"));
-      host.execute(accessoryHosts.accessory().removeServiceDirectory());
+        on(hosts, host -> {
 
-    }
+          host.execute(accessory.removeServiceDirectory());
 
-  }
+        });
 
-  private void removeAccessory(String name) {
+      });
 
-    AccessoryHosts accessoryHosts = withAccessory(name);
-    stop(name);
-    removeContainer(name);
-    removeImage(name);
-    removeServiceDirectory(name);
+    });
 
   }
 
-  private Cmd makeDirectoryFor(String remoteFile) {
-    return makeDirectory( new File(remoteFile).getParent() );
-  }
+  // private
 
-  private Cmd makeDirectory(String path) {
-    return Cmd.cmd("mkdir", "-p", path );
-  }
-
-  private AccessoryHosts withAccessory(String name) {
-    dev.deploy4j.configuration.Accessory accessory = commander.config().accessory(name);
-    if( accessory != null ) {
-      return new AccessoryHosts(accessory, accessoryHosts(accessory) );
+  private void withAccessory(String name, BiConsumer<dev.deploy4j.commands.Accessory, List<String>> block) {
+    if (commander().config().accessory(name) != null) {
+      dev.deploy4j.commands.Accessory accessory = commander().accessory(name);
+      block.accept(accessory, accessoryHosts(accessory));
     } else {
       errorOnMissingAccessory(name);
-      return null;
     }
   }
 
-  private List<String> accessoryHosts(dev.deploy4j.configuration.Accessory accessory) {
-    if( !commander.specificHosts().isEmpty() ) {
-      List<String> intersection = new ArrayList<>( commander.specificHosts() );
-      intersection.retainAll( accessory.hosts() );
+  private void errorOnMissingAccessory(String name) {
+    List<String> options = commander().accessoryNames();
+    throw new RuntimeException("No accessory by the name of '" + name + "'" + (options != null ? " (options:" + options.stream().collect(Collectors.joining(",")) + ")" : ""));
+  }
+
+  private List<String> accessoryHosts(dev.deploy4j.commands.Accessory accessory) {
+    if (!commander().specificHosts().isEmpty()) {
+      List<String> intersection = new ArrayList<>(commander().specificHosts());
+      intersection.retainAll(accessory.hosts());
       return intersection;
     } else {
       return accessory.hosts();
     }
   }
 
-  private void errorOnMissingAccessory(String name) {
-    throw new RuntimeException( "No accessory by the name of '" + name + "'" );
+  private void removeAccessory(String name) {
+
+    withAccessory(name, (accessory, hosts) -> {
+
+      stop(name);
+      removeContainer(name);
+      removeImage(name);
+      removeServiceDirectory(name);
+
+    });
+
   }
 
 }

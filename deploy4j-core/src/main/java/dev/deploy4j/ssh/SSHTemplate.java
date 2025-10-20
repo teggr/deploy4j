@@ -18,14 +18,14 @@ public class SSHTemplate {
 
   private final String host;
   private final String username;
-  private final String port;
+  private final Integer port;
   private final String privateKey;
   private final String privateKeyPassphrase;
   private final boolean strictHostChecking;
 
   private Session session;
 
-  public SSHTemplate(String host, String username, String port, String privateKey, String privateKeyPassphrase, boolean strictHostChecking) {
+  public SSHTemplate(String host, String username, Integer port, String privateKey, String privateKeyPassphrase, boolean strictHostChecking) {
     this.host = host;
     this.username = username;
     this.port = port;
@@ -44,7 +44,7 @@ public class SSHTemplate {
       jsch.addIdentity(privateKey, privateKeyPassphrase);
 
       // create a session
-      session = jsch.getSession(username, host, Integer.parseInt(port));
+      session = jsch.getSession(username, host, port);
       if (!strictHostChecking) {
         session.setConfig("StrictHostKeyChecking", "no");
       }

@@ -124,8 +124,12 @@ public class Commander implements AutoCloseable {
     return new dev.deploy4j.commands.Accessory(config, name);
   }
 
-  public Auditor auditor() { // TODO: details parameters
-    return new Auditor(config());
+  public Auditor auditor() {
+    return auditor(null);
+  }
+
+  public Auditor auditor(Map<String, String> details) {
+    return new Auditor(config(), details);
   }
 
   public Builder builder() {
@@ -198,6 +202,10 @@ public class Commander implements AutoCloseable {
     return holdingLock;
   }
 
+  public void holdingLock(boolean holdingLock) {
+    this.holdingLock = holdingLock;
+  }
+
   public boolean connected() {
     return connected;
   }
@@ -251,11 +259,6 @@ public class Commander implements AutoCloseable {
     // shutdown
     sshHosts.values().forEach(SshHost::close);
 
-  }
-
-
-  public Boot boot(SshHost host, Role role, String version) {
-    return new Boot(this, config, host, role, version); // barrier?
   }
 
   public SshHost host(String host) {

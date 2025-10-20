@@ -9,16 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Server {
+public class Server extends Base {
 
   private static final Logger log = LoggerFactory.getLogger(Server.class);
 
-  private final Cli cli;
-  private final Commander commander;
-
   public Server(Cli cli, Commander commander) {
-    this.cli = cli;
-    this.commander = commander;
+    super(cli, commander);
   }
 
   /**
@@ -29,16 +25,18 @@ public class Server {
   public void exec(boolean interactive, String cmd) {
 
     List<String> hosts = new ArrayList<>();
-    hosts.addAll(commander.hosts());
-    hosts.addAll(commander.accessoryHosts());
+    hosts.addAll(commander().hosts());
+    hosts.addAll(commander().accessoryHosts());
 
     // TODO: interactive mode
     System.out.println( "Running '"+cmd+"' on " + String.join(",", hosts) +  "..." );
 
-    for(SshHost host : cli.on(hosts)) {
-      host.execute( commander.auditor().record( "Executed cmd '" + cmd + "' on " + host.hostName() ) );
+    on(hosts, host -> {
+
+      host.execute( commander().auditor().record( "Executed cmd '" + cmd + "' on " + host.hostName() ) );
       System.out.println( host.capture( cmd ) );
-    }
+
+    });
 
   }
 
@@ -47,32 +45,36 @@ public class Server {
    */
   public void bootstrap() {
 
-    List<SshHost> missing = new ArrayList<>();
+    withLock(() -> {
 
-    List<String> hosts = new ArrayList<>();
-    hosts.addAll(commander.hosts());
-    hosts.addAll(commander.accessoryHosts());
+      List<SshHost> missing = new ArrayList<>();
 
-    for (SshHost host : cli.on(hosts)) {
+      List<String> hosts = new ArrayList<>();
+      hosts.addAll(commander().hosts());
+      hosts.addAll(commander().accessoryHosts());
 
-      if (!host.execute( commander.docker().installed() ) ) {
-        if (host.execute( commander.docker().superUser() ) ) {
-          log.info("Missing Docker on {}. Installing...", host.hostName());
-          host.execute( commander.docker().install() );
-        } else {
-          missing.add(host);
+      on(hosts, host -> {
+
+        if (!host.execute( commander().docker().installed() ) ) {
+          if (host.execute( commander().docker().superUser() ) ) {
+            log.info("Missing Docker on {}. Installing...", host.hostName());
+            host.execute( commander().docker().install() );
+          } else {
+            missing.add(host);
+          }
         }
+
+        host.execute( commander().server().ensureRunDirectory() );
+
+      });
+
+      if (!missing.isEmpty()) {
+        throw new RuntimeException("Docker is not installed on %s and can't be automatically installed without having root access and either `wget` or `curl`. Install Docker manually: https://docs.docker.com/engine/install/".formatted(missing.stream()
+          .map(SshHost::hostName)
+          .collect(Collectors.joining(", "))));
       }
 
-      host.execute( commander.server().ensureRunDirectory() );
-
-    }
-
-    if (!missing.isEmpty()) {
-      throw new RuntimeException("Docker is not installed on %s and can't be automatically installed without having root access and either `wget` or `curl`. Install Docker manually: https://docs.docker.com/engine/install/".formatted(missing.stream()
-        .map(SshHost::hostName)
-        .collect(Collectors.joining(", "))));
-    }
+    });
 
   }
 

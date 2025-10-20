@@ -49,10 +49,6 @@ public class Specifics {
     });
   }
 
-  public String primaryHost() {
-    return primaryHost;
-  }
-
   public List<Role> rolesOn(String host) {
     return roles().stream().filter(role ->
       {
@@ -61,26 +57,16 @@ public class Specifics {
     ).toList();
   }
 
-
-  public List<Role> roles() {
-    return roles;
+  public List<String> traefikHosts() {
+    return config.traefikHosts(); // specifiedHosts
   }
-
-  public List<String> hosts() {
-    return hosts;
-  }
-
-  // traefik and accesssory hosts
-
 
   public List<String> accessoryHosts() {
     // config.accessories.flat_map(&:hosts) & specified_hosts
     return List.of();
   }
 
-  public List<String> traefikHosts() {
-    return config.traefikHosts(); // specifiedHosts
-  }
+  // private
 
   private Role primarySpecificRole() {
     if (specificRoles != null) {
@@ -139,4 +125,33 @@ public class Specifics {
       .toList() );
   }
 
+  // attributes
+
+  public String primaryHost() {
+    return primaryHost;
+  }
+
+  public Role primaryRole() {
+    return primaryRole;
+  }
+
+  public List<Role> roles() {
+    return roles;
+  }
+
+  public List<String> hosts() {
+    return hosts;
+  }
+
+  private Configuration config() {
+    return config;
+  }
+
+  private List<String> specificHosts() {
+    return specificHosts;
+  }
+
+  private List<Role> specificRoles() {
+    return specificRoles;
+  }
 }
