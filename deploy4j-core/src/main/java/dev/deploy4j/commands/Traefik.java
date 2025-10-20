@@ -46,7 +46,7 @@ public class Traefik {
   }
 
   private String[] envArgs() {
-    return config.traefik().env().args();
+    return null; // config.traefik().env().args();
   }
 
   private String[] publishArgs() {

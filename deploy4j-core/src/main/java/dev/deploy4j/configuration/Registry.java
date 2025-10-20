@@ -1,6 +1,7 @@
 package dev.deploy4j.configuration;
 
 import dev.deploy4j.env.ENV;
+import dev.deploy4j.raw.PlainValueOrSecretKey;
 import dev.deploy4j.raw.RegistryConfig;
 
 public class Registry {
@@ -8,29 +9,36 @@ public class Registry {
   private final RegistryConfig registryConfig;
 
   public Registry(Configuration config) {
-    this.registryConfig = config.rawConfig().registry();
+    this.registryConfig = config.rawConfig().registry() != null
+      ? config.rawConfig().registry()
+      : new RegistryConfig();
   }
 
   public String server() {
-    return registryConfig.server();
+    return registryConfig().server();
   }
 
   public String username() {
-    return lookup( registryConfig.username() );
+    return lookup(registryConfig.username());
   }
 
   public String password() {
-    return lookup( registryConfig.password() );
+    return lookup(registryConfig.password());
   }
 
-  private String lookup(String key) {
-    // array of lookups or direct value
-    String fetched = ENV.fetch(key);
-    if(fetched == null) {
-      return key;
+  // private
+
+  private String lookup(PlainValueOrSecretKey key) {
+    if (key.isKey()) {
+      return ENV.fetch(key.key());
     } else {
-      return fetched;
+      return key.value();
     }
   }
 
+  // attributes
+
+  public RegistryConfig registryConfig() {
+    return registryConfig;
+  }
 }

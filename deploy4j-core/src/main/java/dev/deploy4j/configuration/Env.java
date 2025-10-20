@@ -16,6 +16,7 @@ public class Env {
   private Map<String, String> clear;
   private String secretsFile;
   private String context;
+
   private Map<String, String> secrets;
 
   public Env(EnvironmentConfig config) {
@@ -40,8 +41,8 @@ public class Env {
   public List<String> args() {
     List<String> args = new ArrayList<>();
     args.add("--env-file");
-    args.add(secretsFile);
-    args.addAll(Stream.of(argumentize("--env", this.clear)).toList());
+    args.add(secretsFile());
+    args.addAll(Stream.of(argumentize("--env", clear())).toList());
     return args;
   }
 
@@ -60,16 +61,16 @@ public class Env {
   }
 
   public String secretsDirectory() {
-    return new File(secretsFile).getParent();
+    return new File(secretsFile()).getParent();
   }
 
   public Env merge(Env other) {
 
-    Map<String, String> mergedClear = new HashMap<>(clear);
-    mergedClear.putAll(other.clear);
+    Map<String, String> mergedClear = new HashMap<>(clear());
+    mergedClear.putAll(other.clear());
 
-    Set<String> mergedSecrets = new HashSet<>(secretsKeys);
-    mergedSecrets.addAll(other.secretsKeys);
+    Set<String> mergedSecrets = new HashSet<>(secretsKeys());
+    mergedSecrets.addAll(other.secretsKeys());
 
     EnvironmentConfig config = new EnvironmentConfig(
       mergedClear,
@@ -79,10 +80,27 @@ public class Env {
     );
 
     return new Env(
-      config,
-      secretsFile != null ? this.secretsFile : other.secretsFile,
+      null, //config,
+      secretsFile() != null ? this.secretsFile() : other.secretsFile(),
       "env"
     );
   }
 
+  // attributes
+
+  public List<String> secretsKeys() {
+    return secretsKeys;
+  }
+
+  public Map<String, String> clear() {
+    return clear;
+  }
+
+  public String secretsFile() {
+    return secretsFile;
+  }
+
+  public String context() {
+    return context;
+  }
 }

@@ -21,6 +21,12 @@ public class RegistryConfig {
     this.password = password;
   }
 
+  public RegistryConfig() {
+    this.server = null;
+    this.username = null;
+    this.password = null;
+  }
+
   public String server() {
     return server;
   }

@@ -1,8 +1,11 @@
 package dev.deploy4j.configuration;
 
+import dev.deploy4j.configuration.env.Tag;
 import dev.deploy4j.file.Deploy4jFile;
-import dev.deploy4j.raw.HostListConfig;
-import dev.deploy4j.raw.ServerRoleConfig;
+import dev.deploy4j.raw.CustomRoleConfig;
+import dev.deploy4j.raw.EnvironmentConfig;
+import dev.deploy4j.raw.RoleConfig;
+import dev.deploy4j.raw.ServerConfig;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,107 +15,119 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static dev.deploy4j.Commands.argumentize;
+import static dev.deploy4j.Commands.optionize;
 import static java.util.Collections.emptyList;
 
 public class Role {
+
+  private static final String CORD_FILE = "cord";
+
   private final String name;
   private final Configuration config;
   private final Env specializedEnv;
+  private final Logging specializedLogging;
+  private final HealthCheck specializedHealthCheck;
+  private Logging logging;
+  private Map<String, Env> envs;
+  private HealthCheck healthCheck;
+  private Volume cordVolume;
 
   public Role(String name, Configuration config) {
     this.name = name;
     this.config = config;
 
+    // TODO: validate
+
     this.specializedEnv = new Env(
-      specializations() != null ? specializations().env() : null,
-      Deploy4jFile.join(config.hostEnvDirectory(), "roles", containerPrefix() + ".env"),
-      "servers/%s/env".formatted(name)
+      specializations().env() != null ? specializations().env() : new EnvironmentConfig(),
+      Deploy4jFile.join(config().hostEnvDirectory(), "roles", containerPrefix() + ".env"),
+      "servers/%s/env".formatted(name())
     );
 
-    // TODO: validate roleName
+    this.specializedLogging = new Logging(
+      specializations().logging() != null ? specializations().logging() : new dev.deploy4j.raw.LoggingConfig(),
+      "servers/%s/logging".formatted(name)
+    );
 
-    // TODO: specialized roles
+    this.specializedHealthCheck = new HealthCheck(
+      specializations().healthcheck() != null ? specializations().healthcheck() : new dev.deploy4j.raw.HealthCheckConfig(),
+      "servers/%s/healthcheck".formatted(name)
+    );
 
-  }
-
-  private ServerRoleConfig specializations() {
-    if( config.rawConfig().servers() != null && !config.rawConfig().servers().isEmpty() ) {
-      return null;
-    }
-    return config.rawConfig().serverRoles().get( name );
-  }
-
-  public String name() {
-    return name;
-  }
-
-  public List<String> hosts() {
-    return taggedHosts().keySet().stream().toList();
-  }
-
-  public boolean runningTraefik() {
-    // if !role.traefik then is primary?
-    // else return traefik
-    return isPrimary();
-  }
-
-  private boolean isPrimary() {
-    return this.equals(config.primaryRole());
-  }
-
-  public List<Tag> envTags(String host) {
-    return taggedHosts().getOrDefault(host, emptyList())
-      .stream()
-      .flatMap(tag -> config.envTag(tag).stream())
-      .toList();
-  }
-
-  private Map<String, List<String>> taggedHosts() {
-    Map<String, List<String>> taggedHosts = extractHostsFromConfig()
-      .stream()
-      .collect(Collectors.toMap(
-        HostListConfig::host,
-        hostConfig -> hostConfig.tags() != null ? hostConfig.tags() : emptyList()
-      ));
-    return taggedHosts;
-
-  }
-
-  private List<HostListConfig> extractHostsFromConfig() {
-    if (!config.rawConfig().servers().isEmpty()) {
-      return config.rawConfig().servers();
-    } else {
-      ServerRoleConfig servers = config.rawConfig().serverRoles().get(name);
-      return List.of(servers.hostListConfig());
-    }
-  }
-
-  public String containerPrefix() {
-    return Stream.of(
-        config.service(),
-        name,
-        config.destination()
-      ).filter(Objects::nonNull)
-      .collect(Collectors.joining("-"));
   }
 
   public String primaryHost() {
     return hosts().get(0);
   }
 
+  public List<String> hosts() {
+    return taggedHosts().keySet().stream().toList();
+  }
 
-  public String[] envArgs(String host) {
-    return env(host).args();
+  public List<dev.deploy4j.configuration.env.Tag> envTags(String host) {
+    return taggedHosts().getOrDefault(host, emptyList())
+      .stream()
+      .flatMap(tag -> config().envTag(tag).stream())
+      .toList();
+  }
+
+  public String cmd() {
+    return specializations().cmd();
+  }
+
+  public List<String> optionArgs() {
+    if (specializations().options() != null) {
+      return optionize(specializations().options());
+    } else {
+      return List.of();
+    }
+  }
+
+  public Map<String, String> labels() {
+    Map<String, String> labels = new HashMap<>();
+    labels.putAll(defaultLabels());
+    labels.putAll(traefikLabels());
+    labels.putAll(customLabels());
+    return labels;
+  }
+
+  public String[] labelArgs() {
+    return argumentize("--label", labels());
+  }
+
+  public String[] loggingArgs() {
+    return logging().args();
+  }
+
+  private Logging logging() {
+    if (logging == null) {
+      logging = config().logging().merge(specializedLogging());
+    }
+    return logging;
   }
 
   public Env env(String host) {
-    return Stream.concat(
-        Stream.of(config.env()),
-        //sepecialized env (role based
-        envTags(host).stream().map(Tag::env)
-      )
-      .reduce(Env::merge)
-      .orElse(new Env(Map.of()));
+    if (envs == null) {
+      envs = new HashMap<>();
+    }
+    Env env = envs.get(host);
+    if (env == null) {
+      env = Stream.concat(
+          Stream.of(config().env(), specializedEnv()),
+          envTags(host).stream().map(Tag::env)
+        ).reduce(Env::merge)
+        .orElse(new Env(new EnvironmentConfig()));
+      envs.put(host, env);
+    }
+    return env;
+  }
+
+  public List<String> envArgs(String host) {
+    return env(host).args();
+  }
+
+  public String[] assetVolumeArgs() {
+    return assetVolume(null) != null ? assetVolume(null).dockerArgs() : new String[]{};
   }
 
   public List<String> healthCheckArgs() {
@@ -121,56 +136,169 @@ public class Role {
 
   private List<String> healthCheckArgs(boolean cord) {
 
-//    if( runningTraefik() || ( healthcheck() != null && healthcheck().setPortOrPath() ) ) {
-//      // cord / using cord
-//      return optionize(Map.of(
-//          "health-cmd", healthcheck().cmd(),
-//          "health-interval", healthcheck().interval()
-//        )
-//      );
-//    } else {
+    if( runningTraefik() || ( healthcheck() != null && healthcheck().setPortOrPath() ) ) {
+      // cord / using cord
+      return optionize(Map.of(
+          "health-cmd", healthcheck().cmd(),
+          "health-interval", healthcheck().interval()
+        )
+      );
+    } else {
     return emptyList();
-//    }
-
-  }
-
-  private HealthCheck healthcheck() {
-    if (runningTraefik()) {
-      return config.healthcheck(); // merge specialised
     }
-    return null; // specidalized healthcheck
+
   }
 
-  public String[] loggingArgs() {
-    return logging().args();
+  public HealthCheck healthcheck() {
+    if(healthCheck == null) {
+      if (runningTraefik()) {
+        return config().healthcheck().merge(specializedHealthCheck()); // merge specialised
+      } else {
+        healthCheck = specializedHealthCheck();
+      }
+    }
+    return healthCheck;
   }
 
-  private Logging logging() {
-    return config.logging(); // merge specialised
+  public String healthCheckCmdWithCord() {
+    return "(%s) && (stat %s > /dev/null || exit 1)"
+      .formatted( healthcheck().cmd(), cordContainerFile() );
   }
 
-  public List<String> assetVolumeArgs() {
-    // new Volume
-    return List.of();
+  public boolean runningTraefik() {
+    if( specializations().traefik() == null ) {
+      return primary();
+    } else {
+      return specializations().traefik();
+    }
   }
 
-  public String[] labelArgs() {
-    return argumentize("--label", labels());
+  private boolean primary() {
+    return this.equals(config.primaryRole());
   }
 
-  private Map<String, String> labels() {
-    Map<String, String> labels = new HashMap<>();
-    labels.putAll(defaultLabels());
-    labels.putAll(traefikLabels());
-    labels.putAll(customLabels());
-    return labels;
+  public boolean usesCord() {
+    return runningTraefik() && cordVolume() != null && healthcheck().cmd() != null;
   }
 
-  private Map<String, String> customLabels() {
-    Map<String, String> labels = new HashMap<>();
-    labels.putAll(config.labels());
-    // specialized labels
-    return labels;
+  public String cordHostDirectory() {
+    return Deploy4jFile.join( config().runDirectoryAsDockerVolume(), "cords", Stream.of( containerPrefix(), config().runId() ).collect(Collectors.joining("-"))  );
+  }
+
+  public Volume cordVolume() {
+    String cord = healthcheck().cord();
+    if(cord != null) {
+      if(cordVolume == null) {
+        cordVolume = new Volume(
+          Deploy4jFile.join( config().runDirectory(), "cords", Stream.of( containerPrefix(), config().runId() ).collect(Collectors.joining("-"))  ),
+          cord
+        );
+      }
+    }
+    return cordVolume;
+  }
+
+  public String cordHostFile() {
+    return Deploy4jFile.join( cordVolume().hostPath(), CORD_FILE );
+  }
+
+  public String cordContainerDirectory() {
+    // TODO: wjat
+    return null;
+//    return healthCheckOptions().cord() != null ?
+//      healthCheckOptions().cord() :  null;
+  }
+
+  public String cordContainerFile() {
+    return Deploy4jFile.join( cordVolume().containerPath(), CORD_FILE );
+  }
+
+  public String containerName(String version) {
+    return Stream.of(
+        containerPrefix(),
+        version != null ? version  : config().version()
+      ).filter(Objects::nonNull)
+      .collect(Collectors.joining("-"));
+  }
+
+  public String containerPrefix() {
+    return Stream.of(
+        config().service(),
+        name(),
+        config().destination()
+      ).filter(Objects::nonNull)
+      .collect(Collectors.joining("-"));
+  }
+
+  public String assetPath() {
+    return specializations().assetPath() != null ?
+      specializations().assetPath() :
+      config().assetPath() != null ?
+        config().assetPath() : null;
+  }
+
+  public boolean assets() {
+    return assetPath() != null && runningTraefik();
+  }
+
+  public Volume assetVolume(String version) {
+    if (assets()) {
+      return new Volume(
+        assetVolumePath(version),
+        assetPath()
+      );
+    }
+    return null;
+  }
+
+  public String assetExtractedPath(String version) {
+    return Deploy4jFile.join( config().runDirectory(), "assets", "extracted", containerName(version) );
+  }
+
+  public String assetVolumePath(String version) {
+    return Deploy4jFile.join( config().runDirectory(), "assets", "volumes", containerName(version) );
+  }
+
+  // private
+
+  private Map<String, List<String>> taggedHosts() {
+    return extractHostsFromConfig()
+      .stream()
+      .collect(Collectors.toMap(
+        ServerConfig::host,
+        hostConfig -> hostConfig.tags() != null ? hostConfig.tags() : emptyList()
+      ));
+  }
+
+  private List<ServerConfig> extractHostsFromConfig() {
+    if (config().rawConfig().servers().isAList()) {
+      return config().rawConfig().servers().list();
+    } else {
+      RoleConfig servers = config().rawConfig().servers().roles().get(name());
+      if(servers.isAList()) {
+        return servers.list();
+      } else {
+        return servers.customRole().hosts();
+      }
+    }
+  }
+
+  private Map<String, String> defaultLabels() {
+    Map<String, String> defaultLabels = new HashMap<>();
+    defaultLabels.put("service", config().service());
+    defaultLabels.put("role", name());
+    defaultLabels.put("destination", config().destination());
+    return defaultLabels;
+  }
+
+  private CustomRoleConfig specializations() {
+    if (config().rawConfig().servers().isAList() ||
+        (config().rawConfig().servers().roles().get(name()) != null
+         && config().rawConfig().servers().roles().get(name()).isAList())) {
+      return new CustomRoleConfig();
+    } else {
+      return config().rawConfig().servers().roles().get(name()).customRole();
+    }
   }
 
   private Map<String, String> traefikLabels() {
@@ -194,20 +322,32 @@ public class Role {
     return containerPrefix();
   }
 
-  private Map<String, String> defaultLabels() {
-    Map<String, String> defaultLabels = new HashMap<>();
-    defaultLabels.put("service", config.service());
-    defaultLabels.put("role", name);
-    defaultLabels.put("destination", config.destination());
-    return defaultLabels;
+  private Map<String, String> customLabels() {
+    Map<String, String> labels = new HashMap<>();
+    labels.putAll(config().labels());
+    if(specializations().labels() != null) labels.putAll( specializations().labels() );
+    return labels;
   }
 
-  public List<String> optionArgs() {
-    // specialized options
-    return List.of();
+  // attributes
+
+  public String name() {
+    return name;
   }
 
-  public List<String> cmd() {
-    return null;
+  public Configuration config() {
+    return config;
+  }
+
+  public Env specializedEnv() {
+    return specializedEnv;
+  }
+
+  public Logging specializedLogging() {
+    return specializedLogging;
+  }
+
+  public HealthCheck specializedHealthCheck() {
+    return specializedHealthCheck;
   }
 }

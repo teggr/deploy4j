@@ -4,10 +4,10 @@ import dev.deploy4j.cli.app.Boot;
 import dev.deploy4j.commands.*;
 import dev.deploy4j.configuration.Accessory;
 import dev.deploy4j.configuration.Configuration;
+import dev.deploy4j.configuration.ConfigureArgs;
 import dev.deploy4j.configuration.Role;
 import dev.deploy4j.ssh.SshHost;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,53 +17,233 @@ import java.util.Map;
  */
 public class Commander implements AutoCloseable {
 
-  private final Configuration config;
+  private ConfigureArgs configureArgs;
 
-  private final Docker docker;
-  private final Server server;
-  private final Registry registry;
-  private final Builder builder;
-  private final Traefik traefik;
-  private final Prune prune;
-  private final Auditor auditor;
-  private final Lock lock;
+  private boolean holdingLock;
+  private boolean connected;
 
-  private final List<String> specificHosts = new ArrayList<>();
-  private final List<String> specificRoles = new ArrayList<>();
+  private Configuration config;
+
+  private List<Role> specificRoles;
+  private List<String> specificHosts;
+
+  private  Builder builder;
+  private  Docker docker;
+  private Healthcheck healthcheck;
+  private Hook hook;
+  private  Lock lock;
+  private  Prune prune;
+  private  Registry registry;
+  private  Server server;
+  private  Traefik traefik;
+
+  private Specifics specifics;
 
   private final Map<String, SshHost> sshHosts = new HashMap<>();
-  private final Specifics specifics;
 
-  public Commander(Configuration config) {
-    this.config = config;
-    this.specifics = new Specifics(config, List.of(), List.of()); // TODT hosts and roles
-
-    this.docker = new Docker(config);
-    this.server = new Server(config);
-    this.registry = new Registry(config);
-    this.builder = new Builder(config);
-    this.traefik = new Traefik(config);
-    this.prune = new Prune(config);
-    this.auditor = new Auditor(config);
-    this.lock = new Lock(config);
-
+  public Commander() {
+    this.holdingLock = false;
+    this.connected = false;
+    this.specifics = null;
   }
 
+  public Configuration config() {
+    if (config == null) {
+      config = Configuration.createFrom(configureArgs);
+      configureArgs = null;
+    }
+    return config;
+  }
+
+  public void configure(String configFile, String destination, String version) {
+    this.config = null;
+    this.configureArgs = new ConfigureArgs(configFile, destination, version);
+  }
+
+  public void specificPrimary(Boolean primary) {
+    specifics = null;
+    specificHosts = List.of(config().primaryHost());
+  }
+
+  public void specificRoles(String[] roleNames) {
+    specifics = null;
+    if (roleNames != null) {
+      specificRoles = Utils.filterSpecificItems(roleNames, config().roles());
+      if (specificRoles.isEmpty()) {
+        throw new RuntimeException("No --roles match for " + String.join(",", roleNames));
+      }
+    }
+  }
+
+  public List<Role> specificRoles() {
+    return specificRoles;
+  }
+
+  public void specificHosts(String[] hosts) {
+    specifics = null;
+    if (hosts != null) {
+      specificHosts = Utils.filterSpecificItems(hosts, config().allHosts());
+      if (specificHosts.isEmpty()) {
+        throw new RuntimeException("No --hosts match for " + String.join(",", hosts));
+      }
+    }
+  }
+
+  public List<String> specificHosts() {
+    return specificHosts;
+  }
+
+  public void withSpecificHosts(List<String> hosts, Runnable runnable) {
+      List<String> originalHosts = specificHosts;
+      specificHosts = hosts;
+    try {
+      runnable.run();
+    } finally {
+      specificHosts = originalHosts;
+    }
+  }
+
+  public List<String> accessoryNames() {
+    return config().accessories().stream()
+      .map(Accessory::name)
+      .toList();
+  }
+
+  public List<String> accessoriesOn(String host) {
+    return config().accessories().stream()
+      .filter(accessory -> accessory.hosts().contains(host))
+      .map(Accessory::name)
+      .toList();
+  }
+
+  public App app(Role role, String host) {
+    return new App(config, role, host);
+  }
+
+  public dev.deploy4j.commands.Accessory accessory(String name) {
+    return new dev.deploy4j.commands.Accessory(config, name);
+  }
+
+  public Auditor auditor() { // TODO: details parameters
+    return new Auditor(config());
+  }
+
+  public Builder builder() {
+    if(builder == null) {
+      builder = new Builder(config());
+    }
+    return builder;
+  }
+
+  public Docker docker() {
+    if(docker == null) {
+      docker = new Docker(config());
+    }
+    return docker;
+  }
+
+  public Healthcheck healthcheck() {
+    if(healthcheck == null) {
+      healthcheck = new Healthcheck(config());
+    }
+    return healthcheck;
+  }
+
+  public Hook hook() {
+    if(hook == null) {
+      hook = new Hook(config());
+    }
+    return hook;
+  }
+
+  public Lock lock() {
+    if(lock == null) {
+      lock = new Lock(config());
+    }
+    return lock;
+  }
+
+  public Prune prune() {
+    if(prune == null) {
+      prune = new Prune(config());
+    }
+    return prune;
+  }
+
+  public Registry registry() {
+    if(registry == null) {
+      registry = new Registry(config());
+    }
+    return registry;
+  }
+
+  public Server server() {
+    if(server == null) {
+      server = new Server(config());
+    }
+    return server;
+  }
+
+  public Traefik traefik() {
+    if(traefik == null) {
+      traefik = new Traefik(config());
+    }
+    return traefik;
+  }
+
+  // TODO: with verbosity
+  // TODO: boot strategy
+
+  public boolean holdingLock() {
+    return holdingLock;
+  }
+
+  public boolean connected() {
+    return connected;
+  }
+
+  // private
+
+  // TODO: configure ssh kit with
+
   private Specifics specifics() {
+    if(specifics == null) {
+      return new Specifics(config(), specificHosts, specificRoles);
+    }
     return specifics;
   }
 
+  // delegates
+
   public List<String> hosts() {
     return specifics().hosts();
+  }
+
+  public List<Role> roles() {
+    return specifics().roles();
+  }
+
+  public String primaryHost() {
+    return specifics().primaryHost();
+  }
+
+  public Role primaryRole() {
+    return specifics().primaryRole();
+  }
+
+  public List<Role> rolesOn(String host) {
+    return specifics.rolesOn(host);
+  }
+
+  public List<String> traefikHosts() {
+    return specifics.traefikHosts();
   }
 
   public List<String> accessoryHosts() {
     return specifics().accessoryHosts();
   }
 
-  public Configuration config() {
-    return config;
-  }
+  // manage
 
   @Override
   public void close() throws Exception {
@@ -73,41 +253,6 @@ public class Commander implements AutoCloseable {
 
   }
 
-  public App app(Role role, String host) {
-    return new App(config, role, host);
-  }
-
-  public Auditor auditor() {
-    return auditor;
-  }
-
-  public Builder builder() {
-    return builder;
-  }
-
-  public Docker docker() {
-    return docker;
-  }
-
-  // healthcheck
-  // hook
-  // lock
-
-  public Registry registry() {
-    return registry;
-  }
-
-  public Server server() {
-    return server;
-  }
-
-  public Traefik traefik() {
-    return traefik;
-  }
-
-  public List<String> traefikHosts() {
-    return specifics.traefikHosts();
-  }
 
   public Boot boot(SshHost host, Role role, String version) {
     return new Boot(this, config, host, role, version); // barrier?
@@ -116,36 +261,19 @@ public class Commander implements AutoCloseable {
   public SshHost host(String host) {
     SshHost sshHost = sshHosts.get(host);
     if (sshHost == null) {
-      sshHost = new SshHost(host, config.ssh());
+      sshHost = new SshHost(host, config().ssh());
       sshHosts.put(host, sshHost);
     }
     return sshHost;
   }
 
-  public List<Role> rolesOn(String host) {
-    return specifics.rolesOn(host);
-  }
-
-  public Prune prune() {
-    return prune;
-  }
-
-  public List<String> accessoryNames() {
-    return config.accessories().stream()
-      .map(Accessory::name)
-      .toList();
-  }
-
-  public List<String> specificHosts() {
-    return specificHosts;
-  }
 
 
-  public String primaryHost() {
-    return specifics.primaryHost();
-  }
 
-  public Lock lock() {
-    return lock;
-  }
+
+
+
+
+
+
 }

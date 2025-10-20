@@ -1,7 +1,6 @@
 package dev.deploy4j.raw;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,8 @@ public class RoleConfig {
   }
 
   @JsonCreator
-  public RoleConfig(List<?> hosts) {
+  public RoleConfig(
+     List<?> hosts) {
     this.list = hosts.stream().map(o -> {
       if (o instanceof String s) {
         return new ServerConfig(s);
@@ -28,6 +28,11 @@ public class RoleConfig {
         throw new IllegalArgumentException("Invalid server entry: " + o);
       }
     }).toList();
+    this.customRole = null;
+  }
+
+  public RoleConfig() {
+    this.list = null;
     this.customRole = null;
   }
 

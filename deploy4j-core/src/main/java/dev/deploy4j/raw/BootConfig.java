@@ -19,6 +19,11 @@ public class BootConfig {
     this.wait = wait;
   }
 
+  public BootConfig() {
+    this.limit = null;
+    this.wait = null;
+  }
+
   public String limit() {
     return limit;
   }

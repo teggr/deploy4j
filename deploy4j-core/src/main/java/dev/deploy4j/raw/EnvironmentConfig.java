@@ -29,6 +29,13 @@ public class EnvironmentConfig {
     this.tags = tags;
   }
 
+  public EnvironmentConfig() {
+    this.map = null;
+    this.clear = null;
+    this.secrets = null;
+    this.tags = null;
+  }
+
   public boolean isClearAndSecrets() {
     return clear != null || secrets != null;
   }

@@ -19,6 +19,11 @@ public class LoggingConfig {
     this.options = options;
   }
 
+  public LoggingConfig() {
+    this.driver = null;
+    this.options = null;
+  }
+
   public String driver() {
     return driver;
   }
@@ -26,4 +31,12 @@ public class LoggingConfig {
   public Map<String, String> options() {
     return options;
   }
+
+  public LoggingConfig deepMerge(LoggingConfig other) {
+    return new LoggingConfig(
+      other.driver() != null ? other.driver() : this.driver(),
+      other.options() != null ? other.options() : this.options()
+    );
+  }
+
 }

@@ -10,7 +10,7 @@ import java.util.List;
 public class SshConfig {
 
   private final String user;
-  private final String port;
+  private final Integer port;
   private final String proxy;
   private final String proxyCommand;
   private final String logLevel;
@@ -22,7 +22,7 @@ public class SshConfig {
   @JsonCreator
   public SshConfig(
     @JsonProperty("user") String user,
-    @JsonProperty("port") String port,
+    @JsonProperty("port") Integer port,
     @JsonProperty("proxy") String proxy,
     @JsonProperty("proxy_command") String proxyCommand,
     @JsonProperty("log_level") String logLevel,
@@ -42,11 +42,23 @@ public class SshConfig {
     this.keyPassphrase = keyPassphrase;
   }
 
+  public SshConfig() {
+    this.user = null;
+    this.port = null;
+    this.proxy = null;
+    this.proxyCommand = null;
+    this.logLevel = null;
+    this.keysOnly = null;
+    this.keys = null;
+    this.keyData = null;
+    this.keyPassphrase = null;
+  }
+
   public String user() {
     return user;
   }
 
-  public String port() {
+  public Integer port() {
     return port;
   }
 

@@ -159,6 +159,17 @@ public class Commands {
    * argumentize("-e", List.of("USER", "DEBUG"))
    * => ["-e", "USER", "-e", "DEBUG"]
    */
+  public static String[] argumentize(String argument, String... attributes) {
+    return argumentize(argument, Stream.of(attributes).toList());
+  }
+
+  /**
+   * Builds a list of shell arguments like Ruby's argumentize.
+   *
+   * Example:
+   * argumentize("-e", List.of("USER", "DEBUG"))
+   * => ["-e", "USER", "-e", "DEBUG"]
+   */
   public static String[] argumentize(String argument, List<String> attributes) {
     List<String> list = attributes.stream()
       //.map( Commands::escapeShellValue )
