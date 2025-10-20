@@ -14,8 +14,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static dev.deploy4j.Commands.argumentize;
-import static dev.deploy4j.Commands.optionize;
+import static dev.deploy4j.Utils.argumentize;
+import static dev.deploy4j.Utils.optionize;
 import static java.util.Collections.emptyList;
 
 public class Role {

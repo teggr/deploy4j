@@ -4,12 +4,11 @@ import dev.deploy4j.EnvFile;
 import dev.deploy4j.env.ENV;
 import dev.deploy4j.raw.EnvironmentConfig;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static dev.deploy4j.Commands.argumentize;
+import static dev.deploy4j.Utils.argumentize;
 
 public class Env {
 

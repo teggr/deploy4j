@@ -2,16 +2,14 @@ package dev.deploy4j.commands;
 
 import dev.deploy4j.Cmd;
 import dev.deploy4j.configuration.Configuration;
-import dev.deploy4j.raw.AccessoryConfig;
 
 import java.io.File;
 import java.util.List;
-
-import static dev.deploy4j.Commands.pipe;
+import java.util.Map;
 
 public class Accessory extends Base {
 
-  private final AccessoryConfig accessoryConfig;
+  private final dev.deploy4j.configuration.Accessory accessoryConfig;
 
   public Accessory(Configuration config, String name) {
     super(config);
@@ -23,7 +21,7 @@ public class Accessory extends Base {
       .args("--name", serviceName())
       .args("--detach")
       .args("--restart", "unless-stopped")
-      .args(config.loggingArgs())
+      .args(config().loggingArgs())
       .args(publishArgs())
       .args(envArgs())
       .args(volumeArgs())
@@ -64,6 +62,7 @@ public class Accessory extends Base {
 
   public Cmd executeInExistingContainer(String command) {
     return Cmd.cmd( "docker", "exec" )
+      // TODO: interactive mode
       .args( serviceName() )
       .args( command );
   }
@@ -85,7 +84,7 @@ public class Accessory extends Base {
 
   public Cmd removeContainer() {
     return Cmd.cmd( "docker", "container", "prune", "--force")
-      .args( serviceName() );
+      .args( serviceFilter() );
   }
 
   public Cmd removeImage() {
@@ -93,11 +92,11 @@ public class Accessory extends Base {
   }
 
   public Cmd makeEnvDirectory() {
-    return makeDirectory( accessoryConfig.env().secretsDirectory() );
+    return makeDirectory( accessoryConfig().env().secretsDirectory() );
   }
 
   public Cmd removeEnvFile() {
-    return Cmd.cmd( "rm", "-f", accessoryConfig.env().secretsDirectory() );
+    return Cmd.cmd( "rm", "-f", accessoryConfig().env().secretsDirectory() );
   }
 
   // private
@@ -110,52 +109,59 @@ public class Accessory extends Base {
   }
 
   // delegates
+
   public String serviceName() {
-    return accessoryConfig.service();
+    return accessoryConfig().serviceName();
   }
 
   public String image() {
-    return accessoryConfig.image();
+    return accessoryConfig().image();
   }
 
   public List<String> hosts() {
-    return accessoryConfig.hosts();
+    return accessoryConfig().hosts();
   }
 
   public String port() {
-    return accessoryConfig.port();
+    return accessoryConfig().port();
   }
 
-  public List<String> files() {
-    return accessoryConfig.files();
+  public Map<String, String> files() {
+    return accessoryConfig().files();
   }
 
-  public List<String> directories() {
-    return accessoryConfig.directories();
+  public Map<String, String> directories() {
+    return accessoryConfig().directories();
   }
 
   public String cmd() {
-    return accessoryConfig.cmd();
+    return accessoryConfig().cmd();
   }
 
-  public List<String> publishArgs() {
-    return accessoryConfig.publishArgs();
+  public String[] publishArgs() {
+    return accessoryConfig().publishArgs();
   }
 
   public List<String> envArgs() {
-    return accessoryConfig.envArgs();
+    return accessoryConfig().envArgs();
   }
 
-  public List<String> volumeArgs() {
-    return accessoryConfig.volumeArgs();
+  public String[] volumeArgs() {
+    return accessoryConfig().volumeArgs();
+  }
+
+  public String[] labelArgs() {
+    return accessoryConfig().labelArgs();
   }
 
   public List<String> optionArgs() {
-    return accessoryConfig.labelArgs();
+    return accessoryConfig().optionArgs();
   }
 
-  public List<String> optionArgs() {
-    return accessoryConfig.optionArgs();
+  // attributes
+
+  public dev.deploy4j.configuration.Accessory accessoryConfig() {
+    return accessoryConfig;
   }
 
 }

@@ -1,6 +1,7 @@
 package dev.deploy4j.commands;
 
 import dev.deploy4j.Cmd;
+import dev.deploy4j.Utils;
 import dev.deploy4j.configuration.Configuration;
 import dev.deploy4j.configuration.Role;
 import org.apache.commons.lang.StringUtils;
@@ -12,9 +13,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static dev.deploy4j.Commands.*;
-
-public class App extends BaseCommands {
+public class App extends Base {
 
   private static final List<String> ACTIVE_DOCKER_STATUSES = List.of("running", "restarting");
 
@@ -25,6 +24,76 @@ public class App extends BaseCommands {
     super(config);
     this.role = role;
     this.host = host;
+  }
+
+  public Cmd run(String hostName) {
+
+    Cmd cmd = Cmd.cmd("docker", "run")
+      .args("--detach")
+      .args("--restart", "unless-stopped")
+      .args("--name", containerName());
+    if (hostName != null) cmd = cmd.args("--hostname", hostName);
+    cmd = cmd.args("-e", "DEPLOY4J_CONTAINER_NAME=\"" + containerName() + "\"")
+      .args("-e", "DEPLOY4J_VERSION=\"" + config().version() + "\"")
+      .args(role().envArgs(host()))
+      .args(role().healthCheckArgs())
+      .args(role().loggingArgs())
+      .args(config().volumeArgs())
+      .args(role().assetVolumeArgs())
+      .args(role().labelArgs())
+      .args(role().optionArgs())
+      .args(config().absoluteImage())
+      .args(role().cmd())
+      .description("run container");
+    return cmd;
+
+  }
+
+  public Cmd start() {
+    return Cmd.cmd("start", containerName());
+  }
+
+  public Cmd status(String version) {
+    return pipe(
+      containerIdForVersion(version),
+      xargs( docker( "inspect", "--format", DOCKER_HEALTH_STATUS_FORMAT ) )
+    );
+  }
+
+  public Cmd stop() {
+    return stop(null);
+  }
+
+  public Cmd stop(String version) {
+    return pipe(
+      version != null ? containerIdForVersion(version) : currentRunningContainerId(),
+      xargs(config.stopWaitTime() != null ? Cmd.cmd("docker", "stop", "-t", config().stopWaitTime().toString()) : Cmd.cmd("docker", "stop"))
+    ).description("stop container");
+  }
+
+  public Cmd info() {
+    return Cmd.cmd("docker", "ps")
+      .args(filterArgs(List.of()));
+  }
+
+  public Cmd currentRunningContainerId() {
+    return currentRunningContainer("--quiet");
+  }
+
+  public Cmd containerIdForVersion(String version) {
+    return containerIdForVersion(version, false);
+  }
+
+  public Cmd containerIdForVersion(String version, boolean onlyRunning) {
+    return containerIdFor(containerName(version), onlyRunning)
+      .description("container id for version");
+  }
+
+  public Cmd currentRunningVersion() {
+    return pipe(
+      currentRunningContainer("--format '{{.Names}}'"),
+      extractVersionFromName()
+    ).description("current running version");
   }
 
   public Cmd listVersions() {
@@ -42,17 +111,18 @@ public class App extends BaseCommands {
     ).description("list versions");
   }
 
-  public Cmd containerIdForVersion(String version) {
-    return containerIdForVersion(version, false);
+  public Cmd makeEnvDirectory() {
+    return makeDirectory( role.env(host).secretsDirectory() );
   }
 
-  public Cmd containerIdForVersion(String version, boolean onlyRunning) {
-    return containerIdFor(containerName(version), onlyRunning)
-      .description("container id for version");
+  public Cmd removeEnvFile() {
+    return Cmd.cmd( "rm", "-f", role().env(host()).secretsFile() );
   }
+
+  // private
 
   public String containerName() {
-    return containerName(null);
+     return containerName(null);
   }
 
   private String containerName(String version) {
@@ -63,28 +133,13 @@ public class App extends BaseCommands {
       .collect(Collectors.joining("-")).trim();
   }
 
-  public Cmd renameContainer(String version, String newVersion) {
-    return Cmd.cmd("docker", "rename",
-      containerName(version),
-      containerName(newVersion)
-    ).description("rename container");
-  }
-
-  public Cmd currentRunningVersion() {
-    return pipe(
-      currentRunningContainer("--format '{{.Names}}'"),
-      extractVersionFromName()
-    ).description("current running version");
-  }
-
-  private Cmd extractVersionFromName() {
-    return Cmd.cmd(
-      "while read line; do echo ${line#" + role.containerPrefix() + "-}; done"
-    ).description("extract version from container name");
-  }
-
-  public Cmd currentRunningContainerId() {
-    return currentRunningContainer("--quiet");
+  private Cmd latestImageId() {
+    return Cmd.cmd("docker", "image", "ls")
+      .args(Utils.argumentize("--filter",
+        List.of("reference=" + config.latestImage())
+      )).
+      args("--format", "'{{.ID}}'")
+      .description("latest image id");
   }
 
   public Cmd currentRunningContainer(String format) {
@@ -104,15 +159,6 @@ public class App extends BaseCommands {
       .description("latest image container");
   }
 
-  private Cmd latestImageId() {
-    return Cmd.cmd("docker", "image", "ls")
-      .args(argumentize("--filter",
-        List.of("reference=" + config.latestImage())
-      )).
-      args("--format", "'{{.ID}}'")
-      .description("latest image id");
-  }
-
   private Cmd latestContainer(String format) {
     return latestContainer(format, List.of());
   }
@@ -120,15 +166,21 @@ public class App extends BaseCommands {
   private Cmd latestContainer(String format, List<String> filters) {
     return Cmd.cmd("docker", "ps", "--latest", format)
       .args(filterArgs(ACTIVE_DOCKER_STATUSES))
-      .args(argumentize("--filter", filters))
+      .args(Utils.argumentize("--filter", filters))
       .description("latest container");
   }
 
   private String[] filterArgs(List<String> statuses) {
-    return argumentize(
+    return Utils.argumentize(
       "--filter",
       filters(statuses)
     );
+  }
+
+  private Cmd extractVersionFromName() {
+    return Cmd.cmd(
+      "while read line; do echo ${line#" + role.containerPrefix() + "-}; done"
+    ).description("extract version from container name");
   }
 
   private List<String> filters(List<String> statuses) {
@@ -142,90 +194,28 @@ public class App extends BaseCommands {
     return filters;
   }
 
-  public Cmd stop() {
-    return stop(null);
-  }
+  // includes
 
-  public Cmd stop(String version) {
-    return pipe(
-      version != null ? containerIdForVersion(version) : currentRunningContainerId(),
-      xargs(config.stopWaitTime() != null ? Cmd.cmd("docker", "stop", "-t", config.stopWaitTime()) : Cmd.cmd("docker", "stop"))
-    ).description("stop container");
-  }
+  // assets
 
-  public Cmd run(String hostName) {
+  // TODO: extract assets
+  // TODO: sync asset volumes
+  // TODO: clea up assets
+  // TODO: find and remove older siblings
+  // TODO: copy contents
 
-    Cmd cmd = Cmd.cmd("docker", "run")
-      .args("--detach")
-      .args("--restart", "unless-stopped")
-      .args("--name", containerName());
-    if (hostName != null) cmd = cmd.args("--hostname", hostName);
-    cmd = cmd.args("-e", "DEPLOY4J_CONTAINER_NAME=\"" + containerName() + "\"")
-      .args("-e", "DEPLOY4J_VERSION=\"" + config.version() + "\"")
-      .args(role.envArgs(host))
-      .args(role.healthCheckArgs())
-      .args(role.loggingArgs())
-      .args(config.volumeArgs())
-      .args(role.assetVolumeArgs())
-      .args(role.labelArgs())
-      .args(role.optionArgs())
-      .args(config.absoluteImage())
-      .args(role.cmd())
-      .description("run container");
-    return cmd;
+  // containers
 
-  }
-
-  public Cmd tagLatestImage() {
-    return Cmd.cmd("docker", "tag")
-      .args(config.absoluteImage())
-      .args(config.latestImage())
-      .description("tag latest image");
-  }
-
-  public Cmd info() {
-    return Cmd.cmd("docker", "ps")
-      .args(filterArgs(List.of()));
-  }
-
-  public Cmd removeContainers() {
-    return Cmd.cmd("docker", "container", "prune", "--force")
-      .args(filterArgs(List.of()));
-  }
-
-  public Cmd removeImages() {
-    return Cmd.cmd("docker", "image", "prune", "--all", "--force")
-      .args(filterArgs(List.of()));
-  }
-
-  public Cmd start() {
-    return Cmd.cmd("start", containerName());
-  }
-
-  public Cmd executeInExistingContainer(String command, Map<String, String> env) {
-    return Cmd.cmd("docker", "exec")
-      // TODO interactive mode
-      .args(argumentize("--env", env))
-      .args(containerName())
-      .args(command);
-  }
+  private static final String DOCKER_HEALTH_LOG_FORMAT    = "'{{json .State.Health}}'";
 
   public Cmd listContainers() {
     return Cmd.cmd("docker", "ls", "--all")
       .args(filterArgs(List.of()));
   }
 
-  public Cmd listImages() {
-    return Cmd.cmd("docker", "image", "ls")
-      .args(config.repository());
-  }
-
-  public Cmd logs(String version, String since, String lines, String grep, String grepOptions) {
-    return pipe(
-
-      Cmd.cmd("docker", "logs", "traefik", since != null ? "--since " + since : null, lines != null ? "--tail " + lines : null, "--timestamps", "2>&1"),
-      grep != null ? Cmd.cmd("grep", "\"" + grep + "\"" + (grepOptions != null ? " " + grepOptions : "")) : null
-    ).description("logs");
+  public Cmd listContainerNames() {
+    return Cmd.cmd("docker", "ls", "--all")
+      .args("--format", "'{{ .Names }}'" );
   }
 
   public Cmd removeContainer(String version) {
@@ -235,12 +225,103 @@ public class App extends BaseCommands {
     );
   }
 
-  public Cmd makeEnvDirectory() {
-    return makeDirectory( role.env(host).secretsDirectory() );
+  public Cmd renameContainer(String version, String newVersion) {
+    return Cmd.cmd("docker", "rename",
+      containerName(version),
+      containerName(newVersion)
+    ).description("rename container");
   }
 
-  public Cmd makeDirectory(String path) {
-    return Cmd.cmd("mkdir", "-p", path);
+  public Cmd removeContainers() {
+    return Cmd.cmd("docker", "container", "prune", "--force")
+      .args(filterArgs(List.of()));
   }
 
+  public Cmd containerHealthLog(String version) {
+    return pipe(
+      containerIdFor(containerName(version), false),
+      xargs( docker( "inspect", "--format", DOCKER_HEALTH_LOG_FORMAT ) )
+    ).description("container health log");
+  }
+
+  // cord
+
+  public Cmd cord(String version) {
+    return pipe(
+      docker("inspect", "-f '{{ range .Mounts }}{{printf \"%s %s\\n\" .Source .Destination}}{{ end }}'", containerName(version) ),
+      Cmd.cmd("awk", "'$2 == \"%s\" {print $1}'".formatted( role().cordVolume().containerPath() ))
+    ).description("cord");
+  }
+
+  public Cmd tieCord(String cord) {
+    return createEmptyFile(cord);
+  }
+
+  public Cmd cutCord(String cord) {
+    return removeDirectory(cord);
+  }
+
+  // private
+
+  public Cmd createEmptyFile(String file) {
+    return chain(
+      makeDirectoryFor(file),
+      Cmd.cmd("touch", file)
+    );
+  }
+
+  // execution
+
+  public Cmd executeInExistingContainer(String command, Map<String, String> env) {
+    return Cmd.cmd("docker", "exec")
+      // TODO interactive mode
+      .args(Utils.argumentize("--env", env))
+      .args(containerName())
+      .args(command);
+  }
+
+  // TODO: execute in new container
+  // TODO: execute in existing container over ssh
+  // TODO: execute in new container over ssh
+
+  // images
+
+  public Cmd listImages() {
+    return Cmd.cmd("docker", "image", "ls")
+      .args(config.repository());
+  }
+
+  public Cmd removeImages() {
+    return Cmd.cmd("docker", "image", "prune", "--all", "--force")
+      .args(filterArgs(List.of()));
+  }
+
+  public Cmd tagLatestImage() {
+    return Cmd.cmd("docker", "tag")
+      .args(config.absoluteImage())
+      .args(config.latestImage())
+      .description("tag latest image");
+  }
+
+  // logging
+
+  public Cmd logs(String version, String since, String lines, String grep, String grepOptions) {
+    return pipe(
+
+      Cmd.cmd("docker", "logs", "traefik", since != null ? "--since " + since : null, lines != null ? "--tail " + lines : null, "--timestamps", "2>&1"),
+      grep != null ? Cmd.cmd("grep", "\"" + grep + "\"" + (grepOptions != null ? " " + grepOptions : "")) : null
+    ).description("logs");
+  }
+
+  // TODO: follow logs
+
+  // attributes
+
+  public Role role() {
+    return role;
+  }
+
+  public String host() {
+    return host;
+  }
 }

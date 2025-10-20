@@ -7,8 +7,8 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static dev.deploy4j.Commands.argumentize;
-import static dev.deploy4j.Commands.optionize;
+import static dev.deploy4j.Utils.argumentize;
+import static dev.deploy4j.Utils.optionize;
 
 public class Accessory {
 
@@ -140,7 +140,7 @@ public class Accessory {
     return volumes;
   }
 
-  private String[] volumeArgs() {
+  public String[] volumeArgs() {
     return argumentize("--volume", volumes());
   }
 

@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static dev.deploy4j.Commands.argumentize;
+import static dev.deploy4j.Utils.argumentize;
 
 public class Configuration {
 

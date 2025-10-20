@@ -1,19 +1,19 @@
 package dev.deploy4j.commands;
 
 import dev.deploy4j.Cmd;
-import dev.deploy4j.Commands;
 import dev.deploy4j.configuration.Configuration;
+import dev.deploy4j.configuration.Env;
 
 import java.util.List;
+import java.util.Map;
 
-import static dev.deploy4j.Commands.*;
+import static dev.deploy4j.Utils.argumentize;
+import static dev.deploy4j.Utils.optionize;
 
-public class Traefik {
-
-  private final Configuration config;
+public class Traefik extends Base {
 
   public Traefik(Configuration config) {
-    this.config = config;
+    super(config);
   }
 
   public Cmd run() {
@@ -24,38 +24,13 @@ public class Traefik {
       .args(publishArgs())
       .args("--volume", "/var/run/docker.sock:/var/run/docker.sock")
       .args(envArgs())
-      .args(config.loggingArgs())
+      .args(config().loggingArgs())
       .args(labelArgs())
       .args(dockerOptionsArgs())
-      .args(config.traefik().image())
+      .args(image())
       .args("--providers.docker")
       .args(cmdOptionArgs())
       .description("run traefik");
-  }
-
-  private List<String> cmdOptionArgs() {
-    return optionize( config.traefik().args() , "=");
-  }
-
-  private List<String> dockerOptionsArgs() {
-    return Commands.optionize(config.traefik().options());
-  }
-
-  private String[] labelArgs() {
-   return Commands.argumentize("--label", config.traefik().labels());
-  }
-
-  private String[] envArgs() {
-    return null; // config.traefik().env().args();
-  }
-
-  private String[] publishArgs() {
-    if (config.traefik().publish()) {
-      return Commands.argumentize("--publish", List.of(
-        config.traefik().port()
-      ));
-    }
-    return new String[]{};
   }
 
   public Cmd start() {
@@ -84,6 +59,7 @@ public class Traefik {
     ).description("logs");
   }
 
+  // TODO: implement followLogs
   public Cmd followLogs() {
     throw new UnsupportedOperationException();
   }
@@ -94,6 +70,70 @@ public class Traefik {
 
   public Cmd removeImage() {
     return Cmd.cmd("docker", "image", "prune", "--force", "--filter", "label=org.opencontainers.image.title=Traefik").description("remove traefik image");
+  }
+
+  public Cmd makeEnvDirectory() {
+    return makeDirectory(env().secretsDirectory());
+  }
+
+  public Cmd removeEnvFile() {
+    return Cmd.cmd("rm", "-f", env().secretsFile()).description("remove traefik env file");
+  }
+
+  // private
+  private String[] publishArgs() {
+    if (publish()) {
+      return argumentize("--publish",
+        port()
+      );
+    }
+    return new String[]{};
+  }
+
+  private String[] labelArgs() {
+    return argumentize("--label", labels());
+  }
+
+  private List<String> envArgs() {
+    return env().args();
+  }
+
+  private List<String> dockerOptionsArgs() {
+    return optionize(options());
+  }
+
+  private List<String> cmdOptionArgs() {
+    return optionize(args(), "=");
+  }
+
+  // delegate
+
+  public String port() {
+    return config.traefik().port();
+  }
+
+  public boolean publish() {
+    return config.traefik().publish();
+  }
+
+  public Map<String, String> labels() {
+    return config.traefik().labels();
+  }
+
+  public Env env() {
+    return config.traefik().env();
+  }
+
+  public String image() {
+    return config.traefik().image();
+  }
+
+  public Map<String, String> options() {
+    return config.traefik().options();
+  }
+
+  public Map<String, String> args() {
+    return config.traefik().args();
   }
 
 }

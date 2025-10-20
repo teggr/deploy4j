@@ -3,14 +3,10 @@ package dev.deploy4j.commands;
 import dev.deploy4j.Cmd;
 import dev.deploy4j.configuration.Configuration;
 
-import static dev.deploy4j.Commands.*;
-
-public class Docker {
-
-  private final Configuration config;
+public class Docker extends Base {
 
   public Docker(Configuration config) {
-    this.config = config;
+    super(config);
   }
 
   // Install Docker using the https://github.com/docker/docker-install convenience script.

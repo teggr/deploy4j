@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static dev.deploy4j.Commands.argumentize;
-import static dev.deploy4j.Commands.optionize;
+import static dev.deploy4j.Utils.argumentize;
+import static dev.deploy4j.Utils.optionize;
 
 public class Logging {
 

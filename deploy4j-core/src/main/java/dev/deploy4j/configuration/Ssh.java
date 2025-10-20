@@ -25,7 +25,9 @@ public class Ssh {
       sshConfig.port() : 22;
   }
 
-  // TODO: proxy
+  public String proxy() {
+    return sshConfig().proxy();
+  }
 
   public Boolean keysOnly() {
     return sshConfig().keysOnly();

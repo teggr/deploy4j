@@ -4,7 +4,7 @@ import dev.deploy4j.file.Deploy4jFile;
 
 import java.nio.file.Paths;
 
-import static dev.deploy4j.Commands.argumentize;
+import static dev.deploy4j.Utils.argumentize;
 
 public class Volume {
 
