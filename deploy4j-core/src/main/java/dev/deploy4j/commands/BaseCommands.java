@@ -9,13 +9,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class Base {
+import static dev.rebelcraft.cmd.pkgs.Docker.docker;
+
+public abstract class BaseCommands {
 
   protected static final String DOCKER_HEALTH_STATUS_FORMAT = "'{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}'";
 
   protected Configuration config;
 
-  public Base(Configuration config) {
+  public BaseCommands(Configuration config) {
     this.config = config;
   }
 
@@ -34,7 +36,7 @@ public abstract class Base {
   }
 
   public Cmd containerIdFor(String containerName, boolean onlyRunning) {
-    Cmd cmd = Cmd.cmd("docker", "container", "ls");
+    Cmd cmd = docker().container().args("ls");
     if (!onlyRunning) cmd = cmd.args("--all");
     cmd = cmd.args(
       "--filter",
@@ -94,20 +96,16 @@ public abstract class Base {
     return Cmds.shell(command);
   }
 
-  protected Cmd docker(String... args) {
-    return Cmd.cmd("docker").args(args);
-  }
-
   protected Cmd git(String[] args, String path) {
     Cmd git = Cmd.cmd("git");
-    if(path != null) {
-      git = git.args( "-C", path );
+    if (path != null) {
+      git = git.args("-C", path);
     }
-    git = git.args( args );
+    git = git.args(args);
     return git;
   }
 
-  protected Tags tags(Map<String,String> details) {
+  protected Tags tags(Map<String, String> details) {
     return Tags.fromConfig(config(), details);
   }
 

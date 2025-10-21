@@ -1,9 +1,9 @@
 package dev.deploy4j.commands;
 
-import dev.rebelcraft.cmd.Cmd;
 import dev.deploy4j.Tags;
 import dev.deploy4j.configuration.Configuration;
 import dev.deploy4j.file.Deploy4jFile;
+import dev.rebelcraft.cmd.Cmd;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,11 +11,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Auditor extends Base {
+public class AuditorCommands extends BaseCommands {
 
   private final Map<String, String> details;
 
-  public Auditor(Configuration config, Map<String, String> details) {
+  public AuditorCommands(Configuration config, Map<String, String> details) {
     super(config);
     this.details = details;
   }

@@ -1,5 +1,6 @@
 package dev.deploy4j.cli;
 
+import dev.deploy4j.commands.AccessoryCommands;
 import dev.rebelcraft.cmd.Cmd;
 import dev.deploy4j.Commander;
 import org.slf4j.Logger;
@@ -397,9 +398,9 @@ public class Accessory extends Base {
 
   // private
 
-  private void withAccessory(String name, BiConsumer<dev.deploy4j.commands.Accessory, List<String>> block) {
+  private void withAccessory(String name, BiConsumer<AccessoryCommands, List<String>> block) {
     if (commander().config().accessory(name) != null) {
-      dev.deploy4j.commands.Accessory accessory = commander().accessory(name);
+      AccessoryCommands accessory = commander().accessory(name);
       block.accept(accessory, accessoryHosts(accessory));
     } else {
       errorOnMissingAccessory(name);
@@ -411,7 +412,7 @@ public class Accessory extends Base {
     throw new RuntimeException("No accessory by the name of '" + name + "'" + (options != null ? " (options:" + options.stream().collect(Collectors.joining(",")) + ")" : ""));
   }
 
-  private List<String> accessoryHosts(dev.deploy4j.commands.Accessory accessory) {
+  private List<String> accessoryHosts(AccessoryCommands accessory) {
     if (!commander().specificHosts().isEmpty()) {
       List<String> intersection = new ArrayList<>(commander().specificHosts());
       intersection.retainAll(accessory.hosts());

@@ -7,17 +7,18 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
-public class Hook extends Base {
-  public Hook(Configuration config) {
+public class HookCommands extends BaseCommands {
+
+  public HookCommands(Configuration config) {
     super(config);
   }
 
   public List<?> run(String hook, Map<String, String> details) {
-    return List.of( hookFile(hook), tags(details).env() );
+    return List.of(hookFile(hook), tags(details).env());
   }
 
   public boolean hookExists(String hook) {
-    return Paths.get( hookFile(hook) ).toFile().exists();
+    return Paths.get(hookFile(hook)).toFile().exists();
   }
 
   // private

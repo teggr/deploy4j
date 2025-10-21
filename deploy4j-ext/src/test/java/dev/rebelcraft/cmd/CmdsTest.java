@@ -1,9 +1,11 @@
 package dev.rebelcraft.cmd;
 
+import dev.rebelcraft.cmd.pkgs.Docker;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static dev.rebelcraft.cmd.pkgs.Docker.docker;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CmdsTest {
@@ -172,7 +174,7 @@ class CmdsTest {
     List<String> build = cmd.build();
 
     assertThat(build)
-      .containsExactly("xargs", "mkdir", "-p", "/path/to/remote" );
+      .containsExactly("xargs", "mkdir", "-p", "/path/to/remote");
 
   }
 
@@ -186,7 +188,23 @@ class CmdsTest {
     List<String> build = cmd.build();
 
     assertThat(build)
-      .containsExactly("sh", "-c", "'mkdir -p '\\''/path/to/remote'\\'''" );
+      .containsExactly("sh", "-c", "'mkdir -p '\\''/path/to/remote'\\'''");
+
+  }
+
+  @Test
+  void shouldCombineMultipleFluentCommandsByNamedSeparator() {
+
+    Cmd cmd = Cmds.combine(
+      ">",
+      docker().ps().args("--all"),
+      Cmd.cmd("ps.txt")
+    );
+
+    List<String> build = cmd.build();
+
+    assertThat(build)
+      .containsExactly("docker", "ps", "--all", ">", "ps.txt");
 
   }
 

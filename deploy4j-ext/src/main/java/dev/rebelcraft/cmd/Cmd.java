@@ -18,12 +18,12 @@ public class Cmd {
   private final List<String> cmd;
   private String description = "";
 
-  private Cmd(String... base) {
+  protected Cmd(String... base) {
     this.cmd = new ArrayList<>();
     Collections.addAll(this.cmd, base);
   }
 
-  private Cmd(List<String> base) {
+  protected Cmd(List<String> base) {
     this.cmd = new ArrayList<>();
     this.cmd.addAll(base);
   }

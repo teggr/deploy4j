@@ -11,11 +11,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Lock extends Base {
+public class LockCommands extends BaseCommands {
 
   private final Base64.Encoder encoder = Base64.getEncoder();
 
-  public Lock(Configuration config) {
+  public LockCommands(Configuration config) {
     super(config);
   }
 

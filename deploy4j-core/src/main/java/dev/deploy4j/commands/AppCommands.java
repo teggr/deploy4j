@@ -1,9 +1,9 @@
 package dev.deploy4j.commands;
 
-import dev.rebelcraft.cmd.Cmd;
 import dev.deploy4j.Utils;
 import dev.deploy4j.configuration.Configuration;
 import dev.deploy4j.configuration.Role;
+import dev.rebelcraft.cmd.Cmd;
 import org.apache.commons.lang.StringUtils;
 
 import java.nio.file.Paths;
@@ -14,14 +14,17 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class App extends Base {
+import static dev.rebelcraft.cmd.pkgs.Docker.docker;
+import static dev.rebelcraft.cmd.pkgs.Grep.grep;
+
+public class AppCommands extends BaseCommands {
 
   private static final List<String> ACTIVE_DOCKER_STATUSES = List.of("running", "restarting");
 
   private final String host;
   private final Role role;
 
-  public App(Configuration config, Role role, String host) {
+  public AppCommands(Configuration config, Role role, String host) {
     super(config);
     this.role = role;
     this.host = host;
@@ -29,7 +32,7 @@ public class App extends Base {
 
   public Cmd run(String hostName) {
 
-    Cmd cmd = Cmd.cmd("docker", "run")
+    Cmd cmd = docker().run()
       .args("--detach")
       .args("--restart", "unless-stopped")
       .args("--name", containerName());
@@ -51,13 +54,13 @@ public class App extends Base {
   }
 
   public Cmd start() {
-    return Cmd.cmd("start", containerName());
+    return docker().start().args(containerName());
   }
 
   public Cmd status(String version) {
     return pipe(
       containerIdForVersion(version),
-      xargs(docker("inspect", "--format", DOCKER_HEALTH_STATUS_FORMAT))
+      xargs(docker().inspect().args("--format", DOCKER_HEALTH_STATUS_FORMAT))
     );
   }
 
@@ -68,12 +71,12 @@ public class App extends Base {
   public Cmd stop(String version) {
     return pipe(
       version != null ? containerIdForVersion(version) : currentRunningContainerId(),
-      xargs(config.stopWaitTime() != null ? Cmd.cmd("docker", "stop", "-t", config().stopWaitTime().toString()) : Cmd.cmd("docker", "stop"))
+      xargs(config.stopWaitTime() != null ? docker().stop().args("-t", config().stopWaitTime().toString()) : docker().stop())
     ).description("stop container");
   }
 
   public Cmd info() {
-    return Cmd.cmd("docker", "ps")
+    return docker().ps()
       .args(filterArgs(List.of()));
   }
 
@@ -104,7 +107,7 @@ public class App extends Base {
 
   public Cmd listVersions(List<String> dockerArgs, List<String> statuses) {
     return pipe(
-      Cmd.cmd("docker", "ps")
+      docker().ps()
         .args(filterArgs(statuses))
         .args(dockerArgs)
         .args("--format", "\"{{.Names}}\""),
@@ -135,7 +138,7 @@ public class App extends Base {
   }
 
   private Cmd latestImageId() {
-    return Cmd.cmd("docker", "image", "ls")
+    return docker().image().args("ls")
       .args(Utils.argumentize("--filter",
         List.of("reference=" + config.latestImage())
       )).
@@ -165,7 +168,7 @@ public class App extends Base {
   }
 
   private Cmd latestContainer(String format, List<String> filters) {
-    return Cmd.cmd("docker", "ps", "--latest", format)
+    return docker().ps().args("--latest", format)
       .args(filterArgs(ACTIVE_DOCKER_STATUSES))
       .args(Utils.argumentize("--filter", filters))
       .description("latest container");
@@ -206,10 +209,10 @@ public class App extends Base {
     return combine(
       new Cmd[]{
         makeDirectory(role().assetExtractedPath(null)),
-        any(docker("stop", "-t 1", assetContainer, "2> /dev/null"), Cmd.cmd("true")),
-        docker("run", "--name", assetContainer, "--detach", "--rm", config().absoluteImage(), "sleep 1000000"),
-        docker("cp", "-L", assetContainer + ":" + role().assetPath() + "/.", role().assetExtractedPath(null)),
-        docker("stop", "-t 1", assetContainer)
+        any(docker().stop().args("-t 1", assetContainer, "2> /dev/null"), Cmd.cmd("true")),
+        docker().run().args("--name", assetContainer, "--detach", "--rm", config().absoluteImage(), "sleep 1000000"),
+        docker().cp().args("-L", assetContainer + ":" + role().assetPath() + "/.", role().assetExtractedPath(null)),
+        docker().stop().args("-t 1", assetContainer)
       },
       "&&"
 
@@ -218,21 +221,21 @@ public class App extends Base {
 
   public Cmd syncAssetVolumes(String oldVersion) {
 
-   List<Cmd> cmds = new ArrayList<>();
+    List<Cmd> cmds = new ArrayList<>();
 
-   String newExtractedPath = role().assetExtractedPath(config().version());
-   String newVolumePath = role().assetVolume(null).hostPath();
-    cmds.add( makeDirectory(newVolumePath) );
-    cmds.add( copyContents(newExtractedPath, newVolumePath, false) );
+    String newExtractedPath = role().assetExtractedPath(config().version());
+    String newVolumePath = role().assetVolume(null).hostPath();
+    cmds.add(makeDirectory(newVolumePath));
+    cmds.add(copyContents(newExtractedPath, newVolumePath, false));
 
-   if(oldVersion != null) {
-     String oldExtractedPath = role().assetExtractedPath(oldVersion);
-     String oldVolumePath = role().assetVolume(oldVersion).hostPath();
-    cmds.add( copyContents(newExtractedPath, oldVolumePath, true) );
-    cmds.add( copyContents(oldExtractedPath, newVolumePath, true ) );
-   }
+    if (oldVersion != null) {
+      String oldExtractedPath = role().assetExtractedPath(oldVersion);
+      String oldVolumePath = role().assetVolume(oldVersion).hostPath();
+      cmds.add(copyContents(newExtractedPath, oldVolumePath, true));
+      cmds.add(copyContents(oldExtractedPath, newVolumePath, true));
+    }
 
-   return chain( cmds.toArray(new Cmd[0]) );
+    return chain(cmds.toArray(new Cmd[0]));
 
   }
 
@@ -247,16 +250,16 @@ public class App extends Base {
 
   private Cmd findAndRemoveOlderSiblings(String path) {
     return Cmd.cmd("find")
-      .args(Paths.get(path).toString() )
+      .args(Paths.get(path).toString())
       .args("-maxdepth 1")
-      .args("-name", "'"+ role().containerPrefix() +"-*'")
-      .args("!", "-name", Paths.get(path).toString() )
+      .args("-name", "'" + role().containerPrefix() + "-*'")
+      .args("!", "-name", Paths.get(path).toString())
       .args("-exec rm -rf \"{}\" +");
   }
 
   private Cmd copyContents(String source, String destination, Boolean continueOnError) {
     Cmd cmd = Cmd.cmd("cp", "-rnT", source, destination);
-    if(continueOnError) {
+    if (continueOnError) {
       cmd = cmd.args("|| true");
     }
     return cmd;
@@ -267,38 +270,38 @@ public class App extends Base {
   private static final String DOCKER_HEALTH_LOG_FORMAT = "'{{json .State.Health}}'";
 
   public Cmd listContainers() {
-    return Cmd.cmd("docker", "ls", "--all")
+    return docker().ls().args("--all")
       .args(filterArgs(List.of()));
   }
 
   public Cmd listContainerNames() {
-    return Cmd.cmd("docker", "ls", "--all")
+    return docker().ls().args("--all")
       .args("--format", "'{{ .Names }}'");
   }
 
   public Cmd removeContainer(String version) {
     return pipe(
       containerIdFor(containerName(version), false),
-      xargs(Cmd.cmd("docker", "container", "rm"))
+      xargs(docker().container().args("rm"))
     );
   }
 
   public Cmd renameContainer(String version, String newVersion) {
-    return Cmd.cmd("docker", "rename",
+    return docker().rename().args(
       containerName(version),
       containerName(newVersion)
     ).description("rename container");
   }
 
   public Cmd removeContainers() {
-    return Cmd.cmd("docker", "container", "prune", "--force")
+    return docker().container().args("prune", "--force")
       .args(filterArgs(List.of()));
   }
 
   public Cmd containerHealthLog(String version) {
     return pipe(
       containerIdFor(containerName(version), false),
-      xargs(docker("inspect", "--format", DOCKER_HEALTH_LOG_FORMAT))
+      xargs(docker().inspect().args("--format", DOCKER_HEALTH_LOG_FORMAT))
     ).description("container health log");
   }
 
@@ -306,7 +309,7 @@ public class App extends Base {
 
   public Cmd cord(String version) {
     return pipe(
-      docker("inspect", "-f '{{ range .Mounts }}{{printf \"%s %s\\n\" .Source .Destination}}{{ end }}'", containerName(version)),
+      docker().inspect().args("-f '{{ range .Mounts }}{{printf \"%s %s\\n\" .Source .Destination}}{{ end }}'", containerName(version)),
       Cmd.cmd("awk", "'$2 == \"%s\" {print $1}'".formatted(role().cordVolume().containerPath()))
     ).description("cord");
   }
@@ -331,7 +334,7 @@ public class App extends Base {
   // execution
 
   public Cmd executeInExistingContainer(String command, Map<String, String> env) {
-    return Cmd.cmd("docker", "exec")
+    return docker().exec()
       // TODO interactive mode
       .args(Utils.argumentize("--env", env))
       .args(containerName())
@@ -345,17 +348,17 @@ public class App extends Base {
   // images
 
   public Cmd listImages() {
-    return Cmd.cmd("docker", "image", "ls")
+    return docker().image().args("ls")
       .args(config.repository());
   }
 
   public Cmd removeImages() {
-    return Cmd.cmd("docker", "image", "prune", "--all", "--force")
+    return docker().image().args("prune", "--all", "--force")
       .args(filterArgs(List.of()));
   }
 
   public Cmd tagLatestImage() {
-    return Cmd.cmd("docker", "tag")
+    return docker().tag()
       .args(config.absoluteImage())
       .args(config.latestImage())
       .description("tag latest image");
@@ -365,9 +368,9 @@ public class App extends Base {
 
   public Cmd logs(String version, String since, String lines, String grep, String grepOptions) {
     return pipe(
-
-      Cmd.cmd("docker", "logs", "traefik", since != null ? "--since " + since : null, lines != null ? "--tail " + lines : null, "--timestamps", "2>&1"),
-      grep != null ? Cmd.cmd("grep", "\"" + grep + "\"" + (grepOptions != null ? " " + grepOptions : "")) : null
+      docker().logs().args("traefik", since != null ? "--since " + since : null, lines != null ? "--tail " + lines : null, "--timestamps", "2>&1"),
+      grep != null ? grep().search(grep)
+        .args(grepOptions) : null
     ).description("logs");
   }
 

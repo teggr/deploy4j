@@ -1,11 +1,16 @@
 package dev.deploy4j.commands;
 
-import dev.rebelcraft.cmd.Cmd;
 import dev.deploy4j.configuration.Configuration;
+import dev.rebelcraft.cmd.Cmd;
 
-public class Docker extends Base {
+import static dev.rebelcraft.cmd.pkgs.Curl.curl;
+import static dev.rebelcraft.cmd.pkgs.Docker.docker;
+import static dev.rebelcraft.cmd.pkgs.Echo.echo;
+import static dev.rebelcraft.cmd.pkgs.Wget.wget;
 
-  public Docker(Configuration config) {
+public class DockerCommands extends BaseCommands {
+
+  public DockerCommands(Configuration config) {
     super(config);
   }
 
@@ -16,12 +21,12 @@ public class Docker extends Base {
 
   // Checks the Docker client version. Fails if Docker is not installed.
   public Cmd installed() {
-    return Cmd.cmd("docker", "-v").description("installed");
+    return docker().version().description("installed");
   }
 
   // Checks the Docker server version. Fails if Docker is not running.
   public Cmd running() {
-    return Cmd.cmd("docker", "version").description("running");
+    return docker().version().description("running");
   }
 
   // Do we have superuser access to install Docker and start system services?
@@ -32,9 +37,9 @@ public class Docker extends Base {
   private Cmd getDocker() {
     return shell(
       any(
-        Cmd.cmd("curl", "-fsSL", "https://get.docker.com"),
-        Cmd.cmd("wget", "-O -", "https://get.docker.com"),
-        Cmd.cmd("echo", "\"exit 1\"")
+        curl().options("-fsSL").url("https://get.docker.com"),
+        wget().options("-O -").url("https://get.docker.com"),
+        echo().message("exit 1")
       )
     ).description("get docker");
   }

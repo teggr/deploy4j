@@ -1,27 +1,30 @@
 package dev.deploy4j.commands;
 
-import dev.rebelcraft.cmd.Cmd;
 import dev.deploy4j.configuration.Configuration;
+import dev.rebelcraft.cmd.Cmd;
+import dev.rebelcraft.cmd.pkgs.Docker;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-public class Prune extends Base {
+import static dev.rebelcraft.cmd.pkgs.Docker.docker;
 
-  public Prune(Configuration config) {
+public class PruneCommands extends BaseCommands {
+
+  public PruneCommands(Configuration config) {
     super(config);
   }
 
   public Cmd danglingImages() {
-    return Cmd.cmd("docker", "image")
+    return docker().image()
       .args("prune", "--force", "--filter", "label=service=" + config().service())
       .description("dangling images");
   }
 
   public Cmd taggedImages() {
     return pipe(
-      Cmd.cmd("docker", "image", "ls")
-        .args( serviceFilter() )
+      docker().image().args("ls")
+        .args(serviceFilter())
         .args("--format", "'{{.ID}} {{.Repository}}:{{.Tag}}'")
         .description("tagged images"),
       Cmd.cmd("grep", "-v", "-w")
@@ -32,7 +35,7 @@ public class Prune extends Base {
 
   public Cmd appContainers(int retain) {
     return pipe(
-      Cmd.cmd("docker", "ps", "-q", "-a")
+      docker().ps().args("-q", "-a")
         .args(serviceFilter())
         .args(stoppedContainersFilters()),
       Cmd.cmd("tail", "-n", "+" + (retain + 1)),
@@ -41,7 +44,7 @@ public class Prune extends Base {
   }
 
   public Cmd healthcheckContainers() {
-    return Cmd.cmd("docker", "container")
+    return docker().container()
       .args("prune", "--force")
       .args(healthCheckServiceFilter())
       .description("healthcheck containers");
@@ -61,7 +64,7 @@ public class Prune extends Base {
     // Pull the images that are used by any containers
     // Append repo:latest - to avoid deleting the latest tag
     // Append repo:<none> - to avoid deleting dangling images that are in use. Unused dangling images are deleted separately
-    return "$(docker container ls -a --format '{{.Image}}\\|' --filter label=service="+config.service()+" | tr -d '\\n')"+config.latestImage()+"\\|"+config.repository()+":<none>";
+    return "$(docker container ls -a --format '{{.Image}}\\|' --filter label=service=" + config.service() + " | tr -d '\\n')" + config.latestImage() + "\\|" + config.repository() + ":<none>";
   }
 
   private String[] serviceFilter() {

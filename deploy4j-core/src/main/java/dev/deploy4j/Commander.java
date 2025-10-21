@@ -1,6 +1,5 @@
 package dev.deploy4j;
 
-import dev.deploy4j.cli.app.Boot;
 import dev.deploy4j.commands.*;
 import dev.deploy4j.configuration.Accessory;
 import dev.deploy4j.configuration.Configuration;
@@ -27,15 +26,15 @@ public class Commander implements AutoCloseable {
   private List<Role> specificRoles;
   private List<String> specificHosts;
 
-  private  Builder builder;
-  private  Docker docker;
-  private Healthcheck healthcheck;
-  private Hook hook;
-  private  Lock lock;
-  private  Prune prune;
-  private  Registry registry;
-  private  Server server;
-  private  Traefik traefik;
+  private BuilderCommands builder;
+  private DockerCommands docker;
+  private HealthcheckCommands healthcheck;
+  private HookCommands hook;
+  private LockCommands lock;
+  private PruneCommands prune;
+  private RegistryCommands registry;
+  private ServerCommands server;
+  private TraefikCommands traefik;
 
   private Specifics specifics;
 
@@ -116,81 +115,81 @@ public class Commander implements AutoCloseable {
       .toList();
   }
 
-  public App app(Role role, String host) {
-    return new App(config, role, host);
+  public AppCommands app(Role role, String host) {
+    return new AppCommands(config, role, host);
   }
 
-  public dev.deploy4j.commands.Accessory accessory(String name) {
-    return new dev.deploy4j.commands.Accessory(config, name);
+  public AccessoryCommands accessory(String name) {
+    return new AccessoryCommands(config, name);
   }
 
-  public Auditor auditor() {
+  public AuditorCommands auditor() {
     return auditor(null);
   }
 
-  public Auditor auditor(Map<String, String> details) {
-    return new Auditor(config(), details);
+  public AuditorCommands auditor(Map<String, String> details) {
+    return new AuditorCommands(config(), details);
   }
 
-  public Builder builder() {
+  public BuilderCommands builder() {
     if(builder == null) {
-      builder = new Builder(config());
+      builder = new BuilderCommands(config());
     }
     return builder;
   }
 
-  public Docker docker() {
+  public DockerCommands docker() {
     if(docker == null) {
-      docker = new Docker(config());
+      docker = new DockerCommands(config());
     }
     return docker;
   }
 
-  public Healthcheck healthcheck() {
+  public HealthcheckCommands healthcheck() {
     if(healthcheck == null) {
-      healthcheck = new Healthcheck(config());
+      healthcheck = new HealthcheckCommands(config());
     }
     return healthcheck;
   }
 
-  public Hook hook() {
+  public HookCommands hook() {
     if(hook == null) {
-      hook = new Hook(config());
+      hook = new HookCommands(config());
     }
     return hook;
   }
 
-  public Lock lock() {
+  public LockCommands lock() {
     if(lock == null) {
-      lock = new Lock(config());
+      lock = new LockCommands(config());
     }
     return lock;
   }
 
-  public Prune prune() {
+  public PruneCommands prune() {
     if(prune == null) {
-      prune = new Prune(config());
+      prune = new PruneCommands(config());
     }
     return prune;
   }
 
-  public Registry registry() {
+  public RegistryCommands registry() {
     if(registry == null) {
-      registry = new Registry(config());
+      registry = new RegistryCommands(config());
     }
     return registry;
   }
 
-  public Server server() {
+  public ServerCommands server() {
     if(server == null) {
-      server = new Server(config());
+      server = new ServerCommands(config());
     }
     return server;
   }
 
-  public Traefik traefik() {
+  public TraefikCommands traefik() {
     if(traefik == null) {
-      traefik = new Traefik(config());
+      traefik = new TraefikCommands(config());
     }
     return traefik;
   }

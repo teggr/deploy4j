@@ -4,6 +4,7 @@ import dev.deploy4j.Commander;
 import dev.deploy4j.cli.app.Boot;
 import dev.deploy4j.cli.app.PrepareAssets;
 import dev.deploy4j.cli.healthcheck.Barrier;
+import dev.deploy4j.commands.AppCommands;
 import dev.deploy4j.configuration.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -193,7 +194,7 @@ public class App extends Base {
 
         for (Role role : roles) {
 
-          dev.deploy4j.commands.App app = commander().app(role, host.hostName());
+          AppCommands app = commander().app(role, host.hostName());
           List<String> versions = new java.util.ArrayList<>(Stream.of(host.capture(app.listVersions()).split("\n")).toList());
           versions.remove(host.capture(app.currentRunningVersion()).trim());
 

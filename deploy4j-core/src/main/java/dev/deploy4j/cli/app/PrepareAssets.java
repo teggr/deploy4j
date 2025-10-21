@@ -1,6 +1,7 @@
 package dev.deploy4j.cli.app;
 
 import dev.deploy4j.Commander;
+import dev.deploy4j.commands.AppCommands;
 import dev.deploy4j.configuration.Role;
 import dev.deploy4j.ssh.SshHost;
 
@@ -11,7 +12,7 @@ public class PrepareAssets {
   private final SshHost sshHost;
   private final Commander commander;
 
-  private dev.deploy4j.commands.App app;
+  private AppCommands app;
 
   public PrepareAssets(String host, Role role, SshHost sshHost, Commander commander) {
     this.host = host;
@@ -32,7 +33,7 @@ public class PrepareAssets {
 
   // private
 
-  public dev.deploy4j.commands.App app() {
+  public AppCommands app() {
     if( app == null ) {
       app = commander.app(role(), host());
     }

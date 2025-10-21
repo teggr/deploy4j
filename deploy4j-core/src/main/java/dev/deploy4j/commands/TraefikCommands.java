@@ -1,23 +1,24 @@
 package dev.deploy4j.commands;
 
-import dev.rebelcraft.cmd.Cmd;
 import dev.deploy4j.configuration.Configuration;
 import dev.deploy4j.configuration.Env;
+import dev.rebelcraft.cmd.Cmd;
 
 import java.util.List;
 import java.util.Map;
 
 import static dev.deploy4j.Utils.argumentize;
 import static dev.deploy4j.Utils.optionize;
+import static dev.rebelcraft.cmd.pkgs.Docker.docker;
 
-public class Traefik extends Base {
+public class TraefikCommands extends BaseCommands {
 
-  public Traefik(Configuration config) {
+  public TraefikCommands(Configuration config) {
     super(config);
   }
 
   public Cmd run() {
-    return Cmd.cmd("docker", "run")
+    return docker().run()
       .args("--name", "traefik")
       .args("--detach")
       .args("--restart", "unless-stopped")
@@ -34,11 +35,11 @@ public class Traefik extends Base {
   }
 
   public Cmd start() {
-    return Cmd.cmd("docker", "container", "start", "traefik").description("start traefik");
+    return docker().container().args("start", "traefik").description("start traefik");
   }
 
   public Cmd stop() {
-    return Cmd.cmd("docker", "container", "stop", "traefik").description("stop traefik");
+    return docker().container().args("stop", "traefik").description("stop traefik");
   }
 
   public Cmd startOrRun() {
@@ -49,12 +50,12 @@ public class Traefik extends Base {
   }
 
   public Cmd info() {
-    return Cmd.cmd("docker", "ps", "--filter", "name=^traefik$").description("info");
+    return docker().ps().args("--filter", "name=^traefik$").description("info");
   }
 
   public Cmd logs(String since, String lines, String grep, String grepOptions) {
     return pipe(
-      Cmd.cmd("docker", "logs", "traefik", since != null ? "--since " + since : null, lines != null ? "--tail " + lines : null, "--timestamps", "2>&1"),
+      docker().logs().args("traefik", since != null ? "--since " + since : null, lines != null ? "--tail " + lines : null, "--timestamps", "2>&1"),
       grep != null ? Cmd.cmd("grep", "\"" + grep + "\"" + (grepOptions != null ? " " + grepOptions : "")) : null
     ).description("logs");
   }
@@ -65,11 +66,11 @@ public class Traefik extends Base {
   }
 
   public Cmd removeContainer() {
-    return Cmd.cmd("docker", "container", "prune", "--force", "--filter", "label=org.opencontainers.image.title=Traefik").description("remove traefik");
+    return docker().container().args("prune", "--force", "--filter", "label=org.opencontainers.image.title=Traefik").description("remove traefik");
   }
 
   public Cmd removeImage() {
-    return Cmd.cmd("docker", "image", "prune", "--force", "--filter", "label=org.opencontainers.image.title=Traefik").description("remove traefik image");
+    return docker().image().args("prune", "--force", "--filter", "label=org.opencontainers.image.title=Traefik").description("remove traefik image");
   }
 
   public Cmd makeEnvDirectory() {

@@ -1,23 +1,26 @@
 package dev.deploy4j.commands;
 
-import dev.rebelcraft.cmd.Cmd;
 import dev.deploy4j.configuration.Configuration;
+import dev.rebelcraft.cmd.Cmd;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-public class Accessory extends Base {
+import static dev.rebelcraft.cmd.pkgs.Docker.docker;
+import static dev.rebelcraft.cmd.pkgs.Grep.grep;
+
+public class AccessoryCommands extends BaseCommands {
 
   private final dev.deploy4j.configuration.Accessory accessoryConfig;
 
-  public Accessory(Configuration config, String name) {
+  public AccessoryCommands(Configuration config, String name) {
     super(config);
     this.accessoryConfig = config.accessory(name);
   }
 
   public Cmd run() {
-    return Cmd.cmd("docker", "run")
+    return docker().run()
       .args("--name", serviceName())
       .args("--detach")
       .args("--restart", "unless-stopped")
@@ -33,38 +36,38 @@ public class Accessory extends Base {
   }
 
   public Cmd start() {
-    return Cmd.cmd("docker", "container", "start", serviceName() );
+    return docker().container().args("start", serviceName());
   }
 
   public Cmd stop() {
-    return Cmd.cmd( "docker", "container", "stop", serviceName() );
+    return docker().container().args("stop", serviceName());
   }
 
   public Cmd info() {
-    return Cmd.cmd("docker", "ps")
+    return docker().ps()
       .args(serviceFilter());
   }
 
   public Cmd logs(String since, String lines, String grep, String grepOptions) {
     return pipe(
-      Cmd.cmd("docker", "logs")
+      docker().logs()
         .args(serviceName())
         .args(since != null ? List.of("--since", since) : List.of())
         .args(lines != null ? List.of("--tail", lines) : List.of())
         .args("--timestamps")
         .args("2>&1"),
-      grep != null ? Cmd.cmd("grep", "'" + grep + "'")
-        .args( grepOptions ) : null
+      grep != null ? grep().search(grep)
+        .args(grepOptions) : null
     );
   }
 
   // TODO: follow logs
 
   public Cmd executeInExistingContainer(String command) {
-    return Cmd.cmd( "docker", "exec" )
+    return docker().exec()
       // TODO: interactive mode
-      .args( serviceName() )
-      .args( command );
+      .args(serviceName())
+      .args(command);
   }
 
   // TODO: excecute in new container
@@ -73,30 +76,30 @@ public class Accessory extends Base {
   // TODO: run over ssh
 
   public void ensureLocalFilePresent(String localFile) {
-    if( !new File(localFile).exists() ) {
+    if (!new File(localFile).exists()) {
       throw new RuntimeException("Missing file: " + localFile);
     }
   }
 
   public Cmd removeServiceDirectory() {
-    return Cmd.cmd("rm", "-rf", serviceName() );
+    return Cmd.cmd("rm", "-rf", serviceName());
   }
 
   public Cmd removeContainer() {
-    return Cmd.cmd( "docker", "container", "prune", "--force")
-      .args( serviceFilter() );
+    return docker().container().args("prune", "--force")
+      .args(serviceFilter());
   }
 
   public Cmd removeImage() {
-    return Cmd.cmd( "docker", "image", "rm", "--force", image() );
+    return docker().image().args("rm", "--force", image());
   }
 
   public Cmd makeEnvDirectory() {
-    return makeDirectory( accessoryConfig().env().secretsDirectory() );
+    return makeDirectory(accessoryConfig().env().secretsDirectory());
   }
 
   public Cmd removeEnvFile() {
-    return Cmd.cmd( "rm", "-f", accessoryConfig().env().secretsDirectory() );
+    return Cmd.cmd("rm", "-f", accessoryConfig().env().secretsDirectory());
   }
 
   // private
@@ -104,7 +107,7 @@ public class Accessory extends Base {
   private String[] serviceFilter() {
     return new String[]{
       "--filter",
-      "label=service=" +  serviceName()
+      "label=service=" + serviceName()
     };
   }
 
