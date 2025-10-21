@@ -1,4 +1,4 @@
-package dev.deploy4j.ssh;
+package dev.rebelcraft.ssh;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;

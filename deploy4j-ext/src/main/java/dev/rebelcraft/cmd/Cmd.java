@@ -1,7 +1,6 @@
-package dev.deploy4j;
+package dev.rebelcraft.cmd;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 public class Cmd {
 
@@ -34,18 +33,6 @@ public class Cmd {
   public Cmd args(List<String> args) {
     if (args != null && !args.isEmpty()) {
       cmd.addAll(args);
-    }
-    return this;
-  }
-
-  // Add map of key/value pairs as repeated argument
-  // Example: mapArgs("-e", {"USER"="root"}) -> ["-e", "USER=root"]
-  public Cmd mapArgs(String option, Map<String, String> map) {
-    if (map != null) {
-      map.forEach((k, v) -> {
-        cmd.add(option);
-        cmd.add(k + "=" + v);
-      });
     }
     return this;
   }

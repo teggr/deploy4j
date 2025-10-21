@@ -9,6 +9,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
+        <module>deploy4j-ext</module>
         <module>deploy4j-core</module>
         <module>deploy4j-cli</module>
         <module>deploy4j-maven-plugin</module>

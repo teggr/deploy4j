@@ -1,7 +1,8 @@
 package dev.deploy4j.ssh;
 
-import dev.deploy4j.Cmd;
+import dev.rebelcraft.cmd.Cmd;
 import dev.deploy4j.configuration.Ssh;
+import dev.rebelcraft.ssh.SSHTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

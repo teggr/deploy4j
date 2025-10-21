@@ -1,9 +1,7 @@
 package dev.deploy4j.commands;
 
-import dev.deploy4j.Cmd;
-import dev.deploy4j.Utils;
+import dev.rebelcraft.cmd.Cmd;
 import dev.deploy4j.configuration.Configuration;
-import dev.deploy4j.raw.RegistryConfig;
 
 import static dev.deploy4j.Utils.escapeShellValue;
 import static dev.deploy4j.Utils.sensitive;

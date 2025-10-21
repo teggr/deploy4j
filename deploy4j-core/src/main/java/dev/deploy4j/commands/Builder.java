@@ -1,6 +1,6 @@
 package dev.deploy4j.commands;
 
-import dev.deploy4j.Cmd;
+import dev.rebelcraft.cmd.Cmd;
 import dev.deploy4j.configuration.Configuration;
 
 public class Builder extends Base {

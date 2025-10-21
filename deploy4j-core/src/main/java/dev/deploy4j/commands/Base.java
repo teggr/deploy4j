@@ -1,14 +1,11 @@
 package dev.deploy4j.commands;
 
-import dev.deploy4j.Cmd;
 import dev.deploy4j.Tags;
 import dev.deploy4j.configuration.Configuration;
+import dev.rebelcraft.cmd.Cmd;
+import dev.rebelcraft.cmd.Cmds;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,76 +45,57 @@ public abstract class Base {
   }
 
   public Cmd makeDirectoryFor(String remoteFile) {
-    return makeDirectory(new File(remoteFile).getParent());
+    return Cmds.makeDirectoryFor(remoteFile);
   }
 
   public Cmd makeDirectory(String path) {
-    return Cmd.cmd("mkdir", "-p", path);
+    return Cmds.makeDirectory(path);
   }
 
   public Cmd removeDirectory(String path) {
-    return Cmd.cmd("rm", "-r", path);
+    return Cmds.removeDirectory(path);
   }
 
   // private
 
   public Cmd combine(Cmd[] commands, String by) {
-
-    List<String> list = Stream.of(commands)
-      .filter(Objects::nonNull)
-      .map(cmd -> cmd.args( by ) )
-      .flatMap(cmd -> cmd.build().stream() )
-      .toList();
-
-    if(!list.isEmpty()) {
-      list = new ArrayList<>(list);
-      list.removeLast();
-    }
-
-    return Cmd.cmd( list.toArray( new String[0] ) );
-
+    return Cmds.combine(commands, by);
   }
 
-  // Overload with default separator
-
   protected Cmd combine(Cmd... commands) {
-    return combine(commands, "&&");
+    return Cmds.combine(commands);
   }
 
   protected Cmd chain(Cmd... commands) {
-    return combine(commands, ";");
+    return Cmds.chain(commands);
   }
 
   protected Cmd pipe(Cmd... commands) {
-    return combine(commands, "|");
+    return Cmds.pipe(commands);
   }
 
   protected Cmd append(Cmd... commands) {
-    return combine(commands, ">>");
+    return Cmds.append(commands);
   }
 
   protected Cmd write(Cmd... commands) {
-    return combine(commands, ">");
+    return Cmds.write(commands);
   }
 
   protected Cmd any(Cmd... commands) {
-    return combine(commands, "||");
+    return Cmds.any(commands);
   }
 
   protected Cmd xargs(Cmd cmd) {
-    return Cmd.cmd("xargs")
-      .args(cmd.build());
+    return Cmds.xargs(cmd);
   }
 
   protected Cmd shell(Cmd command) {
-    return Cmd.cmd(
-      "sh", "-c",
-      "'" + Stream.of(command).flatMap( Cmd -> command.build().stream() ).collect(Collectors.joining(" ")).replace("'", "'\\''") + "'"
-    );
+    return Cmds.shell(command);
   }
 
   protected Cmd substitute(Cmd... commands) {
-    return Cmd.cmd( "\\$\\(" + Stream.of( commands ).map( cmd ->cmd.build().get(0) ).collect(Collectors.joining(" ")) + "\\)" );
+    return Cmds.substitute(commands);
   }
 
   protected Cmd docker(String... args) {

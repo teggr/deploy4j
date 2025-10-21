@@ -1,6 +1,6 @@
 package dev.deploy4j.cli;
 
-import dev.deploy4j.Cmd;
+import dev.rebelcraft.cmd.Cmd;
 import dev.deploy4j.Commander;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -45,3 +45,14 @@ Env - https://github.com/cdimascio/dotenv-java
     The resulting .env file is pushed to the servers during deployment.
     The .env file is used by docker run --env-file to set environment variables for the containers.
     For host, accessory and traefik the env files are merged with other values
+
+## Next
+
+* unit tests
+* make some nice wrappers around command
+
+```
+Cmd.cmd("docker", "ps").args();
+// can i extend Cmd but have the methods return the extended type?
+Docker.ps().allContainers().args();
+```
