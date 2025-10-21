@@ -59,7 +59,7 @@ public abstract class Base {
   // private
 
   public Cmd combine(Cmd[] commands, String by) {
-    return Cmds.combine(commands, by);
+    return Cmds.combine(by, commands);
   }
 
   protected Cmd combine(Cmd... commands) {
@@ -92,10 +92,6 @@ public abstract class Base {
 
   protected Cmd shell(Cmd command) {
     return Cmds.shell(command);
-  }
-
-  protected Cmd substitute(Cmd... commands) {
-    return Cmds.substitute(commands);
   }
 
   protected Cmd docker(String... args) {

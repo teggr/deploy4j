@@ -1,10 +1,17 @@
 package dev.rebelcraft.cmd;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 public class Cmd {
 
   public static Cmd cmd(String... base) {
+    return new Cmd(base);
+  }
+
+  public static Cmd cmd(List<String> base) {
     return new Cmd(base);
   }
 
@@ -14,6 +21,11 @@ public class Cmd {
   private Cmd(String... base) {
     this.cmd = new ArrayList<>();
     Collections.addAll(this.cmd, base);
+  }
+
+  private Cmd(List<String> base) {
+    this.cmd = new ArrayList<>();
+    this.cmd.addAll(base);
   }
 
   public Cmd description(String description) {

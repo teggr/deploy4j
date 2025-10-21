@@ -21,7 +21,7 @@
 
         <dependency>
             <groupId>com.github.mwiede</groupId>
-            <artifactId>jsch</artifactId>
+           <artifactId>jsch</artifactId>
             <version>2.27.2</version>
         </dependency>
 
@@ -37,6 +37,8 @@
             <version>2.19.0</version>
         </dependency>
 
+
+
         <!-- testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -48,6 +50,12 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>5.10.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.24.2</version>
             <scope>test</scope>
         </dependency>
 
