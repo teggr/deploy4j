@@ -11,7 +11,6 @@ public class Deploy4jCliApplication {
     MainCommand app = new MainCommand();
 
     int exitCode = new CommandLine(app)
-      .setExecutionStrategy(app::executionStrategy)
       .execute(args);
     System.exit(exitCode);
 

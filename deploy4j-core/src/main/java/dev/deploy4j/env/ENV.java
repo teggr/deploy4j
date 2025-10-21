@@ -1,6 +1,7 @@
 package dev.deploy4j.env;
 
-import java.util.*;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * ENV provides access to environment variables. These are initially loaded from the system environment.
@@ -9,21 +10,10 @@ import java.util.*;
  */
 public class ENV {
 
-  private static final Map<String, String> env = new HashMap<>();
-
-  static {
-
-    // load system envs first time
-    loadSystemEnv();
-
-  }
-
-  private static void loadSystemEnv() {
-    env.putAll( System.getenv() );
-  }
+  private static final ConcurrentHashMap<String, String> env = new ConcurrentHashMap<>(System.getenv());
 
   public static Map<String, String> toHash() {
-    return Map.copyOf( env );
+    return Map.copyOf(env);
   }
 
   public static void clear() {
@@ -31,7 +21,7 @@ public class ENV {
   }
 
   public static void update(Map<String, String> newEnv) {
-    env.putAll( newEnv );
+    env.putAll(newEnv);
   }
 
   public static String fetch(String key) {
