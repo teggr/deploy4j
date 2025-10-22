@@ -1,14 +1,14 @@
 package dev.deploy4j;
 
 
-import dev.deploy4j.cli.MainCommand;
+import dev.deploy4j.cli.MainCliCommand;
 import picocli.CommandLine;
 
 public class Deploy4jCliApplication {
 
   public static void main(String[] args) {
 
-    MainCommand app = new MainCommand();
+    MainCliCommand app = new MainCliCommand();
 
     int exitCode = new CommandLine(app)
       .execute(args);

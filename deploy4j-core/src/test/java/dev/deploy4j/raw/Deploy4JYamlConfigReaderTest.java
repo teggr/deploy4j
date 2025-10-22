@@ -1,5 +1,7 @@
 package dev.deploy4j.raw;
 
+import dev.deploy4j.deploy.raw.DeployConfig;
+import dev.deploy4j.deploy.raw.DeployConfigYamlReader;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,7 +28,7 @@ class Deploy4JYamlConfigReaderTest {
       """;
 
     // when
-    Deploy4jConfig config = Deploy4jYamlConfigReader.readYamlFromString(yaml);
+    DeployConfig config = DeployConfigYamlReader.readYamlFromString(yaml);
 
     // then
     assertEquals("hey", config.service());

@@ -1,13 +1,5 @@
 package dev.deploy4j;
 
-import dev.deploy4j.cli.Cli;
-import dev.deploy4j.cli.Main;
-import dev.deploy4j.configuration.Configuration;
-import dev.deploy4j.raw.*;
-
-import java.util.List;
-import java.util.Map;
-
 class Deploy4jTest {
 
   public static void main(String[] args) {
