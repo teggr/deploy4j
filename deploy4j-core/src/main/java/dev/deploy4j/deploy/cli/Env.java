@@ -2,11 +2,15 @@ package dev.deploy4j.deploy.cli;
 
 import dev.deploy4j.deploy.configuration.Accessory;
 import dev.deploy4j.deploy.configuration.Role;
+import dev.deploy4j.deploy.host.commands.TraefikHostCommands;
 
 public class Env extends Base {
 
-  public Env(Commander commander) {
+  private final TraefikHostCommands traefik;
+
+  public Env(Commander commander, TraefikHostCommands traefik) {
     super(commander);
+    this.traefik = traefik;
   }
 
   /**
@@ -31,8 +35,8 @@ public class Env extends Base {
 
       on(commander().traefikHosts(), host -> {
 
-        host.execute(commander().traefik().makeEnvDirectory());
-        host.upload(commander().traefik().env().secretsIO(), commander().traefik().env().secretsFile(), 400);
+        host.execute(traefik.makeEnvDirectory());
+        host.upload(traefik.env().secretsIO(), traefik.env().secretsFile(), 400);
 
       });
 
@@ -73,7 +77,7 @@ public class Env extends Base {
 
       on(commander().traefikHosts(), host -> {
 
-        host.execute(commander().traefik().removeEnvFile());
+        host.execute(traefik.removeEnvFile());
 
       });
 

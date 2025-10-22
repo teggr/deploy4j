@@ -4,7 +4,9 @@ import dev.deploy4j.deploy.configuration.Accessory;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.configuration.ConfigureArgs;
 import dev.deploy4j.deploy.configuration.Role;
-import dev.deploy4j.deploy.host.commands.*;
+import dev.deploy4j.deploy.host.commands.AccessoryHostCommands;
+import dev.deploy4j.deploy.host.commands.AppHostCommands;
+import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHost;
 import dev.deploy4j.deploy.utils.Utils;
 
@@ -26,16 +28,6 @@ public class Commander implements AutoCloseable {
 
   private List<Role> specificRoles;
   private List<String> specificHosts;
-
-  private BuilderHostCommands builder;
-  private DockerHostCommands docker;
-  private HealthcheckHostCommands healthcheck;
-  private HookHostCommands hook;
-  private LockHostCommands lock;
-  private PruneHostCommands prune;
-  private RegistryHostCommands registry;
-  private ServerHostCommands server;
-  private TraefikHostCommands traefik;
 
   private Specifics specifics;
 
@@ -117,11 +109,11 @@ public class Commander implements AutoCloseable {
   }
 
   public AppHostCommands app(Role role, String host) {
-    return new AppHostCommands(config, role, host);
+    return new AppHostCommands(config(), role, host);
   }
 
   public AccessoryHostCommands accessory(String name) {
-    return new AccessoryHostCommands(config, name);
+    return new AccessoryHostCommands(config(), name);
   }
 
   public AuditorHostCommands auditor() {
@@ -130,69 +122,6 @@ public class Commander implements AutoCloseable {
 
   public AuditorHostCommands auditor(Map<String, String> details) {
     return new AuditorHostCommands(config(), details);
-  }
-
-  public BuilderHostCommands builder() {
-    if(builder == null) {
-      builder = new BuilderHostCommands(config());
-    }
-    return builder;
-  }
-
-  public DockerHostCommands docker() {
-    if(docker == null) {
-      docker = new DockerHostCommands(config());
-    }
-    return docker;
-  }
-
-  public HealthcheckHostCommands healthcheck() {
-    if(healthcheck == null) {
-      healthcheck = new HealthcheckHostCommands(config());
-    }
-    return healthcheck;
-  }
-
-  public HookHostCommands hook() {
-    if(hook == null) {
-      hook = new HookHostCommands(config());
-    }
-    return hook;
-  }
-
-  public LockHostCommands lock() {
-    if(lock == null) {
-      lock = new LockHostCommands(config());
-    }
-    return lock;
-  }
-
-  public PruneHostCommands prune() {
-    if(prune == null) {
-      prune = new PruneHostCommands(config());
-    }
-    return prune;
-  }
-
-  public RegistryHostCommands registry() {
-    if(registry == null) {
-      registry = new RegistryHostCommands(config());
-    }
-    return registry;
-  }
-
-  public ServerHostCommands server() {
-    if(server == null) {
-      server = new ServerHostCommands(config());
-    }
-    return server;
-  }
-
-  public TraefikHostCommands traefik() {
-    if(traefik == null) {
-      traefik = new TraefikHostCommands(config());
-    }
-    return traefik;
   }
 
   // TODO: with verbosity
@@ -269,14 +198,5 @@ public class Commander implements AutoCloseable {
     }
     return sshHost;
   }
-
-
-
-
-
-
-
-
-
 
 }

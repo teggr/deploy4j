@@ -1,9 +1,14 @@
 package dev.deploy4j.deploy.cli;
 
+import dev.deploy4j.deploy.host.commands.RegistryHostCommands;
+
 public class Registry extends Base {
 
-  public Registry(Commander commander) {
+  private final RegistryHostCommands registry;
+
+  public Registry(Commander commander, RegistryHostCommands registry) {
     super(commander);
+    this.registry = registry;
   }
 
   /**
@@ -15,7 +20,7 @@ public class Registry extends Base {
 
     on(commander().hosts(), host -> {
 
-      host.execute(commander().registry().login());
+      host.execute(registry.login());
 
     });
 
@@ -30,7 +35,7 @@ public class Registry extends Base {
 
     on(commander().hosts(), host -> {
 
-      host.execute(commander().registry().logout());
+      host.execute(registry.logout());
 
     });
 

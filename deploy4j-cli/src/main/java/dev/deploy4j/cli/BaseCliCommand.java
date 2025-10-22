@@ -32,7 +32,7 @@ public abstract class BaseCliCommand implements Callable<Integer> {
 
     Environment environment = new Environment(destination);
 
-    try (Commander commander = new Commander()) {
+    try (Commander commander = new Commander( )) {
 
       // local logging
       if (quiet) {

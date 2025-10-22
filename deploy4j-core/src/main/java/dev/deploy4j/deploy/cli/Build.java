@@ -1,11 +1,16 @@
 package dev.deploy4j.deploy.cli;
 
+import dev.deploy4j.deploy.host.commands.BuilderHostCommands;
+
 import java.util.List;
 
 public class Build extends Base {
 
-  public Build(Commander commander) {
+  private final BuilderHostCommands builder;
+
+  public Build(Commander commander, BuilderHostCommands builder) {
     super(commander);
+    this.builder = builder;
   }
 
   /**
@@ -23,9 +28,9 @@ public class Build extends Base {
     on(hosts, host -> {
 
       host.execute(commander().auditor().record("Pulled image with version " + commander().config().version()));
-      host.execute(commander().builder().clean());
-      host.execute(commander().builder().pull());
-      host.execute(commander().builder().validateImage());
+      host.execute(builder.clean());
+      host.execute(builder.pull());
+      host.execute(builder.validateImage());
 
     });
 

@@ -1,11 +1,19 @@
 package dev.deploy4j.deploy.cli;
 
+import dev.deploy4j.deploy.host.commands.LockHostCommands;
+import dev.deploy4j.deploy.host.commands.ServerHostCommands;
+
 import java.util.List;
 
 public class Lock extends Base {
 
-  public Lock(Commander commander) {
+  private final ServerHostCommands server;
+  private final LockHostCommands lock;
+
+  public Lock(Commander commander, ServerHostCommands server, LockHostCommands lock) {
     super(commander);
+    this.server = server;
+    this.lock = lock;
   }
 
   /**
@@ -17,8 +25,8 @@ public class Lock extends Base {
 
       on(List.of(commander().primaryHost()), host -> {;
 
-        host.execute(commander().server().ensureRunDirectory());
-        System.out.println( host.capture( commander().lock().status() ) );
+        host.execute(server.ensureRunDirectory());
+        System.out.println( host.capture( lock.status() ) );
 
       });
 
@@ -37,8 +45,8 @@ public class Lock extends Base {
 
       on(List.of(commander().primaryHost()), host -> {
 
-        host.execute(commander().server().ensureRunDirectory());
-        host.execute(commander().lock().acquire(message, commander().config().version()));
+        host.execute(server.ensureRunDirectory());
+        host.execute(lock.acquire(message, commander().config().version()));
 
       });
 
@@ -57,8 +65,8 @@ public class Lock extends Base {
 
       on(List.of(commander().primaryHost()), host -> {
 
-        host.execute(commander().server().ensureRunDirectory());
-        host.execute(commander().lock().release());
+        host.execute(server.ensureRunDirectory());
+        host.execute(lock.release());
 
       });
 

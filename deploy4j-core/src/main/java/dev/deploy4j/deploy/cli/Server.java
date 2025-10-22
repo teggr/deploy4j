@@ -1,5 +1,7 @@
 package dev.deploy4j.deploy.cli;
 
+import dev.deploy4j.deploy.host.commands.DockerHostCommands;
+import dev.deploy4j.deploy.host.commands.ServerHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,9 +13,13 @@ import java.util.stream.Collectors;
 public class Server extends Base {
 
   private static final Logger log = LoggerFactory.getLogger(Server.class);
+  private final DockerHostCommands docker;
+  private final ServerHostCommands server;
 
-  public Server(Commander commander) {
+  public Server(Commander commander, DockerHostCommands docker, ServerHostCommands server) {
     super(commander);
+    this.docker = docker;
+    this.server = server;
   }
 
   /**
@@ -54,16 +60,16 @@ public class Server extends Base {
 
       on(hosts, host -> {
 
-        if (!host.execute( commander().docker().installed() ) ) {
-          if (host.execute( commander().docker().superUser() ) ) {
+        if (!host.execute( docker.installed() ) ) {
+          if (host.execute( docker.superUser() ) ) {
             log.info("Missing Docker on {}. Installing...", host.hostName());
-            host.execute( commander().docker().install() );
+            host.execute( docker.install() );
           } else {
             missing.add(host);
           }
         }
 
-        host.execute( commander().server().ensureRunDirectory() );
+        host.execute( server.ensureRunDirectory() );
 
       });
 

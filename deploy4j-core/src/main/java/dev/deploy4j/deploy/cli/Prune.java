@@ -1,9 +1,14 @@
 package dev.deploy4j.deploy.cli;
 
+import dev.deploy4j.deploy.host.commands.PruneHostCommands;
+
 public class Prune extends Base {
 
-  public Prune(Commander commander) {
+  private final PruneHostCommands prune;
+
+  public Prune(Commander commander, PruneHostCommands prune) {
     super(commander);
+    this.prune = prune;
   }
 
   /**
@@ -30,8 +35,8 @@ public class Prune extends Base {
       on(commander().hosts(), host -> {
 
         host.execute(commander().auditor().record("Pruned images"));
-        host.execute(commander().prune().danglingImages());
-        host.execute(commander().prune().taggedImages());
+        host.execute(prune.danglingImages());
+        host.execute(prune.taggedImages());
 
 
       });
@@ -65,8 +70,8 @@ public class Prune extends Base {
       on(commander().hosts(), host -> {
 
         host.execute(commander().auditor().record("Pruned containers"));
-        host.execute(commander().prune().appContainers(finalRetain));
-        host.execute(commander().prune().healthcheckContainers());
+        host.execute(prune.appContainers(finalRetain));
+        host.execute(prune.healthcheckContainers());
 
       });
 

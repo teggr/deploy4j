@@ -1,5 +1,7 @@
 package dev.deploy4j.deploy.cli;
 
+import dev.deploy4j.deploy.host.commands.RegistryHostCommands;
+import dev.deploy4j.deploy.host.commands.TraefikHostCommands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,8 +9,13 @@ public class Traefik extends Base {
 
   private static final Logger log = LoggerFactory.getLogger(Traefik.class);
 
-  public Traefik(Commander commander) {
+  private final RegistryHostCommands registry;
+  private final TraefikHostCommands traefik;
+
+  public Traefik(Commander commander, RegistryHostCommands registry, TraefikHostCommands traefik) {
     super(commander);
+    this.registry = registry;
+    this.traefik = traefik;
   }
 
   /**
@@ -20,8 +27,8 @@ public class Traefik extends Base {
 
       on(commander().traefikHosts(), host -> {
 
-        host.execute(commander().registry().login());
-        host.execute(commander().traefik().startOrRun());
+        host.execute(registry.login());
+        host.execute(traefik.startOrRun());
 
       });
 
@@ -43,10 +50,10 @@ public class Traefik extends Base {
       on(commander().traefikHosts(), host -> {
 
         host.execute(commander().auditor().record("Rebooted traefik"));
-        host.execute(commander().registry().login());
-        host.execute(commander().traefik().stop());
-        host.execute(commander().traefik().removeContainer());
-        host.execute(commander().traefik().run());
+        host.execute(registry.login());
+        host.execute(traefik.stop());
+        host.execute(traefik.removeContainer());
+        host.execute(traefik.run());
 
       });
 
@@ -64,7 +71,7 @@ public class Traefik extends Base {
       on(commander().traefikHosts(), host -> {
 
         host.execute(commander().auditor().record("Started traefik"));
-        host.execute(commander().traefik().start());
+        host.execute(traefik.start());
 
 
       });
@@ -83,7 +90,7 @@ public class Traefik extends Base {
       on(commander().traefikHosts(), host -> {
 
         host.execute(commander().auditor().record("Stopped traefik"));
-        host.execute(commander().traefik().stop());
+        host.execute(traefik.stop());
 
 
       });
@@ -113,7 +120,7 @@ public class Traefik extends Base {
 
     on(commander().traefikHosts(), host -> {
 
-      System.out.println(host.capture(commander().traefik().info()));
+      System.out.println(host.capture(traefik.info()));
 
     });
 
@@ -145,7 +152,7 @@ public class Traefik extends Base {
 
     on(commander().traefikHosts(), host -> {
 
-      System.out.println(host.capture(commander().traefik().logs(since, lines != null ? lines.toString() : null, grep, grepOptions)));
+      System.out.println(host.capture(traefik.logs(since, lines != null ? lines.toString() : null, grep, grepOptions)));
 
     });
 
@@ -177,7 +184,7 @@ public class Traefik extends Base {
       on(commander().traefikHosts(), host -> {
 
         host.execute(commander().auditor().record("Removed traefik container"));
-        host.execute(commander().traefik().removeContainer());
+        host.execute(traefik.removeContainer());
 
       });
 
@@ -195,7 +202,7 @@ public class Traefik extends Base {
       on(commander().traefikHosts(), host -> {
 
         host.execute(commander().auditor().record("Removed traefik image"));
-        host.execute(commander().traefik().removeImage());
+        host.execute(traefik.removeImage());
 
       });
 
