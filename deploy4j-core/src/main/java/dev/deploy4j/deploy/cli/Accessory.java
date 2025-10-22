@@ -1,6 +1,7 @@
 package dev.deploy4j.deploy.cli;
 
 import dev.deploy4j.deploy.host.commands.AccessoryHostCommands;
+import dev.deploy4j.deploy.host.commands.RegistryHostCommands;
 import dev.rebelcraft.cmd.Cmd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +15,11 @@ public class Accessory extends Base {
 
   private static final Logger log = LoggerFactory.getLogger(Accessory.class);
 
-  public Accessory(Commander commander) {
+  private final RegistryHostCommands registry;
+
+  public Accessory(Commander commander, RegistryHostCommands registry) {
     super(commander);
+    this.registry = registry;
   }
 
   /**
@@ -52,7 +56,7 @@ public class Accessory extends Base {
           on(hosts, host -> {
 
             if (login) {
-              host.execute(commander().registry().login());
+              host.execute(registry.login());
             }
             host.execute(commander().auditor().record("Booted " + name + " accessory"));
             host.execute(accessory.run());
@@ -136,7 +140,7 @@ public class Accessory extends Base {
 
           on(hosts, host -> {
 
-            host.execute(commander().registry().login());
+            host.execute(registry.login());
 
           });
 

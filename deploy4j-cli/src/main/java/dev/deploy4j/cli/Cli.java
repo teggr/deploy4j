@@ -40,7 +40,7 @@ public class Cli {
     this.app = new App(commander);
     this.server = new Server(commander, docker, server);
     this.env = new Env(commander, traefik);
-    this.accessory = new Accessory(commander);
+    this.accessory = new Accessory(commander, registry);
     this.registry = new Registry(commander, registry);
     this.build = new Build(commander, builder);
     this.prune = new Prune(commander, prune);
