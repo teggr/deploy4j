@@ -7,8 +7,8 @@ public class Traefik extends Base {
 
   private static final Logger log = LoggerFactory.getLogger(Traefik.class);
 
-  public Traefik(Cli cli, Commander commander) {
-    super(cli, commander);
+  public Traefik(Commander commander) {
+    super(commander);
   }
 
   /**

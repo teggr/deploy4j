@@ -5,8 +5,8 @@ import dev.deploy4j.deploy.configuration.Role;
 
 public class Env extends Base {
 
-  public Env(Cli cli, Commander commander) {
-    super(cli, commander);
+  public Env(Commander commander) {
+    super(commander);
   }
 
   /**

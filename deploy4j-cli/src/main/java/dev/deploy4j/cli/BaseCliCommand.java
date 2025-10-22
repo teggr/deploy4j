@@ -2,7 +2,6 @@ package dev.deploy4j.cli;
 
 import dev.deploy4j.deploy.cli.Commander;
 import dev.deploy4j.deploy.cli.Environment;
-import dev.deploy4j.deploy.cli.Cli;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;

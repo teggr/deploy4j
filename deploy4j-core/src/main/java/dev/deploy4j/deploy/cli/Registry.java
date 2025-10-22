@@ -2,8 +2,8 @@ package dev.deploy4j.deploy.cli;
 
 public class Registry extends Base {
 
-  public Registry(Cli cli, Commander commander) {
-    super(cli, commander);
+  public Registry(Commander commander) {
+    super(commander);
   }
 
   /**

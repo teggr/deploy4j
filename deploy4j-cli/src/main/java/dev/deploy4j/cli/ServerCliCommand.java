@@ -1,6 +1,5 @@
 package dev.deploy4j.cli;
 
-import dev.deploy4j.deploy.cli.Cli;
 import picocli.CommandLine;
 
 @CommandLine.Command(

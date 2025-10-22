@@ -1,4 +1,6 @@
-package dev.deploy4j.deploy.cli;
+package dev.deploy4j.cli;
+
+import dev.deploy4j.deploy.cli.*;
 
 public class Cli {
 
@@ -17,20 +19,17 @@ public class Cli {
 
   public Cli(Environment environment, Commander commander) {
 
+    this.app = new App( commander);
+    this.server = new Server( commander);
+    this.env = new Env(commander);
+    this.accessory = new Accessory(commander);
+    this.registry = new Registry( commander);
+    this.build = new Build( commander);
+    this.prune = new Prune(commander);
     this.environment = environment;
-
-    this.main = new Main(this, commander);
-    this.server = new Server(this, commander);
-    this.registry = new Registry(this, commander);
-    this.build = new Build(this, commander);
-
-    this.traefik = new Traefik(this, commander);
-    this.app = new App(this, commander);
-    this.prune = new Prune(this, commander);
-    this.accessory = new Accessory(this, commander);
-
-    this.lock = new Lock(this, commander);
-    this.env = new Env(this,commander);
+    this.traefik = new Traefik(commander);
+    this.lock = new Lock(commander);
+    this.main = new Main(commander, app, server, env, accessory, registry, build, prune, environment, traefik );
 
   }
 

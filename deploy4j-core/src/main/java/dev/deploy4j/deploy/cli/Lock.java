@@ -4,8 +4,8 @@ import java.util.List;
 
 public class Lock extends Base {
 
-  public Lock(Cli cli, Commander commander) {
-    super(cli, commander);
+  public Lock(Commander commander) {
+    super(commander);
   }
 
   /**

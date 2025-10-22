@@ -7,16 +7,10 @@ import java.util.function.Consumer;
 
 public class Base {
 
-  private final Cli cli;
   private final Commander commander;
 
-  public Base(Cli cli, Commander commander) {
-    this.cli = cli;
+  public Base(Commander commander) {
     this.commander = commander;
-  }
-
-  public Cli cli() {
-    return cli;
   }
 
   public Commander commander() {
@@ -25,7 +19,7 @@ public class Base {
 
   // private
 
-  protected void withLock(Runnable runnable) {
+  public void withLock(Runnable runnable) {
     if (commander.holdingLock()) {
       runnable.run();
     } else {
@@ -93,8 +87,8 @@ public class Base {
   protected void on(List<String> hosts, Consumer<SshHost> block) {
 
     hosts.stream()
-      .map(h -> commander.host(h))
-      .forEach(block::accept);
+      .map(commander::host)
+      .forEach(block);
 
   }
 

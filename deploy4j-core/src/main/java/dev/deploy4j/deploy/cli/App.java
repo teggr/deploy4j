@@ -17,8 +17,8 @@ public class App extends Base {
 
   private static final Logger log = LoggerFactory.getLogger(App.class);
 
-  public App(Cli cli, Commander commander) {
-    super(cli, commander);
+  public App(Commander commander) {
+    super(commander);
   }
 
   /**

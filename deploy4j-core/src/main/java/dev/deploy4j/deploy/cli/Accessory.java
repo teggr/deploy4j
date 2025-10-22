@@ -14,8 +14,8 @@ public class Accessory extends Base {
 
   private static final Logger log = LoggerFactory.getLogger(Accessory.class);
 
-  public Accessory(Cli cli, Commander commander) {
-    super(cli, commander);
+  public Accessory(Commander commander) {
+    super(commander);
   }
 
   /**

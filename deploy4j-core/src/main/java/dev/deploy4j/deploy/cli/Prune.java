@@ -2,8 +2,8 @@ package dev.deploy4j.deploy.cli;
 
 public class Prune extends Base {
 
-  public Prune(Cli cli, Commander commander) {
-    super(cli, commander);
+  public Prune(Commander commander) {
+    super(commander);
   }
 
   /**

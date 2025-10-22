@@ -12,8 +12,8 @@ public class Server extends Base {
 
   private static final Logger log = LoggerFactory.getLogger(Server.class);
 
-  public Server(Cli cli, Commander commander) {
-    super(cli, commander);
+  public Server(Commander commander) {
+    super(commander);
   }
 
   /**

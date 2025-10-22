@@ -4,8 +4,8 @@ import java.util.List;
 
 public class Build extends Base {
 
-  public Build(Cli cli, Commander commander) {
-    super(cli, commander);
+  public Build(Commander commander) {
+    super(commander);
   }
 
   /**

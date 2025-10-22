@@ -16,8 +16,27 @@ public class Main extends Base {
 
   private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-  public Main(Cli cli, Commander commander) {
-    super(cli, commander);
+  private final App app;
+  private final Server server;
+  private final Env env;
+  private final Accessory accessory;
+  private final Registry registry;
+  private final Build build;
+  private final Prune prune;
+  private final Environment environment;
+  private final Traefik traefik;
+
+  public Main(Commander commander, App app, Server server, Env env, Accessory accessory, Registry registry, Build build, Prune prune, Environment environment, Traefik traefik) {
+    super(commander);
+    this.app = app;
+    this.server = server;
+    this.env = env;
+    this.accessory = accessory;
+    this.registry = registry;
+    this.build = build;
+    this.prune = prune;
+    this.environment = environment;
+    this.traefik = traefik;
   }
 
   /**
@@ -30,13 +49,13 @@ public class Main extends Base {
     withLock(() -> {
 
       System.out.println("Ensure Docker is installed...");
-      cli().server().bootstrap();
+      server.bootstrap();
 
       System.out.println("Evaluate and push env files...");
-      cli().main().envify(false, null);
-      cli().env().push();
+      envify(false, null);
+      env.push();
 
-      cli().accessory().boot("all", true);
+      accessory.boot("all", true);
 
       deploy(skipPush);
 
@@ -53,25 +72,25 @@ public class Main extends Base {
   public void deploy(boolean skipPush) {
 
     System.out.println("Log into image registry...");
-    cli().registry().login();
+    registry.login();
 
     if (skipPush) {
       System.out.println("Pull app image...");
-      cli().build().pull();
+      build.pull();
     }
 
     withLock(() -> {
 
       System.out.println("Ensure Traefik is running...");
-      cli().traefik().boot();
+      traefik.boot();
 
       System.out.println("Detect stale containers...");
-      cli().app().staleContainers();
+      app.staleContainers();
 
-      cli().app().boot();
+      app.boot();
 
       System.out.println("Prune old containers and images...");
-      cli().prune().all();
+      prune.all();
 
     });
 
@@ -86,15 +105,15 @@ public class Main extends Base {
 
     if (skipPush) {
       System.out.println("Pull app image...");
-      cli().build().pull();
+      build.pull();
     }
 
     withLock(() -> {
 
       System.out.println("Detect stale containers...");
-      cli().app().staleContainers();
+      app.staleContainers();
 
-      cli().app().boot();
+      app.boot();
 
     });
 
@@ -115,7 +134,7 @@ public class Main extends Base {
 
       if (containerAvailable(version)) {
 
-        cli().app().boot();
+        app.boot();
         rolledBack = true;
       } else {
         System.err.println("The app version '%s' is not available as a container (use 'deploy4j app containers' for available versions)".formatted(version));
@@ -129,9 +148,9 @@ public class Main extends Base {
    * Show details about all containers
    */
   public void details() {
-    cli().traefik().details();
-    cli().app().details();
-    cli().accessory().details("all");
+    traefik.details();
+    app.details();
+    accessory.details("all");
   }
 
   /**
@@ -213,7 +232,7 @@ public class Main extends Base {
 
     File envTemplateFile = new File(envTemplatePath);
     if (envTemplateFile.exists()) {
-      String content = cli().environment()
+      String content = environment
         .withOriginalEnv(() -> new ERB(envTemplateFile).result());
       try {
         FileUtils.writeStringToFile(new File(envPath), content, StandardCharsets.UTF_8);
@@ -222,8 +241,8 @@ public class Main extends Base {
       }
 
       if (skipPush) {
-        cli().environment().reloadEnv();
-        cli().env().push();
+        environment.reloadEnv();
+        env.push();
       }
 
     } else {
@@ -240,10 +259,10 @@ public class Main extends Base {
 
     withLock(() -> {
 
-      cli().traefik().remove();
-      cli().app().remove();
-      cli().accessory().remove("all");
-      cli().registry().logout();
+      traefik.remove();
+      app.remove();
+      accessory.remove("all");
+      registry.logout();
 
     });
 
