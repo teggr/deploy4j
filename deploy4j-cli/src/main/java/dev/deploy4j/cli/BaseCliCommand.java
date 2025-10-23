@@ -3,6 +3,7 @@ package dev.deploy4j.cli;
 import dev.deploy4j.deploy.Commander;
 import dev.deploy4j.deploy.DeployApplicationContext;
 import dev.deploy4j.deploy.Environment;
+import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 import picocli.CommandLine;
 
@@ -43,11 +44,9 @@ public abstract class BaseCliCommand implements Callable<Integer> {
       System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
     }
 
-    Commander commander = new Commander( );
-    commander.configure(configFile, destination, version);
-    commander.specificHosts(hosts);
-    commander.specificRoles(roles);
-    if (primary != null) commander.specificPrimary(primary);
+    Configuration configuration = Configuration.createFrom(configFile, destination, version);
+
+    Commander commander = new Commander(configuration, hosts, roles, primary);
 
     try (SshHosts sshHosts = new SshHosts(commander.config())) {
 

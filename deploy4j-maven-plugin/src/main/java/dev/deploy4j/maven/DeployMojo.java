@@ -1,7 +1,9 @@
 package dev.deploy4j.maven;
 
+import dev.deploy4j.deploy.Commander;
 import dev.deploy4j.deploy.DeployApplicationContext;
 import dev.deploy4j.deploy.Environment;
+import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -40,11 +42,9 @@ public class DeployMojo extends AbstractMojo {
 //      System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
 //    }
 
-    dev.deploy4j.deploy.Commander commander = new dev.deploy4j.deploy.Commander();
-    commander.configure(configFile, destination, version);
-//    commander.specificHosts(hosts);
-//    commander.specificRoles(roles);
-//    if (primary != null) commander.specificPrimary(primary);
+    Configuration configuration = Configuration.createFrom(configFile, destination, version);
+
+    Commander commander = new Commander(configuration, null, null, null); // specific hosts, roles, primary not yet supported
 
     try (SshHosts sshHosts = new SshHosts(commander.config())) {
 

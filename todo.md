@@ -3,7 +3,6 @@
 * unit tests
 * move deploy4j-droplet to its own repo + deploy to dockerhub + mount key as volume
 * extract config from commander?
-* boot the config before command
 * remove host commands from commander
   * app
   * accessory

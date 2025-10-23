@@ -36,6 +36,10 @@ public class Configuration {
     return null;
   }
 
+  public static Configuration createFrom(String configFile, String destination, String version) {
+    return createFrom(new ConfigureArgs(configFile, destination, version));
+  }
+
   private final String destination;
   private final DeployConfig rawConfig;
 
