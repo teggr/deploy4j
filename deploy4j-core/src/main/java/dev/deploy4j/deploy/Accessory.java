@@ -1,6 +1,7 @@
 package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.host.commands.AccessoryHostCommands;
+import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.host.commands.RegistryHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 import dev.rebelcraft.cmd.Cmd;
@@ -18,11 +19,13 @@ public class Accessory extends Base {
 
   private final LockManager lockManager;
   private final RegistryHostCommands registry;
+  private final AuditorHostCommands audit;
 
-  public Accessory(SshHosts sshHosts, LockManager lockManager, RegistryHostCommands registry) {
+  public Accessory(SshHosts sshHosts, LockManager lockManager, RegistryHostCommands registry, AuditorHostCommands audit) {
     super(sshHosts);
     this.lockManager = lockManager;
     this.registry = registry;
+    this.audit = audit;
   }
 
   /**
@@ -61,7 +64,7 @@ public class Accessory extends Base {
             if (login) {
               host.execute(registry.login());
             }
-            host.execute(commander.auditor().record("Booted " + name + " accessory"));
+            host.execute(audit.record("Booted " + name + " accessory"));
             host.execute(accessory.run());
 
           });
@@ -170,7 +173,7 @@ public class Accessory extends Base {
 
         on(hosts, host -> {
 
-          host.execute(commander.auditor().record("Started " + name + " accessory"));
+          host.execute(audit.record("Started " + name + " accessory"));
           host.execute(accessory.start());
 
         });
@@ -192,7 +195,7 @@ public class Accessory extends Base {
 
         on(hosts, host -> {
 
-          host.execute(commander.auditor().record("Stopped " + name + " accessory"));
+          host.execute(audit.record("Stopped " + name + " accessory"));
           host.execute(accessory.stop());
 
         });
@@ -266,7 +269,7 @@ public class Accessory extends Base {
       System.out.println("Launching command from existing container...");
       on(hosts, host -> {
 
-        host.execute(commander.auditor().record("Executed cmd '" + cmd + "' on " + name + " accessory"));
+        host.execute(audit.record("Executed cmd '" + cmd + "' on " + name + " accessory"));
         host.capture(accessory.executeInExistingContainer(cmd));
 
       });
@@ -348,7 +351,7 @@ public class Accessory extends Base {
 
         on(hosts, host -> {
 
-          host.execute(commander.auditor().record("Remove " + name + " accessory container"));
+          host.execute(audit.record("Remove " + name + " accessory container"));
           host.execute(accessory.removeContainer());
 
         });
@@ -371,7 +374,7 @@ public class Accessory extends Base {
 
         on(hosts, host -> {
 
-          host.execute(commander.auditor().record("Removed " + name + " accessory image"));
+          host.execute(audit.record("Removed " + name + " accessory image"));
           host.execute(accessory.removeImage());
 
         });

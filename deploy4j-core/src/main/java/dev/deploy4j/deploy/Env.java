@@ -2,6 +2,7 @@ package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.configuration.Accessory;
 import dev.deploy4j.deploy.configuration.Role;
+import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.host.commands.TraefikHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 import dev.deploy4j.deploy.utils.erb.ERB;
@@ -16,12 +17,14 @@ public class Env extends Base {
   private final LockManager lockManager;
   private final TraefikHostCommands traefik;
   private final Environment environment;
+  private final AuditorHostCommands audit;
 
-  public Env(SshHosts sshHosts, LockManager lockManager, TraefikHostCommands traefik, Environment environment ) {
+  public Env(SshHosts sshHosts, LockManager lockManager, TraefikHostCommands traefik, Environment environment, AuditorHostCommands audit) {
     super(sshHosts);
     this.lockManager = lockManager;
     this.traefik = traefik;
     this.environment = environment;
+    this.audit = audit;
   }
 
   /**
@@ -33,7 +36,7 @@ public class Env extends Base {
 
       on(commander.hosts(), host -> {
 
-        host.execute(commander.auditor().record("Pushed env files"));
+        host.execute(audit.record("Pushed env files"));
 
         for (Role role : commander.rolesOn(host.hostName())) {
 
@@ -76,7 +79,7 @@ public class Env extends Base {
 
       on(commander.hosts(), host -> {
 
-        host.execute(commander.auditor().record("Deleted env files"));
+        host.execute(audit.record("Deleted env files"));
 
         for (Role role : commander.rolesOn(host.hostName())) {
 

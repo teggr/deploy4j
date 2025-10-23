@@ -1,5 +1,6 @@
 package dev.deploy4j.deploy;
 
+import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.host.commands.BuilderHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 
@@ -8,10 +9,12 @@ import java.util.List;
 public class Build extends Base {
 
   private final BuilderHostCommands builder;
+  private final AuditorHostCommands audit;
 
-  public Build(SshHosts sshHosts, BuilderHostCommands builder) {
+  public Build(SshHosts sshHosts, BuilderHostCommands builder, AuditorHostCommands audit) {
     super(sshHosts);
     this.builder = builder;
+    this.audit = audit;
   }
 
   /**
@@ -28,7 +31,7 @@ public class Build extends Base {
 
     on(hosts, host -> {
 
-      host.execute(commander.auditor().record("Pulled image with version " + commander.config().version()));
+      host.execute(audit.record("Pulled image with version " + commander.config().version()));
       host.execute(builder.clean());
       host.execute(builder.pull());
       host.execute(builder.validateImage());

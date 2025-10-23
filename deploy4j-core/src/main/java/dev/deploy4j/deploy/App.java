@@ -5,6 +5,7 @@ import dev.deploy4j.deploy.app.PrepareAssets;
 import dev.deploy4j.deploy.healthcheck.Barrier;
 import dev.deploy4j.deploy.host.commands.AppHostCommands;
 import dev.deploy4j.deploy.configuration.Role;
+import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +19,12 @@ public class App extends Base {
 
   private static final Logger log = LoggerFactory.getLogger(App.class);
   private final LockManager lockManager;
+  private final AuditorHostCommands audit;
 
-  public App(SshHosts sshHosts, LockManager lockManager) {
+  public App(SshHosts sshHosts, LockManager lockManager, AuditorHostCommands audit) {
     super(sshHosts);
     this.lockManager = lockManager;
+    this.audit = audit;
   }
 
   /**
@@ -52,7 +55,7 @@ public class App extends Base {
 
           for( Role role : commander.rolesOn(host.hostName()) ) {
 
-            Boot appBoot = new Boot(host.hostName(), role, host, version, barrier, commander);
+            Boot appBoot = new Boot(host.hostName(), role, host, version, barrier, commander, audit);
             appBoot.run();
 
           }
@@ -61,7 +64,7 @@ public class App extends Base {
 
         on(commander.hosts(), host -> {
 
-          host.execute(commander.auditor().record("Tagging " + commander.config().absoluteImage() + " as the latest image"));
+          host.execute(audit.record("Tagging " + commander.config().absoluteImage() + " as the latest image"));
           host.execute(commander.app(null, null)
             .tagLatestImage());
 
@@ -84,7 +87,7 @@ public class App extends Base {
 
         for (Role role : commander.rolesOn(host.hostName())) {
 
-          host.execute(commander.auditor().record("Started app version " + commander.config().version()));
+          host.execute(audit.record("Started app version " + commander.config().version()));
           host.execute(commander.app(role, host.hostName()).start());
 
         }
@@ -106,7 +109,7 @@ public class App extends Base {
 
         for (Role role : commander.rolesOn(host.hostName())) {
 
-          host.execute(commander.auditor().record("Stopped app"));
+          host.execute(audit.record("Stopped app"));
           host.execute(commander.app(role, host.hostName()).stop());
 
         }
@@ -155,7 +158,7 @@ public class App extends Base {
 
         for (Role role : commander.rolesOn(host.hostName())) {
 
-          host.execute(commander.auditor().record("Executed cmd '" + cmd + "' on app version " + version));
+          host.execute(audit.record("Executed cmd '" + cmd + "' on app version " + version));
           System.out.println(host.capture(commander.app(role, host.hostName()).executeInExistingContainer(cmd, env)));
 
         }
@@ -289,7 +292,7 @@ public class App extends Base {
 
         for (Role role : commander.rolesOn(host.hostName())) {
 
-          host.execute(commander.auditor().record("Removed app container with version " + version));
+          host.execute(audit.record("Removed app container with version " + version));
           host.execute(commander.app(role, host.hostName()).removeContainer(version));
 
         }
@@ -311,7 +314,7 @@ public class App extends Base {
 
         for (Role role : commander.rolesOn(host.hostName())) {
 
-          host.execute(commander.auditor().record("Removed all app containers"));
+          host.execute(audit.record("Removed all app containers"));
           host.execute(commander.app(role, host.hostName()).removeContainers());
 
         }
@@ -333,7 +336,7 @@ public class App extends Base {
 
         for (Role role : commander.rolesOn(host.hostName())) {
 
-          host.execute(commander.auditor().record("Removed all app images"));
+          host.execute(audit.record("Removed all app images"));
           host.execute(commander.app(role, host.hostName()).removeImages());
 
         }

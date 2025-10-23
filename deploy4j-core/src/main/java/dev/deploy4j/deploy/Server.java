@@ -1,5 +1,6 @@
 package dev.deploy4j.deploy;
 
+import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.host.commands.DockerHostCommands;
 import dev.deploy4j.deploy.host.commands.ServerHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHost;
@@ -17,12 +18,14 @@ public class Server extends Base {
   private final LockManager lockManager;
   private final DockerHostCommands docker;
   private final ServerHostCommands server;
+  private final AuditorHostCommands audit;
 
-  public Server(SshHosts sshHosts, LockManager lockManager, DockerHostCommands docker, ServerHostCommands server) {
+  public Server(SshHosts sshHosts, LockManager lockManager, DockerHostCommands docker, ServerHostCommands server, AuditorHostCommands audit) {
     super(sshHosts);
     this.lockManager = lockManager;
     this.docker = docker;
     this.server = server;
+    this.audit = audit;
   }
 
   /**
@@ -41,7 +44,7 @@ public class Server extends Base {
 
     on(hosts, host -> {
 
-      host.execute( commander.auditor().record( "Executed cmd '" + cmd + "' on " + host.hostName() ) );
+      host.execute( audit.record( "Executed cmd '" + cmd + "' on " + host.hostName() ) );
       System.out.println( host.capture( cmd ) );
 
     });

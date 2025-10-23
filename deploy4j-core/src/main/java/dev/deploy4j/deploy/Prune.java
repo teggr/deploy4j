@@ -1,5 +1,6 @@
 package dev.deploy4j.deploy;
 
+import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.host.commands.PruneHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 
@@ -7,11 +8,13 @@ public class Prune extends Base {
 
   private final LockManager lockManager;
   private final PruneHostCommands prune;
+  private final AuditorHostCommands audit;
 
-  public Prune(SshHosts sshHosts, LockManager lockManager, PruneHostCommands prune) {
+  public Prune(SshHosts sshHosts, LockManager lockManager, PruneHostCommands prune, AuditorHostCommands audit) {
     super(sshHosts);
     this.lockManager = lockManager;
     this.prune = prune;
+    this.audit = audit;
   }
 
   /**
@@ -37,7 +40,7 @@ public class Prune extends Base {
 
       on(commander.hosts(), host -> {
 
-        host.execute(commander.auditor().record("Pruned images"));
+        host.execute(audit.record("Pruned images"));
         host.execute(prune.danglingImages());
         host.execute(prune.taggedImages());
 
@@ -72,7 +75,7 @@ public class Prune extends Base {
 
       on(commander.hosts(), host -> {
 
-        host.execute(commander.auditor().record("Pruned containers"));
+        host.execute(audit.record("Pruned containers"));
         host.execute(prune.appContainers(finalRetain));
         host.execute(prune.healthcheckContainers());
 

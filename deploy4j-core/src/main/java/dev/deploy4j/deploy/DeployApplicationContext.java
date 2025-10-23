@@ -4,6 +4,8 @@ import dev.deploy4j.deploy.host.commands.*;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 import dev.deploy4j.init.Initializer;
 
+import java.util.Map;
+
 public class DeployApplicationContext {
 
   private final Environment environment;
@@ -46,20 +48,22 @@ public class DeployApplicationContext {
 
     TraefikHostCommands traefik = new TraefikHostCommands(commander.config());
 
+    AuditorHostCommands audit = new AuditorHostCommands(commander.config(), Map.of());
+
     this.lockManager = new LockManager(sshHosts, lock, server, commander.config().version());
 
-    this.app = new App(sshHosts, lockManager);
-    this.server = new Server(sshHosts, lockManager, docker, server);
-    this.env = new Env(sshHosts, lockManager, traefik, this.environment);
-    this.accessory = new Accessory(sshHosts, lockManager, registry);
+    this.app = new App(sshHosts, lockManager, audit);
+    this.server = new Server(sshHosts, lockManager, docker, server, audit);
+    this.env = new Env(sshHosts, lockManager, traefik, this.environment, audit);
+    this.accessory = new Accessory(sshHosts, lockManager, registry, audit);
     this.registry = new Registry(sshHosts, registry);
-    this.build = new Build(sshHosts, builder);
-    this.prune = new Prune(sshHosts, lockManager, prune);
-    this.traefik = new Traefik(sshHosts, lockManager, registry, traefik);
+    this.build = new Build(sshHosts, builder, audit);
+    this.prune = new Prune(sshHosts, lockManager, prune, audit);
+    this.traefik = new Traefik(sshHosts, lockManager, registry, traefik, audit);
     this.lock = new Lock(sshHosts, lockManager, server, lock);
 
     this.initializer = new Initializer();
-    this.audit = new Audit(sshHosts);
+    this.audit = new Audit(sshHosts, audit);
     this.version = new Version();
     this.deploy = new Deploy(sshHosts, lockManager, this.app, this.server, this.env, this.accessory, this.registry, build, this.prune, this.traefik);
 

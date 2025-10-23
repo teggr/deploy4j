@@ -6,7 +6,6 @@
 * remove host commands from commander
   * app
   * accessory
-  * auditor
 
 # Notes
 

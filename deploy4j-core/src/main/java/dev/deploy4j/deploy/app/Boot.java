@@ -22,15 +22,18 @@ public class Boot {
   private final String version;
   private final Barrier barrier;
   private final Commander commander;
+  private final AuditorHostCommands audit;
+
   private AppHostCommands app;
 
-  public Boot(String host, Role role, SshHost sshHost, String version, Barrier barrier, Commander commander) {
+  public Boot(String host, Role role, SshHost sshHost, String version, Barrier barrier, Commander commander, AuditorHostCommands audit) {
     this.host = host;
     this.role = role;
     this.sshHost = sshHost;
     this.version = version;
     this.barrier = barrier;
     this.commander = commander;
+    this.audit = audit;
   }
 
   public void run() {
@@ -166,12 +169,8 @@ public class Boot {
     return app;
   }
 
-  private AuditorHostCommands auditor() {
-    return commander.auditor();
-  }
-
   private void audit(String message) {
-    sshHost().execute( auditor().record(message) );
+    sshHost().execute( audit.record(message) );
   }
 
   private boolean gatekeeper() {

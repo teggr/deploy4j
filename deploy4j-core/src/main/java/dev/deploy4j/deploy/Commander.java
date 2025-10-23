@@ -93,14 +93,6 @@ public class Commander implements LockContext {
     return new AccessoryHostCommands(config(), name);
   }
 
-  public AuditorHostCommands auditor() {
-    return auditor(null);
-  }
-
-  public AuditorHostCommands auditor(Map<String, String> details) {
-    return new AuditorHostCommands(config(), details);
-  }
-
   // TODO: with verbosity
   // TODO: boot strategy
 

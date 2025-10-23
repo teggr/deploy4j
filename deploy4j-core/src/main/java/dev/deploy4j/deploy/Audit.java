@@ -1,11 +1,15 @@
 package dev.deploy4j.deploy;
 
+import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 
 public class Audit extends Base {
 
-  public Audit(SshHosts sshHosts) {
+  private final AuditorHostCommands audit;
+
+  public Audit(SshHosts sshHosts, AuditorHostCommands audit) {
     super(sshHosts);
+    this.audit = audit;
   }
 
   /**
@@ -13,7 +17,7 @@ public class Audit extends Base {
    */
   public void audit(Commander commander) {
     on(commander.hosts(), host -> {
-      System.out.println(host.capture(commander.auditor().reveal()));
+      System.out.println(host.capture(audit.reveal()));
     });
   }
 
