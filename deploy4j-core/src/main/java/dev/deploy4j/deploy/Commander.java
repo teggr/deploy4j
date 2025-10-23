@@ -5,11 +5,9 @@ import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.configuration.Role;
 import dev.deploy4j.deploy.host.commands.AccessoryHostCommands;
 import dev.deploy4j.deploy.host.commands.AppHostCommands;
-import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.utils.Utils;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Context class to hold shared information and configurations for deployment processes.
@@ -85,14 +83,6 @@ public class Commander implements LockContext {
       .toList();
   }
 
-  public AppHostCommands app(Role role, String host) {
-    return new AppHostCommands(config(), role, host);
-  }
-
-  public AccessoryHostCommands accessory(String name) {
-    return new AccessoryHostCommands(config(), name);
-  }
-
   // TODO: with verbosity
   // TODO: boot strategy
 
@@ -147,7 +137,7 @@ public class Commander implements LockContext {
   }
 
   public List<String> accessoryHosts() {
-    return specifics().accessoryHosts();
+    return specifics.accessoryHosts();
   }
 
 }

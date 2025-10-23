@@ -2,8 +2,7 @@ package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.configuration.Accessory;
 import dev.deploy4j.deploy.configuration.Role;
-import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
-import dev.deploy4j.deploy.host.commands.TraefikHostCommands;
+import dev.deploy4j.deploy.host.commands.*;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 import dev.deploy4j.deploy.utils.erb.ERB;
 import org.apache.commons.io.FileUtils;
@@ -18,13 +17,17 @@ public class Env extends Base {
   private final TraefikHostCommands traefik;
   private final Environment environment;
   private final AuditorHostCommands audit;
+  private final AppHostCommandsFactory apps;
+  private final AccessoryHostCommandsFactory accessories;
 
-  public Env(SshHosts sshHosts, LockManager lockManager, TraefikHostCommands traefik, Environment environment, AuditorHostCommands audit) {
+  public Env(SshHosts sshHosts, LockManager lockManager, TraefikHostCommands traefik, Environment environment, AuditorHostCommands audit, AppHostCommandsFactory apps, AccessoryHostCommandsFactory accessories) {
     super(sshHosts);
     this.lockManager = lockManager;
     this.traefik = traefik;
     this.environment = environment;
     this.audit = audit;
+    this.apps = apps;
+    this.accessories = accessories;
   }
 
   /**
@@ -40,7 +43,7 @@ public class Env extends Base {
 
         for (Role role : commander.rolesOn(host.hostName())) {
 
-          host.execute(commander.app(role, host.hostName()).makeEnvDirectory());
+          host.execute(apps.app(role, host.hostName()).makeEnvDirectory());
           host.upload(role.env(host.hostName()).secretsIO(), role.env(host.hostName()).secretsFile(), 400);
 
         }
@@ -59,7 +62,7 @@ public class Env extends Base {
         for (String accessory : commander.accessoriesOn(host.hostName())) {
 
           Accessory accesssoryConfig = commander.config().accessory(accessory);
-          host.execute(commander.accessory(accessory).makeEnvDirectory());
+          host.execute(accessories.accessory(accessory).makeEnvDirectory());
           host.upload(accesssoryConfig.env().secretsIO(), accesssoryConfig.env().secretsFile(), 400);
 
         }
@@ -83,7 +86,7 @@ public class Env extends Base {
 
         for (Role role : commander.rolesOn(host.hostName())) {
 
-          host.execute(commander.app(role, host.hostName()).removeEnvFile());
+          host.execute(apps.app(role, host.hostName()).removeEnvFile());
 
         }
 
@@ -99,8 +102,8 @@ public class Env extends Base {
 
         for (String accessory : commander.accessoriesOn(host.hostName())) {
 
-          Accessory accessoryCOnfig = commander.config().accessory(accessory);
-          host.execute(commander.accessory(accessory).removeEnvFile());
+          Accessory accessoryConfig = commander.config().accessory(accessory);
+          host.execute(accessories.accessory(accessory).removeEnvFile());
 
         }
 

@@ -1,6 +1,7 @@
 package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.host.commands.AccessoryHostCommands;
+import dev.deploy4j.deploy.host.commands.AccessoryHostCommandsFactory;
 import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.host.commands.RegistryHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
@@ -20,12 +21,14 @@ public class Accessory extends Base {
   private final LockManager lockManager;
   private final RegistryHostCommands registry;
   private final AuditorHostCommands audit;
+  private final AccessoryHostCommandsFactory accessories;
 
-  public Accessory(SshHosts sshHosts, LockManager lockManager, RegistryHostCommands registry, AuditorHostCommands audit) {
+  public Accessory(SshHosts sshHosts, LockManager lockManager, RegistryHostCommands registry, AuditorHostCommands audit, AccessoryHostCommandsFactory accessories) {
     super(sshHosts);
     this.lockManager = lockManager;
     this.registry = registry;
     this.audit = audit;
+    this.accessories = accessories;
   }
 
   /**
@@ -410,7 +413,7 @@ public class Accessory extends Base {
 
   private void withAccessory(Commander commander, String name, BiConsumer<AccessoryHostCommands, List<String>> block) {
     if (commander.config().accessory(name) != null) {
-      AccessoryHostCommands accessory = commander.accessory(name);
+      AccessoryHostCommands accessory = accessories.accessory(name);
       block.accept(accessory, accessoryHosts(commander, accessory));
     } else {
       errorOnMissingAccessory(commander, name);

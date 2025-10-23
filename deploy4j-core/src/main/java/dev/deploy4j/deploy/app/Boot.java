@@ -1,6 +1,7 @@
 package dev.deploy4j.deploy.app;
 
 import dev.deploy4j.deploy.Commander;
+import dev.deploy4j.deploy.host.commands.AppHostCommandsFactory;
 import dev.deploy4j.deploy.utils.RandomHex;
 import dev.deploy4j.deploy.healthcheck.Barrier;
 import dev.deploy4j.deploy.healthcheck.Poller;
@@ -23,10 +24,11 @@ public class Boot {
   private final Barrier barrier;
   private final Commander commander;
   private final AuditorHostCommands audit;
+  private final AppHostCommandsFactory apps;
 
   private AppHostCommands app;
 
-  public Boot(String host, Role role, SshHost sshHost, String version, Barrier barrier, Commander commander, AuditorHostCommands audit) {
+  public Boot(String host, Role role, SshHost sshHost, String version, Barrier barrier, Commander commander, AuditorHostCommands audit, AppHostCommandsFactory apps) {
     this.host = host;
     this.role = role;
     this.sshHost = sshHost;
@@ -34,6 +36,7 @@ public class Boot {
     this.barrier = barrier;
     this.commander = commander;
     this.audit = audit;
+    this.apps = apps;
   }
 
   public void run() {
@@ -164,7 +167,7 @@ public class Boot {
 
   private AppHostCommands app() {
     if (app == null) {
-      app = commander.app(role(), host());
+      app = apps.app(role(), host());
     }
     return app;
   }

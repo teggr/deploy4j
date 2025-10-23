@@ -50,12 +50,15 @@ public class DeployApplicationContext {
 
     AuditorHostCommands audit = new AuditorHostCommands(commander.config(), Map.of());
 
+    AppHostCommandsFactory apps = new AppHostCommandsFactory(commander.config());
+    AccessoryHostCommandsFactory accessories = new AccessoryHostCommandsFactory(commander.config());
+
     this.lockManager = new LockManager(sshHosts, lock, server, commander.config().version());
 
-    this.app = new App(sshHosts, lockManager, audit);
+    this.app = new App(sshHosts, lockManager, audit, apps);
     this.server = new Server(sshHosts, lockManager, docker, server, audit);
-    this.env = new Env(sshHosts, lockManager, traefik, this.environment, audit);
-    this.accessory = new Accessory(sshHosts, lockManager, registry, audit);
+    this.env = new Env(sshHosts, lockManager, traefik, this.environment, audit, apps, accessories);
+    this.accessory = new Accessory(sshHosts, lockManager, registry, audit, accessories);
     this.registry = new Registry(sshHosts, registry);
     this.build = new Build(sshHosts, builder, audit);
     this.prune = new Prune(sshHosts, lockManager, prune, audit);
@@ -65,7 +68,7 @@ public class DeployApplicationContext {
     this.initializer = new Initializer();
     this.audit = new Audit(sshHosts, audit);
     this.version = new Version();
-    this.deploy = new Deploy(sshHosts, lockManager, this.app, this.server, this.env, this.accessory, this.registry, build, this.prune, this.traefik);
+    this.deploy = new Deploy(sshHosts, lockManager, this.app, this.server, this.env, this.accessory, this.registry, build, this.prune, this.traefik, apps);
 
   }
 

@@ -1,6 +1,7 @@
 package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.configuration.Role;
+import dev.deploy4j.deploy.host.commands.AppHostCommandsFactory;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +22,9 @@ public class Deploy extends Base {
   private final Build build;
   private final Prune prune;
   private final Traefik traefik;
+  private final AppHostCommandsFactory apps;
 
-  public Deploy(SshHosts sshHosts, LockManager lockManager, App app, Server server, Env env, Accessory accessory, Registry registry, Build build, Prune prune, Traefik traefik) {
+  public Deploy(SshHosts sshHosts, LockManager lockManager, App app, Server server, Env env, Accessory accessory, Registry registry, Build build, Prune prune, Traefik traefik, AppHostCommandsFactory apps) {
     super(sshHosts);
     this.lockManager = lockManager;
     this.app = app;
@@ -33,6 +35,7 @@ public class Deploy extends Base {
     this.build = build;
     this.prune = prune;
     this.traefik = traefik;
+    this.apps = apps;
   }
 
   /**
@@ -187,7 +190,7 @@ public class Deploy extends Base {
 
         for (Role role : commander.rolesOn(host.hostName())) {
 
-          String containerId = host.capture(commander.app(role, host.hostName()).containerIdForVersion(version));
+          String containerId = host.capture(apps.app(role, host.hostName()).containerIdForVersion(version));
           if (containerId == null) {
             throw new RuntimeException("Container not found");
           }
