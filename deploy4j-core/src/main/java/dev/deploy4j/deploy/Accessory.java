@@ -34,9 +34,9 @@ public class Accessory extends Base {
   /**
    * Boot new accessory service on host (use NAME=all to boot all accessories)
    */
-  public void boot(Commander commander) {
+  public void boot(DeployContext deployContext) {
 
-    boot(commander, null, true);
+    boot(deployContext, null, true);
 
   }
 
@@ -46,21 +46,21 @@ public class Accessory extends Base {
    * @param name  (use NAME=all to boot all accessories)
    * @param login
    */
-  public void boot(Commander commander, String name, boolean login) {
+  public void boot(DeployContext deployContext, String name, boolean login) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
       if ("all".equalsIgnoreCase(name)) {
 
-        commander.accessoryNames()
-          .forEach(accessoryName -> boot(commander, accessoryName, login));
+        deployContext.accessoryNames()
+          .forEach(accessoryName -> boot(deployContext, accessoryName, login));
 
       } else {
 
-        withAccessory(commander, name, (accessory, hosts) -> {
+        withAccessory(deployContext, name, (accessory, hosts) -> {
 
-          directories(commander, name);
-          upload(commander, name);
+          directories(deployContext, name);
+          upload(deployContext, name);
 
           on(hosts, host -> {
 
@@ -83,11 +83,11 @@ public class Accessory extends Base {
   /**
    * Upload accessory files to host
    */
-  public void upload(Commander commander, String name) {
+  public void upload(DeployContext deployContext, String name) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      withAccessory(commander, name, (accessory, hosts) -> {
+      withAccessory(deployContext, name, (accessory, hosts) -> {
 
         on(hosts, host -> {
 
@@ -111,11 +111,11 @@ public class Accessory extends Base {
   /**
    * Create accessory directories on host
    */
-  public void directories(Commander commander, String name) {
+  public void directories(DeployContext deployContext, String name) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      withAccessory(commander, name, (accessory, hosts) -> {
+      withAccessory(deployContext, name, (accessory, hosts) -> {
 
         on(hosts, host -> {
 
@@ -134,18 +134,18 @@ public class Accessory extends Base {
   /**
    * Reboot existing accessory on host (stop container, remove container, start new container; use NAME=all to boot all accessories)
    */
-  public void reboot(Commander commander, String name) {
+  public void reboot(DeployContext deployContext, String name) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
       if ("all".equalsIgnoreCase(name)) {
 
-        commander.accessoryNames()
-          .forEach(accessoryName -> reboot(commander, accessoryName));
+        deployContext.accessoryNames()
+          .forEach(accessoryName -> reboot(deployContext, accessoryName));
 
       } else {
 
-        withAccessory(commander, name, (accessory, hosts) -> {
+        withAccessory(deployContext, name, (accessory, hosts) -> {
 
           on(hosts, host -> {
 
@@ -155,9 +155,9 @@ public class Accessory extends Base {
 
         });
 
-        stop(commander, name);
-        removeContainer(commander, name);
-        boot(commander, name, false);
+        stop(deployContext, name);
+        removeContainer(deployContext, name);
+        boot(deployContext, name, false);
 
       }
 
@@ -168,11 +168,11 @@ public class Accessory extends Base {
   /**
    * Start existing accessory container on host
    */
-  public void start(Commander commander, String name) {
+  public void start(DeployContext deployContext, String name) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      withAccessory(commander, name, (accessory, hosts) -> {
+      withAccessory(deployContext, name, (accessory, hosts) -> {
 
         on(hosts, host -> {
 
@@ -190,11 +190,11 @@ public class Accessory extends Base {
   /**
    * Stop existing accessory container on host
    */
-  public void stop(Commander commander, String name) {
+  public void stop(DeployContext deployContext, String name) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      withAccessory(commander, name, (accessory, hosts) -> {
+      withAccessory(deployContext, name, (accessory, hosts) -> {
 
         on(hosts, host -> {
 
@@ -212,14 +212,14 @@ public class Accessory extends Base {
   /**
    * Restart existing accessory container on host
    */
-  public void restart(Commander commander, String name) {
+  public void restart(DeployContext deployContext, String name) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      withAccessory(commander, name, (accessory, hosts) -> {
+      withAccessory(deployContext, name, (accessory, hosts) -> {
 
-        stop(commander, name);
-        start(commander, name);
+        stop(deployContext, name);
+        start(deployContext, name);
 
       });
 
@@ -230,18 +230,18 @@ public class Accessory extends Base {
   /**
    * Show details about accessory on host (use NAME=all to show all accessories)
    */
-  public void details(Commander commander, String name) {
+  public void details(DeployContext deployContext, String name) {
 
     if ("all".equalsIgnoreCase(name)) {
 
-      commander.accessoryNames()
-        .forEach(accessoryName -> details(commander, accessoryName));
+      deployContext.accessoryNames()
+        .forEach(accessoryName -> details(deployContext, accessoryName));
 
     } else {
 
       String type = "Accessory " + name;
 
-      withAccessory(commander, type, (accessory, hosts) -> {
+      withAccessory(deployContext, type, (accessory, hosts) -> {
 
         on(hosts, host -> {
 
@@ -263,11 +263,11 @@ public class Accessory extends Base {
    * @param name
    * @param cmd
    */
-  public void exec(Commander commander, boolean interactive, boolean reuse, String name, String cmd) {
+  public void exec(DeployContext deployContext, boolean interactive, boolean reuse, String name, String cmd) {
 
     // TODO: interactive and not reuse
 
-    withAccessory(commander, name, (accessory, hosts) -> {
+    withAccessory(deployContext, name, (accessory, hosts) -> {
 
       System.out.println("Launching command from existing container...");
       on(hosts, host -> {
@@ -291,7 +291,7 @@ public class Accessory extends Base {
    * @param follow      Follow logs on primary server (or specific host set by --hosts)
    */
   public void logs(
-    Commander commander,
+    DeployContext deployContext,
     String since,
     Integer lines,
     String grep,
@@ -300,7 +300,7 @@ public class Accessory extends Base {
     String name
   ) {
 
-    withAccessory(commander, name, (accessory, hosts) -> {
+    withAccessory(deployContext, name, (accessory, hosts) -> {
 
 //      // TODO: follow
 //      if (lines != null || (since != null || grep != null)) {
@@ -323,18 +323,18 @@ public class Accessory extends Base {
   /**
    * Remove accessory container, image and data directory from host (use NAME=all to remove all accessories)
    */
-  public void remove(Commander commander, String name) {
+  public void remove(DeployContext deployContext, String name) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
       if ("all".equalsIgnoreCase(name)) {
 
-        commander.accessoryNames()
-          .forEach(accessoryName -> remove(commander, accessoryName));
+        deployContext.accessoryNames()
+          .forEach(accessoryName -> remove(deployContext, accessoryName));
 
       } else {
 
-        removeAccessory(commander, name);
+        removeAccessory(deployContext, name);
 
       }
 
@@ -346,11 +346,11 @@ public class Accessory extends Base {
   /**
    * Remove accessory container from host
    */
-  public void removeContainer(Commander commander, String name) {
+  public void removeContainer(DeployContext deployContext, String name) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      withAccessory(commander, name, (accessory, hosts) -> {
+      withAccessory(deployContext, name, (accessory, hosts) -> {
 
         on(hosts, host -> {
 
@@ -369,11 +369,11 @@ public class Accessory extends Base {
   /**
    * Remove accessory image from host
    */
-  public void removeImage(Commander commander, String name) {
+  public void removeImage(DeployContext deployContext, String name) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      withAccessory(commander, name, (accessory, hosts) -> {
+      withAccessory(deployContext, name, (accessory, hosts) -> {
 
         on(hosts, host -> {
 
@@ -391,11 +391,11 @@ public class Accessory extends Base {
   /**
    * Remove accessory directory used for uploaded files and data directories from host
    */
-  public void removeServiceDirectory(Commander commander, String name) {
+  public void removeServiceDirectory(DeployContext deployContext, String name) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      withAccessory(commander, name, (accessory, hosts) -> {
+      withAccessory(deployContext, name, (accessory, hosts) -> {
 
         on(hosts, host -> {
 
@@ -411,23 +411,23 @@ public class Accessory extends Base {
 
   // private
 
-  private void withAccessory(Commander commander, String name, BiConsumer<AccessoryHostCommands, List<String>> block) {
-    if (commander.config().accessory(name) != null) {
+  private void withAccessory(DeployContext deployContext, String name, BiConsumer<AccessoryHostCommands, List<String>> block) {
+    if (deployContext.config().accessory(name) != null) {
       AccessoryHostCommands accessory = accessories.accessory(name);
-      block.accept(accessory, accessoryHosts(commander, accessory));
+      block.accept(accessory, accessoryHosts(deployContext, accessory));
     } else {
-      errorOnMissingAccessory(commander, name);
+      errorOnMissingAccessory(deployContext, name);
     }
   }
 
-  private void errorOnMissingAccessory(Commander commander, String name) {
-    List<String> options = commander.accessoryNames();
+  private void errorOnMissingAccessory(DeployContext deployContext, String name) {
+    List<String> options = deployContext.accessoryNames();
     throw new RuntimeException("No accessory by the name of '" + name + "'" + (options != null ? " (options:" + options.stream().collect(Collectors.joining(",")) + ")" : ""));
   }
 
-  private List<String> accessoryHosts(Commander commander, AccessoryHostCommands accessory) {
-    if (!commander.specificHosts().isEmpty()) {
-      List<String> intersection = new ArrayList<>(commander.specificHosts());
+  private List<String> accessoryHosts(DeployContext deployContext, AccessoryHostCommands accessory) {
+    if (!deployContext.specificHosts().isEmpty()) {
+      List<String> intersection = new ArrayList<>(deployContext.specificHosts());
       intersection.retainAll(accessory.hosts());
       return intersection;
     } else {
@@ -435,14 +435,14 @@ public class Accessory extends Base {
     }
   }
 
-  private void removeAccessory(Commander commander, String name) {
+  private void removeAccessory(DeployContext deployContext, String name) {
 
-    withAccessory(commander, name, (accessory, hosts) -> {
+    withAccessory(deployContext, name, (accessory, hosts) -> {
 
-      stop(commander, name);
-      removeContainer(commander, name);
-      removeImage(commander, name);
-      removeServiceDirectory(commander, name);
+      stop(deployContext, name);
+      removeContainer(deployContext, name);
+      removeImage(deployContext, name);
+      removeServiceDirectory(deployContext, name);
 
     });
 

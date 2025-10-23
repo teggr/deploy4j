@@ -15,11 +15,11 @@ public class Registry extends Base {
   /**
    * Log in to registry locally and remotely
    */
-  public void login(Commander commander) {
+  public void login(DeployContext deployContext) {
 
     // TODO: locally?
 
-    on(commander.hosts(), host -> {
+    on(deployContext.hosts(), host -> {
 
       host.execute(registry.login());
 
@@ -30,11 +30,11 @@ public class Registry extends Base {
   /**
    * Log out of registry locally and remotely
    */
-  public void logout(Commander commander) {
+  public void logout(DeployContext deployContext) {
 
     // TODO: locally?
 
-    on(commander.hosts(), host -> {
+    on(deployContext.hosts(), host -> {
 
       host.execute(registry.logout());
 

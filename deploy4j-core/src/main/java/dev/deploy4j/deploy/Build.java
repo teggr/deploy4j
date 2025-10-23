@@ -20,18 +20,18 @@ public class Build extends Base {
   /**
    * Pull app image from registry onto server
    */
-  public void pull(Commander commander) {
+  public void pull(DeployContext deployContext) {
     // TODO: mirror hosts
-    pullOnHosts(commander, commander.hosts());
+    pullOnHosts(deployContext, deployContext.hosts());
   }
 
   // private
 
-  private void pullOnHosts(Commander commander, List<String> hosts) {
+  private void pullOnHosts(DeployContext deployContext, List<String> hosts) {
 
     on(hosts, host -> {
 
-      host.execute(audit.record("Pulled image with version " + commander.config().version()));
+      host.execute(audit.record("Pulled image with version " + deployContext.config().version()));
       host.execute(builder.clean());
       host.execute(builder.pull());
       host.execute(builder.validateImage());

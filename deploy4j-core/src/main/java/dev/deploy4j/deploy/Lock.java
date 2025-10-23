@@ -22,11 +22,11 @@ public class Lock extends Base {
   /**
    * Report lock status
    */
-  public void status(Commander commander) {
+  public void status(DeployContext deployContext) {
 
     handleMissingLock(() -> {
 
-      on(List.of(commander.primaryHost()), host -> {;
+      on(List.of(deployContext.primaryHost()), host -> {;
 
         host.execute(server.ensureRunDirectory());
         System.out.println( host.capture( lock.status() ) );
@@ -42,14 +42,14 @@ public class Lock extends Base {
    *
    * @param message A lock message
    */
-  public void acquire(Commander commander, String message) {
+  public void acquire(DeployContext deployContext, String message) {
 
-    lockManager.raiseIfLocked(commander, () -> {
+    lockManager.raiseIfLocked(deployContext, () -> {
 
-      on(List.of(commander.primaryHost()), host -> {
+      on(List.of(deployContext.primaryHost()), host -> {
 
         host.execute(server.ensureRunDirectory());
-        host.execute(lock.acquire(message, commander.config().version()));
+        host.execute(lock.acquire(message, deployContext.config().version()));
 
       });
 
@@ -62,11 +62,11 @@ public class Lock extends Base {
   /**
    * Release the deploy lock
    */
-  public void release(Commander commander) {
+  public void release(DeployContext deployContext) {
 
     handleMissingLock(() -> {
 
-      on(List.of(commander.primaryHost()), host -> {
+      on(List.of(deployContext.primaryHost()), host -> {
 
         host.execute(server.ensureRunDirectory());
         host.execute(lock.release());

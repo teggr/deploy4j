@@ -33,15 +33,15 @@ public class Env extends Base {
   /**
    * Push the env file to the remote hosts
    */
-  public void push(Commander commander) {
+  public void push(DeployContext deployContext) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      on(commander.hosts(), host -> {
+      on(deployContext.hosts(), host -> {
 
         host.execute(audit.record("Pushed env files"));
 
-        for (Role role : commander.rolesOn(host.hostName())) {
+        for (Role role : deployContext.rolesOn(host.hostName())) {
 
           host.execute(apps.app(role, host.hostName()).makeEnvDirectory());
           host.upload(role.env(host.hostName()).secretsIO(), role.env(host.hostName()).secretsFile(), 400);
@@ -50,18 +50,18 @@ public class Env extends Base {
 
       });
 
-      on(commander.traefikHosts(), host -> {
+      on(deployContext.traefikHosts(), host -> {
 
         host.execute(traefik.makeEnvDirectory());
         host.upload(traefik.env().secretsIO(), traefik.env().secretsFile(), 400);
 
       });
 
-      on(commander.accessoryHosts(), host -> {
+      on(deployContext.accessoryHosts(), host -> {
 
-        for (String accessory : commander.accessoriesOn(host.hostName())) {
+        for (String accessory : deployContext.accessoriesOn(host.hostName())) {
 
-          Accessory accesssoryConfig = commander.config().accessory(accessory);
+          Accessory accesssoryConfig = deployContext.config().accessory(accessory);
           host.execute(accessories.accessory(accessory).makeEnvDirectory());
           host.upload(accesssoryConfig.env().secretsIO(), accesssoryConfig.env().secretsFile(), 400);
 
@@ -76,15 +76,15 @@ public class Env extends Base {
   /**
    * Delete the env file from the remote hosts
    */
-  public void delete(Commander commander) {
+  public void delete(DeployContext deployContext) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      on(commander.hosts(), host -> {
+      on(deployContext.hosts(), host -> {
 
         host.execute(audit.record("Deleted env files"));
 
-        for (Role role : commander.rolesOn(host.hostName())) {
+        for (Role role : deployContext.rolesOn(host.hostName())) {
 
           host.execute(apps.app(role, host.hostName()).removeEnvFile());
 
@@ -92,17 +92,17 @@ public class Env extends Base {
 
       });
 
-      on(commander.traefikHosts(), host -> {
+      on(deployContext.traefikHosts(), host -> {
 
         host.execute(traefik.removeEnvFile());
 
       });
 
-      on(commander.accessoryHosts(), host -> {
+      on(deployContext.accessoryHosts(), host -> {
 
-        for (String accessory : commander.accessoriesOn(host.hostName())) {
+        for (String accessory : deployContext.accessoriesOn(host.hostName())) {
 
-          Accessory accessoryConfig = commander.config().accessory(accessory);
+          Accessory accessoryConfig = deployContext.config().accessory(accessory);
           host.execute(accessories.accessory(accessory).removeEnvFile());
 
         }
@@ -119,7 +119,7 @@ public class Env extends Base {
    * @param skipPush    Skip .env file push
    * @param destination
    */
-  public void envify(Commander commander, boolean skipPush, String destination) {
+  public void envify(DeployContext deployContext, boolean skipPush, String destination) {
 
     String envTemplatePath;
     String envPath;
@@ -143,7 +143,7 @@ public class Env extends Base {
 
       if (skipPush) {
         environment.reloadEnv();
-        push(commander);
+        push(deployContext);
       }
 
     } else {

@@ -1,6 +1,6 @@
 package dev.deploy4j.deploy.app;
 
-import dev.deploy4j.deploy.Commander;
+import dev.deploy4j.deploy.DeployContext;
 import dev.deploy4j.deploy.host.commands.AppHostCommandsFactory;
 import dev.deploy4j.deploy.utils.RandomHex;
 import dev.deploy4j.deploy.healthcheck.Barrier;
@@ -22,19 +22,19 @@ public class Boot {
   private final SshHost sshHost;
   private final String version;
   private final Barrier barrier;
-  private final Commander commander;
+  private final DeployContext deployContext;
   private final AuditorHostCommands audit;
   private final AppHostCommandsFactory apps;
 
   private AppHostCommands app;
 
-  public Boot(String host, Role role, SshHost sshHost, String version, Barrier barrier, Commander commander, AuditorHostCommands audit, AppHostCommandsFactory apps) {
+  public Boot(String host, Role role, SshHost sshHost, String version, Barrier barrier, DeployContext deployContext, AuditorHostCommands audit, AppHostCommandsFactory apps) {
     this.host = host;
     this.role = role;
     this.sshHost = sshHost;
     this.version = version;
     this.barrier = barrier;
-    this.commander = commander;
+    this.deployContext = deployContext;
     this.audit = audit;
     this.apps = apps;
   }
@@ -105,7 +105,7 @@ public class Boot {
 
     sshHost().execute(app().run(hostName));
 
-    new Poller(commander).waitForHealthy(true, () -> sshHost().capture( app().status(version()) ) );
+    new Poller(deployContext).waitForHealthy(true, () -> sshHost().capture( app().status(version()) ) );
 
   }
 
@@ -119,7 +119,7 @@ public class Boot {
       String cord = sshHost().capture(app().cord(version));
       if(StringUtils.isNotBlank(cord)) {
         sshHost().execute( app().cutCord(cord) );
-        new Poller(commander).waitForUnhealthy(true, () -> sshHost().capture( app().status(version()) ) );
+        new Poller(deployContext).waitForUnhealthy(true, () -> sshHost().capture( app().status(version()) ) );
       }
     }
 
@@ -133,18 +133,18 @@ public class Boot {
 
   private void releaseBarrier() {
     if (barrier().open()) {
-      log.info("First " + commander.primaryRole() + " container is healthy on " + host + ", booting any other roles");
+      log.info("First " + deployContext.primaryRole() + " container is healthy on " + host + ", booting any other roles");
     }
   }
 
   private void waitAtBarrier() {
 
     try {
-      log.info("Waiting for the first healthy " + commander.primaryRole() + " container before booting " + role() + " on " + host + "...");
+      log.info("Waiting for the first healthy " + deployContext.primaryRole() + " container before booting " + role() + " on " + host + "...");
       barrier().waitFor();
-      log.info("First " + commander.primaryRole() + " container is healthy, booting " + role() + " on " + host + "...");
+      log.info("First " + deployContext.primaryRole() + " container is healthy, booting " + role() + " on " + host + "...");
     } catch (RuntimeException e) {
-      log.info("First " + commander.primaryRole() + " container is unhealthy, not booting " + role() + " on " + host + "...");
+      log.info("First " + deployContext.primaryRole() + " container is unhealthy, not booting " + role() + " on " + host + "...");
       throw e;
     }
 
@@ -154,7 +154,7 @@ public class Boot {
 
     if (barrier().close()) {
 
-      log.info("First " + commander.primaryRole() + " container is unhealthy on " + host + ", not booting any other roles");
+      log.info("First " + deployContext.primaryRole() + " container is unhealthy on " + host + ", not booting any other roles");
       log.error(sshHost.capture(app().logs(version(), null, null, null, null)));
       log.error(sshHost.capture(app().containerHealthLog(version())));
     }
@@ -162,7 +162,7 @@ public class Boot {
   }
 
   private boolean barrierRole() {
-    return role() == commander.primaryRole();
+    return role() == deployContext.primaryRole();
   }
 
   private AppHostCommands app() {

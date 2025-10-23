@@ -19,41 +19,41 @@ public class DeployApplicationContext {
   private final Accessory accessory;
   private final Lock lock;
   private final Env env;
-  private final Commander commander;
+  private final DeployContext deployContext;
   private final LockManager lockManager;
   private final Initializer initializer;
   private final Audit audit;
   private final Version version;
 
-  public DeployApplicationContext(Environment environment, SshHosts sshHosts, Commander commander) {
+  public DeployApplicationContext(Environment environment, SshHosts sshHosts, DeployContext deployContext) {
 
     this.environment = environment;
-    this.commander = commander;
+    this.deployContext = deployContext;
 
-    BuilderHostCommands builder = new BuilderHostCommands(commander.config());
+    BuilderHostCommands builder = new BuilderHostCommands(deployContext.config());
 
-    DockerHostCommands docker = new DockerHostCommands(commander.config());
+    DockerHostCommands docker = new DockerHostCommands(deployContext.config());
 
-    HealthcheckHostCommands healthcheck = new HealthcheckHostCommands(commander.config());
+    HealthcheckHostCommands healthcheck = new HealthcheckHostCommands(deployContext.config());
 
-    HookHostCommands hook = new HookHostCommands(commander.config());
+    HookHostCommands hook = new HookHostCommands(deployContext.config());
 
-    LockHostCommands lock = new LockHostCommands(commander.config());
+    LockHostCommands lock = new LockHostCommands(deployContext.config());
 
-    PruneHostCommands prune = new PruneHostCommands(commander.config());
+    PruneHostCommands prune = new PruneHostCommands(deployContext.config());
 
-    RegistryHostCommands registry = new RegistryHostCommands(commander.config());
+    RegistryHostCommands registry = new RegistryHostCommands(deployContext.config());
 
-    ServerHostCommands server = new ServerHostCommands(commander.config());
+    ServerHostCommands server = new ServerHostCommands(deployContext.config());
 
-    TraefikHostCommands traefik = new TraefikHostCommands(commander.config());
+    TraefikHostCommands traefik = new TraefikHostCommands(deployContext.config());
 
-    AuditorHostCommands audit = new AuditorHostCommands(commander.config(), Map.of());
+    AuditorHostCommands audit = new AuditorHostCommands(deployContext.config(), Map.of());
 
-    AppHostCommandsFactory apps = new AppHostCommandsFactory(commander.config());
-    AccessoryHostCommandsFactory accessories = new AccessoryHostCommandsFactory(commander.config());
+    AppHostCommandsFactory apps = new AppHostCommandsFactory(deployContext.config());
+    AccessoryHostCommandsFactory accessories = new AccessoryHostCommandsFactory(deployContext.config());
 
-    this.lockManager = new LockManager(sshHosts, lock, server, commander.config().version());
+    this.lockManager = new LockManager(sshHosts, lock, server, deployContext.config().version());
 
     this.app = new App(sshHosts, lockManager, audit, apps);
     this.server = new Server(sshHosts, lockManager, docker, server, audit);
@@ -116,8 +116,8 @@ public class DeployApplicationContext {
     return lock;
   }
 
-  public Commander commander() {
-    return commander;
+  public DeployContext commander() {
+    return deployContext;
   }
 
   public LockManager lockManager() {

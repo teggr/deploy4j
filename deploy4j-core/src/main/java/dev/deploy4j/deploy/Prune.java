@@ -20,12 +20,12 @@ public class Prune extends Base {
   /**
    * Prune unused images and stopped containers
    */
-  public void all(Commander commander) {
+  public void all(DeployContext deployContext) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      containers(commander);
-      images(commander);
+      containers(deployContext);
+      images(deployContext);
 
     });
 
@@ -34,11 +34,11 @@ public class Prune extends Base {
   /**
    * Prune unused images
    */
-  public void images(Commander commander) {
+  public void images(DeployContext deployContext) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      on(commander.hosts(), host -> {
+      on(deployContext.hosts(), host -> {
 
         host.execute(audit.record("Pruned images"));
         host.execute(prune.danglingImages());
@@ -51,8 +51,8 @@ public class Prune extends Base {
 
   }
 
-  public void containers(Commander commander) {
-    containers(commander, null);
+  public void containers(DeployContext deployContext) {
+    containers(deployContext, null);
   }
 
   /**
@@ -60,10 +60,10 @@ public class Prune extends Base {
    *
    * @param retain Number of containers to retain
    */
-  public void containers(Commander commander, Integer retain) {
+  public void containers(DeployContext deployContext, Integer retain) {
 
     if (retain == null) {
-      retain = commander.config().retainContainer();
+      retain = deployContext.config().retainContainer();
     }
     Integer finalRetain = retain;
 
@@ -71,9 +71,9 @@ public class Prune extends Base {
       throw new RuntimeException("retain must be at least 1");
     }
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      on(commander.hosts(), host -> {
+      on(deployContext.hosts(), host -> {
 
         host.execute(audit.record("Pruned containers"));
         host.execute(prune.appContainers(finalRetain));

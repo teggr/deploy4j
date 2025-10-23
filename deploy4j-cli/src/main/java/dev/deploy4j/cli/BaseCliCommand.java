@@ -1,6 +1,6 @@
 package dev.deploy4j.cli;
 
-import dev.deploy4j.deploy.Commander;
+import dev.deploy4j.deploy.DeployContext;
 import dev.deploy4j.deploy.DeployApplicationContext;
 import dev.deploy4j.deploy.Environment;
 import dev.deploy4j.deploy.configuration.Configuration;
@@ -46,11 +46,11 @@ public abstract class BaseCliCommand implements Callable<Integer> {
 
     Configuration configuration = Configuration.createFrom(configFile, destination, version);
 
-    Commander commander = new Commander(configuration, hosts, roles, primary);
+    DeployContext deployContext = new DeployContext(configuration, hosts, roles, primary);
 
-    try (SshHosts sshHosts = new SshHosts(commander.config())) {
+    try (SshHosts sshHosts = new SshHosts(deployContext.config())) {
 
-      DeployApplicationContext deployApplicationContext = new DeployApplicationContext(environment, sshHosts, commander);
+      DeployApplicationContext deployApplicationContext = new DeployApplicationContext(environment, sshHosts, deployContext);
 
       execute(deployApplicationContext);
 

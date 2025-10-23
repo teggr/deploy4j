@@ -33,11 +33,11 @@ public class Server extends Base {
    *
    * @param interactive Run the command interactively (use for console/bash)
    */
-  public void exec(Commander commander, boolean interactive, String cmd) {
+  public void exec(DeployContext deployContext, boolean interactive, String cmd) {
 
     List<String> hosts = new ArrayList<>();
-    hosts.addAll(commander.hosts());
-    hosts.addAll(commander.accessoryHosts());
+    hosts.addAll(deployContext.hosts());
+    hosts.addAll(deployContext.accessoryHosts());
 
     // TODO: interactive mode
     System.out.println( "Running '"+cmd+"' on " + String.join(",", hosts) +  "..." );
@@ -54,15 +54,15 @@ public class Server extends Base {
   /**
    * Set up Docker to run Kamal apps
    */
-  public void bootstrap(Commander commander) {
+  public void bootstrap(DeployContext deployContext) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
       List<SshHost> missing = new ArrayList<>();
 
       List<String> hosts = new ArrayList<>();
-      hosts.addAll(commander.hosts());
-      hosts.addAll(commander.accessoryHosts());
+      hosts.addAll(deployContext.hosts());
+      hosts.addAll(deployContext.accessoryHosts());
 
       on(hosts, host -> {
 

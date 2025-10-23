@@ -3,18 +3,14 @@ package dev.deploy4j.deploy;
 import dev.deploy4j.deploy.configuration.Accessory;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.configuration.Role;
-import dev.deploy4j.deploy.host.commands.AccessoryHostCommands;
-import dev.deploy4j.deploy.host.commands.AppHostCommands;
 import dev.deploy4j.deploy.utils.Utils;
 
 import java.util.List;
 
 /**
  * Context class to hold shared information and configurations for deployment processes.
- * <p>
- * This will become Deployment Context
  */
-public class Commander implements LockContext {
+public class DeployContext implements LockContext {
 
   private final Configuration config;
   private final List<Role> specificRoles;
@@ -24,7 +20,7 @@ public class Commander implements LockContext {
   private boolean holdingLock;
   private boolean connected;
 
-  public Commander(
+  public DeployContext(
     Configuration config,
     String[] hosts,
     String[] roleNames,

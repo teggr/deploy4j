@@ -1,6 +1,6 @@
 package dev.deploy4j.deploy.healthcheck;
 
-import dev.deploy4j.deploy.Commander;
+import dev.deploy4j.deploy.DeployContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,16 +12,16 @@ public class Poller {
 
   private static final Integer TRAEFIK_UPDATE_DELAY = 5;
 
-  private final Commander commander;
+  private final DeployContext deployContext;
 
-  public Poller(Commander commander) {
-    this.commander = commander;
+  public Poller(DeployContext deployContext) {
+    this.deployContext = deployContext;
   }
 
   public void waitForHealthy(boolean pauseAfterReady, Supplier<String> block) {
 
     int attempt = 1;
-    int maxAttempts = commander.config().healthcheck().maxAttempts();
+    int maxAttempts = deployContext.config().healthcheck().maxAttempts();
 
     try {
 
@@ -42,7 +42,7 @@ public class Poller {
           case "running":
             containerReady = true;
             if( pauseAfterReady ) {
-              Thread.sleep( commander.config().readinessDelay() );
+              Thread.sleep( deployContext.config().readinessDelay() );
             }
             break;
           default:
@@ -71,7 +71,7 @@ public class Poller {
   public void waitForUnhealthy(boolean pauseAfterReady, Supplier<String> block) {
 
     int attempt = 1;
-    int maxAttempts = commander.config().healthcheck().maxAttempts();
+    int maxAttempts = deployContext.config().healthcheck().maxAttempts();
 
     try {
 

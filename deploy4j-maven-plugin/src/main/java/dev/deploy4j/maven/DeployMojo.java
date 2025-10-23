@@ -1,6 +1,6 @@
 package dev.deploy4j.maven;
 
-import dev.deploy4j.deploy.Commander;
+import dev.deploy4j.deploy.DeployContext;
 import dev.deploy4j.deploy.DeployApplicationContext;
 import dev.deploy4j.deploy.Environment;
 import dev.deploy4j.deploy.configuration.Configuration;
@@ -44,13 +44,13 @@ public class DeployMojo extends AbstractMojo {
 
     Configuration configuration = Configuration.createFrom(configFile, destination, version);
 
-    Commander commander = new Commander(configuration, null, null, null); // specific hosts, roles, primary not yet supported
+    DeployContext deployContext = new DeployContext(configuration, null, null, null); // specific hosts, roles, primary not yet supported
 
-    try (SshHosts sshHosts = new SshHosts(commander.config())) {
+    try (SshHosts sshHosts = new SshHosts(deployContext.config())) {
 
-      DeployApplicationContext deployApplicationContext = new DeployApplicationContext(environment, sshHosts, commander);
+      DeployApplicationContext deployApplicationContext = new DeployApplicationContext(environment, sshHosts, deployContext);
 
-      deployApplicationContext.deploy().deploy(commander, false);
+      deployApplicationContext.deploy().deploy(deployContext, false);
 
     } catch (Exception e) {
 

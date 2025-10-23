@@ -15,8 +15,8 @@ public class Audit extends Base {
   /**
    * Show audit log from servers
    */
-  public void audit(Commander commander) {
-    on(commander.hosts(), host -> {
+  public void audit(DeployContext deployContext) {
+    on(deployContext.hosts(), host -> {
       System.out.println(host.capture(audit.reveal()));
     });
   }

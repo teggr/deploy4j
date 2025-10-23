@@ -27,11 +27,11 @@ public class Traefik extends Base {
   /**
    * Boot Traefik on servers
    */
-  public void boot(Commander commander) {
+  public void boot(DeployContext deployContext) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      on(commander.traefikHosts(), host -> {
+      on(deployContext.traefikHosts(), host -> {
 
         host.execute(registry.login());
         host.execute(traefik.startOrRun());
@@ -49,11 +49,11 @@ public class Traefik extends Base {
    *
    * @param rolling Reboot traefik on hosts in sequence, rather than in parallel
    */
-  public void reboot(Commander commander, boolean rolling) {
+  public void reboot(DeployContext deployContext, boolean rolling) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      on(commander.traefikHosts(), host -> {
+      on(deployContext.traefikHosts(), host -> {
 
         host.execute(audit.record("Rebooted traefik"));
         host.execute(registry.login());
@@ -70,11 +70,11 @@ public class Traefik extends Base {
   /**
    * Start existing Traefik container on servers
    */
-  public void start(Commander commander) {
+  public void start(DeployContext deployContext) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      on(commander.traefikHosts(), host -> {
+      on(deployContext.traefikHosts(), host -> {
 
         host.execute(audit.record("Started traefik"));
         host.execute(traefik.start());
@@ -89,11 +89,11 @@ public class Traefik extends Base {
   /**
    * Stop existing Traefik container on servers
    */
-  public void stop(Commander commander) {
+  public void stop(DeployContext deployContext) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      on(commander.traefikHosts(), host -> {
+      on(deployContext.traefikHosts(), host -> {
 
         host.execute(audit.record("Stopped traefik"));
         host.execute(traefik.stop());
@@ -108,12 +108,12 @@ public class Traefik extends Base {
   /**
    * Restart existing Traefik container on servers
    */
-  public void restart(Commander commander) {
+  public void restart(DeployContext deployContext) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      stop(commander);
-      start(commander);
+      stop(deployContext);
+      start(deployContext);
 
     });
 
@@ -122,9 +122,9 @@ public class Traefik extends Base {
   /**
    * Show details about Traefik container from servers
    */
-  public void details(Commander commander) {
+  public void details(DeployContext deployContext) {
 
-    on(commander.traefikHosts(), host -> {
+    on(deployContext.traefikHosts(), host -> {
 
       System.out.println(host.capture(traefik.info()));
 
@@ -142,7 +142,7 @@ public class Traefik extends Base {
    * @param follow      Follow logs on primary server (or specific host set by --hosts)
    */
   public void logs(
-    Commander commander,
+    DeployContext deployContext,
     String since,
     Integer lines,
     String grep,
@@ -157,7 +157,7 @@ public class Traefik extends Base {
 //      lines = 100;
 //    }
 
-    on(commander.traefikHosts(), host -> {
+    on(deployContext.traefikHosts(), host -> {
 
       System.out.println(host.capture(traefik.logs(since, lines != null ? lines.toString() : null, grep, grepOptions)));
 
@@ -168,13 +168,13 @@ public class Traefik extends Base {
   /**
    * Remove Traefik container and image from servers
    */
-  public void remove(Commander commander) {
+  public void remove(DeployContext deployContext) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      stop(commander);
-      removeContainer(commander);
-      removeImage(commander);
+      stop(deployContext);
+      removeContainer(deployContext);
+      removeImage(deployContext);
 
     });
 
@@ -184,11 +184,11 @@ public class Traefik extends Base {
   /**
    * Remove Traefik container from servers
    */
-  public void removeContainer(Commander commander) {
+  public void removeContainer(DeployContext deployContext) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      on(commander.traefikHosts(), host -> {
+      on(deployContext.traefikHosts(), host -> {
 
         host.execute(audit.record("Removed traefik container"));
         host.execute(traefik.removeContainer());
@@ -202,11 +202,11 @@ public class Traefik extends Base {
   /**
    * Remove Traefik image from servers
    */
-  public void removeImage(Commander commander) {
+  public void removeImage(DeployContext deployContext) {
 
-    lockManager.withLock(commander, () -> {
+    lockManager.withLock(deployContext, () -> {
 
-      on(commander.traefikHosts(), host -> {
+      on(deployContext.traefikHosts(), host -> {
 
         host.execute(audit.record("Removed traefik image"));
         host.execute(traefik.removeImage());
