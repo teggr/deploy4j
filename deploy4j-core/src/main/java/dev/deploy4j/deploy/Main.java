@@ -25,10 +25,9 @@ public class Main extends Base {
   private final Registry registry;
   private final Build build;
   private final Prune prune;
-  private final Environment environment;
   private final Traefik traefik;
 
-  public Main(SshHosts sshHosts, LockManager lockManager, App app, Server server, Env env, Accessory accessory, Registry registry, Build build, Prune prune, Environment environment, Traefik traefik) {
+  public Main(SshHosts sshHosts, LockManager lockManager, App app, Server server, Env env, Accessory accessory, Registry registry, Build build, Prune prune, Traefik traefik) {
     super(sshHosts);
     this.lockManager = lockManager;
     this.app = app;
@@ -38,7 +37,6 @@ public class Main extends Base {
     this.registry = registry;
     this.build = build;
     this.prune = prune;
-    this.environment = environment;
     this.traefik = traefik;
   }
 
@@ -55,7 +53,7 @@ public class Main extends Base {
       server.bootstrap(commander);
 
       System.out.println("Evaluate and push env files...");
-      envify(commander, false, null);
+      env.envify(commander, false, null);
       env.push(commander);
 
       accessory.boot(commander, "all", true);
@@ -63,7 +61,6 @@ public class Main extends Base {
       deploy(commander, skipPush);
 
     });
-
 
   }
 
@@ -157,15 +154,6 @@ public class Main extends Base {
   }
 
   /**
-   * Show audit log from servers
-   */
-  public void audit(Commander commander) {
-    on(commander.hosts(), host -> {
-      System.out.println(host.capture(commander.auditor().reveal()));
-    });
-  }
-
-  /**
    * Show combined config (including secrets!)
    */
   public void config(Commander commander) {
@@ -175,84 +163,7 @@ public class Main extends Base {
 
   // TODO: docs
 
-  /**
-   * Create config stub in config/deploy.yml and env stub in .env
-   */
-  public void init(boolean bundle) {
 
-    File deployFile = new File("config/deploy.yml");
-    if (deployFile.exists()) {
-      System.out.println("Config file already exists in config/deploy.yml (remove first to create a new one)");
-    } else {
-      deployFile.getParentFile().mkdirs();
-      try {
-        FileUtils.copyInputStreamToFile(
-          getClass().getClassLoader().getResourceAsStream("templates/deploy.yml"),
-          deployFile
-        );
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-      System.out.println("Created configuration file in config/deploy.yml");
-    }
-
-    deployFile = new File(".env");
-    if (!deployFile.exists()) {
-      try {
-        FileUtils.copyInputStreamToFile(
-          getClass().getClassLoader().getResourceAsStream("templates/template.env"),
-          deployFile
-        );
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-      System.out.println("Created .env file");
-    }
-
-    // TODO: hooks
-
-    // TODO: bundle add maven dependency?
-
-  }
-
-  /**
-   * Create .env by evaluating .env.thyme (or .env.staging.thyme -> .env.staging when using -d staging)
-   *
-   * @param skipPush    Skip .env file push
-   * @param destination
-   */
-  public void envify(Commander commander, boolean skipPush, String destination) {
-
-    String envTemplatePath;
-    String envPath;
-    if (destination != null) {
-      envTemplatePath = ".env.%s.thyme".formatted(destination);
-      envPath = ".env.%s".formatted(destination);
-    } else {
-      envTemplatePath = ".env.thyme";
-      envPath = ".env";
-    }
-
-    File envTemplateFile = new File(envTemplatePath);
-    if (envTemplateFile.exists()) {
-      String content = environment
-        .withOriginalEnv(() -> new ERB(envTemplateFile).result());
-      try {
-        FileUtils.writeStringToFile(new File(envPath), content, StandardCharsets.UTF_8);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-
-      if (skipPush) {
-        environment.reloadEnv();
-        env.push(commander);
-      }
-
-    } else {
-      System.out.println("Skipping envify (no " + envTemplatePath + " exists)");
-    }
-
-  }
 
 
   /**
@@ -269,10 +180,6 @@ public class Main extends Base {
 
     });
 
-  }
-
-  public void version() {
-    System.out.println(Version.VERSION);
   }
 
   // private

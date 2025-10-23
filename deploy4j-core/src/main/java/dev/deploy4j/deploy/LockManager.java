@@ -11,11 +11,13 @@ public class LockManager {
   private final SshHosts sshHosts;
   private final LockHostCommands lock;
   private final ServerHostCommands server;
+  private final String version;
 
-  public LockManager(SshHosts sshHosts, LockHostCommands lock, ServerHostCommands server) {
+  public LockManager(SshHosts sshHosts, LockHostCommands lock, ServerHostCommands server, String version) {
     this.sshHosts = sshHosts;
     this.lock = lock;
     this.server = server;
+    this.version = version;
   }
 
   public void withLock(LockContext lockContext, Runnable runnable) {
@@ -41,7 +43,7 @@ public class LockManager {
 
     sshHosts.on(List.of(lockContext.primaryHost()), host -> {
 
-      host.execute(lock.acquire("Automatic deploy lock", lockContext.version()));
+      host.execute(lock.acquire("Automatic deploy lock", version));
 
     });
 

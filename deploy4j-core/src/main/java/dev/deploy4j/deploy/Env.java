@@ -4,16 +4,24 @@ import dev.deploy4j.deploy.configuration.Accessory;
 import dev.deploy4j.deploy.configuration.Role;
 import dev.deploy4j.deploy.host.commands.TraefikHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.utils.erb.ERB;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class Env extends Base {
 
   private final LockManager lockManager;
   private final TraefikHostCommands traefik;
+  private final Environment environment;
 
-  public Env(SshHosts sshHosts, LockManager lockManager, TraefikHostCommands traefik) {
+  public Env(SshHosts sshHosts, LockManager lockManager, TraefikHostCommands traefik, Environment environment ) {
     super(sshHosts);
     this.lockManager = lockManager;
     this.traefik = traefik;
+    this.environment = environment;
   }
 
   /**
@@ -96,6 +104,45 @@ public class Env extends Base {
       });
 
     });
+
+  }
+
+  /**
+   * Create .env by evaluating .env.thyme (or .env.staging.thyme -> .env.staging when using -d staging)
+   *
+   * @param skipPush    Skip .env file push
+   * @param destination
+   */
+  public void envify(Commander commander, boolean skipPush, String destination) {
+
+    String envTemplatePath;
+    String envPath;
+    if (destination != null) {
+      envTemplatePath = ".env.%s.thyme".formatted(destination);
+      envPath = ".env.%s".formatted(destination);
+    } else {
+      envTemplatePath = ".env.thyme";
+      envPath = ".env";
+    }
+
+    File envTemplateFile = new File(envTemplatePath);
+    if (envTemplateFile.exists()) {
+      String content = environment
+        .withOriginalEnv(() -> new ERB(envTemplateFile).result());
+      try {
+        FileUtils.writeStringToFile(new File(envPath), content, StandardCharsets.UTF_8);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+
+      if (skipPush) {
+        environment.reloadEnv();
+        push(commander);
+      }
+
+    } else {
+      System.out.println("Skipping envify (no " + envTemplatePath + " exists)");
+    }
 
   }
 

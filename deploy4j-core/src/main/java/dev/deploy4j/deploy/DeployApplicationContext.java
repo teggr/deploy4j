@@ -2,6 +2,7 @@ package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.host.commands.*;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.init.Initializer;
 
 public class DeployApplicationContext {
 
@@ -18,9 +19,13 @@ public class DeployApplicationContext {
   private final Env env;
   private final Commander commander;
   private final LockManager lockManager;
+  private final Initializer initializer;
+  private final Audit audit;
+  private final Version version;
 
   public DeployApplicationContext(Environment environment, SshHosts sshHosts, Commander commander) {
 
+    this.environment = environment;
     this.commander = commander;
 
     BuilderHostCommands builder = new BuilderHostCommands(commander.config());
@@ -41,19 +46,22 @@ public class DeployApplicationContext {
 
     TraefikHostCommands traefik = new TraefikHostCommands(commander.config());
 
-    this.lockManager = new LockManager(sshHosts, lock,server);
+    this.lockManager = new LockManager(sshHosts, lock, server, commander.config().version());
 
     this.app = new App(sshHosts, lockManager);
     this.server = new Server(sshHosts, lockManager, docker, server);
-    this.env = new Env(sshHosts, lockManager, traefik);
+    this.env = new Env(sshHosts, lockManager, traefik, this.environment);
     this.accessory = new Accessory(sshHosts, lockManager, registry);
     this.registry = new Registry(sshHosts, registry);
     this.build = new Build(sshHosts, builder);
     this.prune = new Prune(sshHosts, lockManager, prune);
-    this.environment = environment;
     this.traefik = new Traefik(sshHosts, lockManager, registry, traefik);
     this.lock = new Lock(sshHosts, lockManager, server, lock);
-    this.main = new Main(sshHosts, lockManager, this.app, this.server, this.env, this.accessory, this.registry, build, this.prune, this.environment, this.traefik);
+
+    this.initializer = new Initializer();
+    this.audit = new Audit(sshHosts);
+    this.version = new Version();
+    this.main = new Main(sshHosts, lockManager, this.app, this.server, this.env, this.accessory, this.registry, build, this.prune, this.traefik);
 
   }
 
@@ -107,6 +115,18 @@ public class DeployApplicationContext {
 
   public LockManager lockManager() {
     return lockManager;
+  }
+
+  public Initializer initializer() {
+    return initializer;
+  }
+
+  public Audit audit() {
+    return audit;
+  }
+
+  public Version version() {
+    return version;
   }
 
 }

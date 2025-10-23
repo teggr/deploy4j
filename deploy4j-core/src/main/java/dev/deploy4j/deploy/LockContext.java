@@ -12,6 +12,4 @@ public interface LockContext {
 
   List<String> hosts();
 
-  String version();
-
 }

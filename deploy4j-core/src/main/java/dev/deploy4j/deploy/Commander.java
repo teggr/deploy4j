@@ -185,11 +185,4 @@ public class Commander implements LockContext {
     return specifics().accessoryHosts();
   }
 
-  // overrides
-
-  @Override
-  public String version() {
-    return config().version();
-  }
-
 }

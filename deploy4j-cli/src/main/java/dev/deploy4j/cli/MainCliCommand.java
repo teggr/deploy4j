@@ -142,7 +142,7 @@ public class MainCliCommand extends BaseCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.main().audit(deployApplicationContext.commander());
+      deployApplicationContext.audit().audit(deployApplicationContext.commander());
     }
 
   }
@@ -169,7 +169,7 @@ public class MainCliCommand extends BaseCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.main().init(bundle);
+      deployApplicationContext.initializer().init(bundle);
     }
 
   }
@@ -184,7 +184,7 @@ public class MainCliCommand extends BaseCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.main().envify(deployApplicationContext.commander(), skipPush, destination);
+      deployApplicationContext.env().envify(deployApplicationContext.commander(), skipPush, destination);
     }
 
   }
@@ -208,7 +208,7 @@ public class MainCliCommand extends BaseCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.main().version();
+      deployApplicationContext.version().version();
     }
 
   }
