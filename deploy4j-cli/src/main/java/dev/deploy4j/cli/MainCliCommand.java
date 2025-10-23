@@ -53,7 +53,7 @@ public class MainCliCommand extends BaseCliCommand {
 
         deployApplicationContext.lockManager().withLock( deployApplicationContext.commander(), () -> {
 
-          deployApplicationContext.main().setup(deployApplicationContext.commander(), skipPush);
+          deployApplicationContext.deploy().setup(deployApplicationContext.commander(), skipPush);
 
         });
 
@@ -76,7 +76,7 @@ public class MainCliCommand extends BaseCliCommand {
 
       printRuntime(() -> {
 
-        deployApplicationContext.main().deploy(deployApplicationContext.commander(), skipPush);
+        deployApplicationContext.deploy().deploy(deployApplicationContext.commander(), skipPush);
 
       });
 
@@ -97,7 +97,7 @@ public class MainCliCommand extends BaseCliCommand {
 
       printRuntime(() -> {
 
-        deployApplicationContext.main().redeploy(deployApplicationContext.commander(), skipPush);
+        deployApplicationContext.deploy().redeploy(deployApplicationContext.commander(), skipPush);
 
       });
 
@@ -115,7 +115,7 @@ public class MainCliCommand extends BaseCliCommand {
 
       printRuntime(() -> {
 
-        deployApplicationContext.main().rollback(deployApplicationContext.commander(), version);
+        deployApplicationContext.deploy().rollback(deployApplicationContext.commander(), version);
 
       });
 
@@ -130,7 +130,7 @@ public class MainCliCommand extends BaseCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.main().details(deployApplicationContext.commander());
+      deployApplicationContext.deploy().details(deployApplicationContext.commander());
     }
 
   }
@@ -154,7 +154,7 @@ public class MainCliCommand extends BaseCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.main().config(deployApplicationContext.commander());
+      deployApplicationContext.deploy().config(deployApplicationContext.commander());
     }
 
   }
@@ -196,7 +196,7 @@ public class MainCliCommand extends BaseCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.main().remove(deployApplicationContext.commander());
+      deployApplicationContext.deploy().remove(deployApplicationContext.commander());
     }
 
   }

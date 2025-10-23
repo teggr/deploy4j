@@ -2,20 +2,15 @@ package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.configuration.Role;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
-import dev.deploy4j.deploy.utils.erb.ERB;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 
-public class Main extends Base {
+public class Deploy extends Base {
 
-  private static final Logger log = LoggerFactory.getLogger(Main.class);
+  private static final Logger log = LoggerFactory.getLogger(Deploy.class);
 
   private final LockManager lockManager;
   private final App app;
@@ -27,7 +22,7 @@ public class Main extends Base {
   private final Prune prune;
   private final Traefik traefik;
 
-  public Main(SshHosts sshHosts, LockManager lockManager, App app, Server server, Env env, Accessory accessory, Registry registry, Build build, Prune prune, Traefik traefik) {
+  public Deploy(SshHosts sshHosts, LockManager lockManager, App app, Server server, Env env, Accessory accessory, Registry registry, Build build, Prune prune, Traefik traefik) {
     super(sshHosts);
     this.lockManager = lockManager;
     this.app = app;

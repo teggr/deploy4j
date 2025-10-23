@@ -7,7 +7,7 @@ import dev.deploy4j.init.Initializer;
 public class DeployApplicationContext {
 
   private final Environment environment;
-  private final Main main;
+  private final Deploy deploy;
   private final Server server;
   private final Registry registry;
   private final Build build;
@@ -61,7 +61,7 @@ public class DeployApplicationContext {
     this.initializer = new Initializer();
     this.audit = new Audit(sshHosts);
     this.version = new Version();
-    this.main = new Main(sshHosts, lockManager, this.app, this.server, this.env, this.accessory, this.registry, build, this.prune, this.traefik);
+    this.deploy = new Deploy(sshHosts, lockManager, this.app, this.server, this.env, this.accessory, this.registry, build, this.prune, this.traefik);
 
   }
 
@@ -85,8 +85,8 @@ public class DeployApplicationContext {
     return build;
   }
 
-  public Main main() {
-    return main;
+  public Deploy deploy() {
+    return deploy;
   }
 
   public Traefik traefik() {
