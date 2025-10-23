@@ -57,3 +57,18 @@ mvn verify deploy4j:deploy
 [INFO] sshUsername:       root
 ...
 ```
+
+## Testing
+
+Spin up a local ssh docker container for testing:
+
+```bash
+# Running instructions
+docker run -d -p 2222:22 --name deploy4j-droplet -v "C:\Users\YOUR_USER\.ssh\id_rsa.pub":/root/.ssh/authorized_keys teggr/deploy4j-docker-droplet:latest
+
+# connect via ssh
+ssh -o StrictHostKeyChecking=no -p 2222 root@localhost 
+
+# connect to shell
+docker exec -it deploy4j-droplet /bin/bash
+```

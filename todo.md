@@ -1,7 +1,6 @@
 # Next
 
 * unit tests
-* move deploy4j-droplet to its own repo + deploy to dockerhub + mount key as volume
 * need to remove config() dependency
 
 # Notes
