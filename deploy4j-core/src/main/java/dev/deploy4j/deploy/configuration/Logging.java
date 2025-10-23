@@ -1,6 +1,6 @@
 package dev.deploy4j.deploy.configuration;
 
-import dev.deploy4j.deploy.raw.LoggingConfig;
+import dev.deploy4j.deploy.configuration.raw.LoggingConfig;
 
 import java.util.ArrayList;
 import java.util.Arrays;

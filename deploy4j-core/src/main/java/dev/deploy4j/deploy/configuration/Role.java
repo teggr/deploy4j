@@ -1,7 +1,7 @@
 package dev.deploy4j.deploy.configuration;
 
 import dev.deploy4j.deploy.configuration.env.Tag;
-import dev.deploy4j.deploy.raw.*;
+import dev.deploy4j.deploy.configuration.raw.*;
 import dev.deploy4j.deploy.utils.file.File;
 
 import java.util.HashMap;

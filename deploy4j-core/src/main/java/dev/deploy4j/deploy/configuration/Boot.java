@@ -1,6 +1,6 @@
 package dev.deploy4j.deploy.configuration;
 
-import dev.deploy4j.deploy.raw.BootConfig;
+import dev.deploy4j.deploy.configuration.raw.BootConfig;
 
 public class Boot {
 

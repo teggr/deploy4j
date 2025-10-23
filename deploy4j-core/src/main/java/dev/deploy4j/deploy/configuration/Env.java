@@ -2,7 +2,7 @@ package dev.deploy4j.deploy.configuration;
 
 import dev.deploy4j.deploy.env.EnvFile;
 import dev.deploy4j.deploy.env.ENV;
-import dev.deploy4j.deploy.raw.EnvironmentConfig;
+import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
 
 import java.nio.file.Paths;
 import java.util.*;

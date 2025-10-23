@@ -1,6 +1,6 @@
 package dev.deploy4j.cli;
 
-import dev.deploy4j.deploy.cli.*;
+import dev.deploy4j.deploy.*;
 import dev.deploy4j.deploy.host.commands.*;
 
 public class Cli {

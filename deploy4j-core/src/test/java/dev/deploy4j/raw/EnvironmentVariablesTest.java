@@ -3,7 +3,7 @@ package dev.deploy4j.raw;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import dev.deploy4j.deploy.raw.EnvironmentConfig;
+import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

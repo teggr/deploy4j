@@ -1,8 +1,8 @@
 package dev.deploy4j.deploy.configuration;
 
-import dev.deploy4j.deploy.raw.EnvironmentConfig;
+import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
 import dev.deploy4j.deploy.utils.file.File;
-import dev.deploy4j.deploy.raw.AccessoryConfig;
+import dev.deploy4j.deploy.configuration.raw.AccessoryConfig;
 
 import java.nio.file.Paths;
 import java.util.*;

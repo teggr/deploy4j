@@ -1,6 +1,6 @@
 package dev.deploy4j.deploy.host.commands;
 
-import dev.deploy4j.deploy.cli.Tags;
+import dev.deploy4j.deploy.Tags;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.rebelcraft.cmd.Cmd;
 import dev.rebelcraft.cmd.Cmds;

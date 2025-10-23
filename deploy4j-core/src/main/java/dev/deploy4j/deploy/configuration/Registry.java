@@ -1,8 +1,8 @@
 package dev.deploy4j.deploy.configuration;
 
 import dev.deploy4j.deploy.env.ENV;
-import dev.deploy4j.deploy.raw.PlainValueOrSecretKey;
-import dev.deploy4j.deploy.raw.RegistryConfig;
+import dev.deploy4j.deploy.configuration.raw.PlainValueOrSecretKey;
+import dev.deploy4j.deploy.configuration.raw.RegistryConfig;
 
 public class Registry {
 

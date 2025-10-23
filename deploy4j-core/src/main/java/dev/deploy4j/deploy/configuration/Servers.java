@@ -1,6 +1,6 @@
 package dev.deploy4j.deploy.configuration;
 
-import dev.deploy4j.deploy.raw.ServersConfig;
+import dev.deploy4j.deploy.configuration.raw.ServersConfig;
 
 import java.util.List;
 

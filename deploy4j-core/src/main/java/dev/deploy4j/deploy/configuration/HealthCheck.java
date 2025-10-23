@@ -1,6 +1,6 @@
 package dev.deploy4j.deploy.configuration;
 
-import dev.deploy4j.deploy.raw.HealthCheckConfig;
+import dev.deploy4j.deploy.configuration.raw.HealthCheckConfig;
 
 import java.util.Objects;
 import java.util.stream.Collectors;

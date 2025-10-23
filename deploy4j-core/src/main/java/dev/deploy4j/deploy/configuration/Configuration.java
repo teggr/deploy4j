@@ -4,9 +4,9 @@ import dev.deploy4j.deploy.utils.RandomHex;
 import dev.deploy4j.deploy.configuration.env.Tag;
 import dev.deploy4j.deploy.env.ENV;
 import dev.deploy4j.deploy.utils.file.File;
-import dev.deploy4j.deploy.raw.DeployConfig;
-import dev.deploy4j.deploy.raw.DeployConfigYamlReader;
-import dev.deploy4j.deploy.raw.EnvironmentConfig;
+import dev.deploy4j.deploy.configuration.raw.DeployConfig;
+import dev.deploy4j.deploy.configuration.raw.DeployConfigYamlReader;
+import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
 import org.apache.commons.lang.StringUtils;
 
 import java.nio.file.Paths;

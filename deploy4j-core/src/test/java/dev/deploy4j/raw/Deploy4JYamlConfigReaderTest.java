@@ -1,7 +1,7 @@
 package dev.deploy4j.raw;
 
-import dev.deploy4j.deploy.raw.DeployConfig;
-import dev.deploy4j.deploy.raw.DeployConfigYamlReader;
+import dev.deploy4j.deploy.configuration.raw.DeployConfig;
+import dev.deploy4j.deploy.configuration.raw.DeployConfigYamlReader;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -1,8 +1,8 @@
 package dev.deploy4j.deploy.configuration;
 
 import dev.deploy4j.deploy.env.ENV;
-import dev.deploy4j.deploy.raw.PlainValueOrSecretKey;
-import dev.deploy4j.deploy.raw.SshConfig;
+import dev.deploy4j.deploy.configuration.raw.PlainValueOrSecretKey;
+import dev.deploy4j.deploy.configuration.raw.SshConfig;
 
 import java.util.HashMap;
 import java.util.Map;

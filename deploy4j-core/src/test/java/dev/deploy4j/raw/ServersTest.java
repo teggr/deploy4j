@@ -3,9 +3,9 @@ package dev.deploy4j.raw;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import dev.deploy4j.deploy.raw.CustomRoleConfig;
-import dev.deploy4j.deploy.raw.RoleConfig;
-import dev.deploy4j.deploy.raw.ServersConfig;
+import dev.deploy4j.deploy.configuration.raw.CustomRoleConfig;
+import dev.deploy4j.deploy.configuration.raw.RoleConfig;
+import dev.deploy4j.deploy.configuration.raw.ServersConfig;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

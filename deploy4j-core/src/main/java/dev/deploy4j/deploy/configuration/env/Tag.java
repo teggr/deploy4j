@@ -1,7 +1,7 @@
 package dev.deploy4j.deploy.configuration.env;
 
 import dev.deploy4j.deploy.configuration.Env;
-import dev.deploy4j.deploy.raw.EnvironmentConfig;
+import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
 
 public class Tag {
 
