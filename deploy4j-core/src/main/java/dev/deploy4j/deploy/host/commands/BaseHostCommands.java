@@ -115,4 +115,7 @@ public abstract class BaseHostCommands {
     return config;
   }
 
+  protected String sensitive(String s) {
+    return s;
+  }
 }
