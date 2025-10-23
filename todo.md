@@ -9,6 +9,7 @@
   * accessory
   * auditor
 * remove version from LockContext - load into LockManager
+* rename Main to Deploy + extract init / setup / audit / envify / version
 
 # Notes
 
