@@ -1,5 +1,6 @@
 package dev.deploy4j.cli;
 
+import dev.deploy4j.deploy.DeployApplicationContext;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -17,8 +18,8 @@ public class BuildCliCommand {
   public static class PullCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.build().pull();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.build().pull(deployApplicationContext.commander());
     }
 
   }

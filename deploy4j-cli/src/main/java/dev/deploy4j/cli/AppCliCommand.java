@@ -1,5 +1,6 @@
 package dev.deploy4j.cli;
 
+import dev.deploy4j.deploy.DeployApplicationContext;
 import picocli.CommandLine;
 
 import java.util.Map;
@@ -32,8 +33,8 @@ public class AppCliCommand {
   public static class BootCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.app().boot();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.app().boot(deployApplicationContext.commander());
     }
 
   }
@@ -44,8 +45,8 @@ public class AppCliCommand {
   public static class StartCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.app().start();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.app().start(deployApplicationContext.commander());
     }
 
   }
@@ -56,8 +57,8 @@ public class AppCliCommand {
   public static class StopCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.app().stop();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.app().stop(deployApplicationContext.commander());
     }
 
   }
@@ -68,8 +69,8 @@ public class AppCliCommand {
   public static class DetailsCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.app().details();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.app().details(deployApplicationContext.commander());
     }
 
   }
@@ -92,8 +93,8 @@ public class AppCliCommand {
     private String cmd;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.app().exec(interactive, reuse, env, cmd);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.app().exec(deployApplicationContext.commander(), interactive, reuse, env, cmd);
     }
 
   }
@@ -104,8 +105,8 @@ public class AppCliCommand {
   public static class ContainersCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.app().containers();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.app().containers(deployApplicationContext.commander());
     }
 
   }
@@ -119,8 +120,8 @@ public class AppCliCommand {
     private boolean stop;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.app().staleContainers(stop);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.app().staleContainers(deployApplicationContext.commander(), stop);
     }
 
   }
@@ -131,8 +132,8 @@ public class AppCliCommand {
   public static class ImagesCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.app().images();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.app().images(deployApplicationContext.commander());
     }
 
   }
@@ -158,8 +159,8 @@ public class AppCliCommand {
     private boolean follow;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.app().logs(since,lines, grep, grepOptions, follow);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.app().logs(deployApplicationContext.commander(), since,lines, grep, grepOptions, follow);
     }
 
   }
@@ -170,8 +171,8 @@ public class AppCliCommand {
   public static class RemoveCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.app().containers();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.app().containers(deployApplicationContext.commander());
     }
 
   }
@@ -185,8 +186,8 @@ public class AppCliCommand {
     private String version;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.app().removeContainer(version);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.app().removeContainer(deployApplicationContext.commander(), version);
     }
 
   }
@@ -197,8 +198,8 @@ public class AppCliCommand {
   public static class RemoveContainersCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.app().removeContainers();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.app().removeContainers(deployApplicationContext.commander());
     }
 
   }
@@ -209,8 +210,8 @@ public class AppCliCommand {
   public static class RemoveImagesCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.app().removeImages();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.app().removeImages(deployApplicationContext.commander());
     }
 
   }
@@ -221,8 +222,8 @@ public class AppCliCommand {
   public static class VersionCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.app().version();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.app().version(deployApplicationContext.commander());
     }
 
   }

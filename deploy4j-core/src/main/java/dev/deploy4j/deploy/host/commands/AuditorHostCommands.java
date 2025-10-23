@@ -11,6 +11,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static dev.rebelcraft.cmd.Cmds.append;
+
 public class AuditorHostCommands extends BaseHostCommands {
 
   private final Map<String, String> details;

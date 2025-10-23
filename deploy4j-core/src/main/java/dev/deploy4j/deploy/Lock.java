@@ -2,16 +2,19 @@ package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.host.commands.LockHostCommands;
 import dev.deploy4j.deploy.host.commands.ServerHostCommands;
+import dev.deploy4j.deploy.host.ssh.SshHosts;
 
 import java.util.List;
 
 public class Lock extends Base {
 
+  private final LockManager lockManager;
   private final ServerHostCommands server;
   private final LockHostCommands lock;
 
-  public Lock(Commander commander, ServerHostCommands server, LockHostCommands lock) {
-    super(commander);
+  public Lock(SshHosts sshHosts, LockManager lockManager, ServerHostCommands server, LockHostCommands lock) {
+    super(sshHosts);
+    this.lockManager = lockManager;
     this.server = server;
     this.lock = lock;
   }
@@ -19,11 +22,11 @@ public class Lock extends Base {
   /**
    * Report lock status
    */
-  public void status() {
+  public void status(Commander commander) {
 
     handleMissingLock(() -> {
 
-      on(List.of(commander().primaryHost()), host -> {;
+      on(List.of(commander.primaryHost()), host -> {;
 
         host.execute(server.ensureRunDirectory());
         System.out.println( host.capture( lock.status() ) );
@@ -39,14 +42,14 @@ public class Lock extends Base {
    *
    * @param message A lock message
    */
-  public void acquire(String message) {
+  public void acquire(Commander commander, String message) {
 
-    raiseIfLocked(() -> {
+    lockManager.raiseIfLocked(commander, () -> {
 
-      on(List.of(commander().primaryHost()), host -> {
+      on(List.of(commander.primaryHost()), host -> {
 
         host.execute(server.ensureRunDirectory());
-        host.execute(lock.acquire(message, commander().config().version()));
+        host.execute(lock.acquire(message, commander.config().version()));
 
       });
 
@@ -59,11 +62,11 @@ public class Lock extends Base {
   /**
    * Release the deploy lock
    */
-  public void release() {
+  public void release(Commander commander) {
 
     handleMissingLock(() -> {
 
-      on(List.of(commander().primaryHost()), host -> {
+      on(List.of(commander.primaryHost()), host -> {
 
         host.execute(server.ensureRunDirectory());
         host.execute(lock.release());

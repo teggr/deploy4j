@@ -13,11 +13,12 @@ import dev.deploy4j.deploy.utils.Utils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Context class to hold shared information and configurations for deployment processes.
  */
-public class Commander implements AutoCloseable {
+public class Commander implements LockContext {
 
   private ConfigureArgs configureArgs;
 
@@ -30,8 +31,6 @@ public class Commander implements AutoCloseable {
   private List<String> specificHosts;
 
   private Specifics specifics;
-
-  private final Map<String, SshHost> sshHosts = new HashMap<>();
 
   public Commander() {
     this.holdingLock = false;
@@ -127,10 +126,12 @@ public class Commander implements AutoCloseable {
   // TODO: with verbosity
   // TODO: boot strategy
 
+  @Override
   public boolean holdingLock() {
     return holdingLock;
   }
 
+  @Override
   public void holdingLock(boolean holdingLock) {
     this.holdingLock = holdingLock;
   }
@@ -152,6 +153,7 @@ public class Commander implements AutoCloseable {
 
   // delegates
 
+  @Override
   public List<String> hosts() {
     return specifics().hosts();
   }
@@ -160,6 +162,7 @@ public class Commander implements AutoCloseable {
     return specifics().roles();
   }
 
+  @Override
   public String primaryHost() {
     return specifics().primaryHost();
   }
@@ -180,23 +183,11 @@ public class Commander implements AutoCloseable {
     return specifics().accessoryHosts();
   }
 
-  // manage
+  // overrides
 
   @Override
-  public void close() throws Exception {
-
-    // shutdown
-    sshHosts.values().forEach(SshHost::close);
-
-  }
-
-  public SshHost host(String host) {
-    SshHost sshHost = sshHosts.get(host);
-    if (sshHost == null) {
-      sshHost = new SshHost(host, config().ssh());
-      sshHosts.put(host, sshHost);
-    }
-    return sshHost;
+  public String version() {
+    return config().version();
   }
 
 }

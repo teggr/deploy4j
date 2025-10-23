@@ -1,5 +1,6 @@
 package dev.deploy4j.cli;
 
+import dev.deploy4j.deploy.DeployApplicationContext;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -26,8 +27,8 @@ public class TraefikCliCommand {
   public static class BootCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.traefik().boot();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.traefik().boot(deployApplicationContext.commander());
     }
 
   }
@@ -44,9 +45,9 @@ public class TraefikCliCommand {
     private boolean confirmed;
 
     @Override
-    protected void execute(Cli cli) {
+    protected void execute(DeployApplicationContext deployApplicationContext) {
       // TODO: confirmation prompt
-      cli.traefik().reboot(rolling);
+      deployApplicationContext.traefik().reboot(deployApplicationContext.commander(), rolling);
     }
 
   }
@@ -57,8 +58,8 @@ public class TraefikCliCommand {
   public static class StartCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.traefik().start();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.traefik().start(deployApplicationContext.commander());
     }
 
   }
@@ -69,8 +70,8 @@ public class TraefikCliCommand {
   public static class StopCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.traefik().stop();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.traefik().stop(deployApplicationContext.commander());
     }
 
   }
@@ -81,8 +82,8 @@ public class TraefikCliCommand {
   public static class RestartCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.traefik().restart();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.traefik().restart(deployApplicationContext.commander());
     }
 
   }
@@ -93,8 +94,8 @@ public class TraefikCliCommand {
   public static class DetailsCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.traefik().details();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.traefik().details(deployApplicationContext.commander());
     }
 
   }
@@ -120,8 +121,8 @@ public class TraefikCliCommand {
     private boolean follow;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.traefik().logs(since,lines, grep, grepOptions, follow);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.traefik().logs(deployApplicationContext.commander(), since,lines, grep, grepOptions, follow);
     }
 
   }
@@ -132,8 +133,8 @@ public class TraefikCliCommand {
   public static class RemoveCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.traefik().remove();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.traefik().remove(deployApplicationContext.commander());
     }
 
   }
@@ -144,8 +145,8 @@ public class TraefikCliCommand {
   public static class RemoveContainerCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.traefik().removeContainer();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.traefik().removeContainer(deployApplicationContext.commander());
     }
 
   }
@@ -156,8 +157,8 @@ public class TraefikCliCommand {
   public static class RemoveImageCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.traefik().removeImage();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.traefik().removeImage(deployApplicationContext.commander());
     }
 
   }

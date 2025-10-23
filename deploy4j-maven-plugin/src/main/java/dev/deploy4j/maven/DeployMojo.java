@@ -1,10 +1,8 @@
 package dev.deploy4j.maven;
 
-import dev.deploy4j.Commander;
-import dev.deploy4j.cli.Cli;
-import dev.deploy4j.configuration.Configuration;
-import dev.deploy4j.raw.Deploy4jConfig;
-import dev.deploy4j.raw.Deploy4jConfigReader;
+import dev.deploy4j.deploy.DeployApplicationContext;
+import dev.deploy4j.deploy.Environment;
+import dev.deploy4j.deploy.host.ssh.SshHosts;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -30,44 +28,33 @@ public class DeployMojo extends AbstractMojo {
     String destination = null;
     String configFile = "config/deploy.yml";
 
-    long start = System.currentTimeMillis();
+    Environment environment = new Environment(destination);
 
-    try {
+    // TODO: maven logging?
+    // local logging
+//    if (quiet) {
+//      System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
+//    } else if (verbose) {
+//      System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
+//    } else {
+//      System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
+//    }
 
-      Deploy4jConfig deploy4jConfig = Deploy4jConfigReader.readYaml(configFile);
+    dev.deploy4j.deploy.Commander commander = new dev.deploy4j.deploy.Commander();
+    commander.configure(configFile, destination, version);
+//    commander.specificHosts(hosts);
+//    commander.specificRoles(roles);
+//    if (primary != null) commander.specificPrimary(primary);
 
-      Configuration config = new Configuration(
-        deploy4jConfig,
-        destination,
-        version
-      );
+    try (SshHosts sshHosts = new SshHosts(commander.config())) {
 
-      try (Commander commander = new Commander(config)) {
+      DeployApplicationContext deployApplicationContext = new DeployApplicationContext(environment, sshHosts, commander);
 
-//    commander.setVerbosity();
-//    commander.configure( configFile, destination, version );
-//    commander.specificHosts();
-//    commander.specificRoles();
-//    commander.specificPrimary();
-
-        Cli cli = new Cli(commander);
-
-        cli.main().deploy(false);
-
-      } catch (Exception e) {
-
-        throw new RuntimeException(e);
-
-      }
+      deployApplicationContext.main().deploy(commander, false);
 
     } catch (Exception e) {
+
       throw new RuntimeException(e);
-    } finally {
-
-      long end = System.currentTimeMillis();
-
-      System.out.println("=================================");
-      System.out.println("Finished all in  in " + (end - start) / 1000 + " seconds");
 
     }
 

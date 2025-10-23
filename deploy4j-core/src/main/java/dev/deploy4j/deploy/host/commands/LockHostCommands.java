@@ -2,6 +2,7 @@ package dev.deploy4j.deploy.host.commands;
 
 import dev.rebelcraft.cmd.Cmd;
 import dev.deploy4j.deploy.configuration.Configuration;
+import dev.rebelcraft.cmd.Cmds;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -10,6 +11,8 @@ import java.util.Base64;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static dev.rebelcraft.cmd.Cmds.*;
 
 public class LockHostCommands extends BaseHostCommands {
 

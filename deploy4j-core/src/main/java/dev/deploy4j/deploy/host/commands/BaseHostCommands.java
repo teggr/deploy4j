@@ -60,42 +60,6 @@ public abstract class BaseHostCommands {
 
   // private
 
-  public Cmd combine(Cmd[] commands, String by) {
-    return Cmds.combine(by, commands);
-  }
-
-  protected Cmd combine(Cmd... commands) {
-    return Cmds.combine(commands);
-  }
-
-  protected Cmd chain(Cmd... commands) {
-    return Cmds.chain(commands);
-  }
-
-  protected Cmd pipe(Cmd... commands) {
-    return Cmds.pipe(commands);
-  }
-
-  protected Cmd append(Cmd... commands) {
-    return Cmds.append(commands);
-  }
-
-  protected Cmd write(Cmd... commands) {
-    return Cmds.write(commands);
-  }
-
-  protected Cmd any(Cmd... commands) {
-    return Cmds.any(commands);
-  }
-
-  protected Cmd xargs(Cmd cmd) {
-    return Cmds.xargs(cmd);
-  }
-
-  protected Cmd shell(Cmd command) {
-    return Cmds.shell(command);
-  }
-
   protected Cmd git(String[] args, String path) {
     Cmd git = Cmd.cmd("git");
     if (path != null) {

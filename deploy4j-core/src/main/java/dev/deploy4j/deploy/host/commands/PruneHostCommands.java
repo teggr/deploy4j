@@ -2,10 +2,13 @@ package dev.deploy4j.deploy.host.commands;
 
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.rebelcraft.cmd.Cmd;
+import dev.rebelcraft.cmd.Cmds;
 
 import java.util.List;
 import java.util.stream.Stream;
 
+import static dev.rebelcraft.cmd.Cmds.*;
+import static dev.rebelcraft.cmd.Cmds.pipe;
 import static dev.rebelcraft.cmd.pkgs.Docker.docker;
 
 public class PruneHostCommands extends BaseHostCommands {

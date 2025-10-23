@@ -1,5 +1,6 @@
 package dev.deploy4j.cli;
 
+import dev.deploy4j.deploy.DeployApplicationContext;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -33,7 +34,7 @@ import picocli.CommandLine;
 public class MainCliCommand extends BaseCliCommand {
 
   @Override
-  protected void execute(Cli cli) {
+  protected void execute(DeployApplicationContext deployApplicationContext) {
     CommandLine.usage(this, System.out);
   }
 
@@ -46,13 +47,13 @@ public class MainCliCommand extends BaseCliCommand {
     private boolean skipPush;
 
     @Override
-    protected void execute(Cli cli) {
+    protected void execute(DeployApplicationContext deployApplicationContext) {
 
       printRuntime(() -> {
 
-        cli.lock().withLock(() -> {
+        deployApplicationContext.lockManager().withLock( deployApplicationContext.commander(), () -> {
 
-          cli.main().setup(skipPush);
+          deployApplicationContext.main().setup(deployApplicationContext.commander(), skipPush);
 
         });
 
@@ -71,11 +72,11 @@ public class MainCliCommand extends BaseCliCommand {
     private boolean skipPush;
 
     @Override
-    protected void execute(Cli cli) {
+    protected void execute(DeployApplicationContext deployApplicationContext) {
 
       printRuntime(() -> {
 
-        cli.main().deploy(skipPush);
+        deployApplicationContext.main().deploy(deployApplicationContext.commander(), skipPush);
 
       });
 
@@ -92,11 +93,11 @@ public class MainCliCommand extends BaseCliCommand {
     private boolean skipPush;
 
     @Override
-    protected void execute(Cli cli) {
+    protected void execute(DeployApplicationContext deployApplicationContext) {
 
       printRuntime(() -> {
 
-        cli.main().redeploy(skipPush);
+        deployApplicationContext.main().redeploy(deployApplicationContext.commander(), skipPush);
 
       });
 
@@ -110,11 +111,11 @@ public class MainCliCommand extends BaseCliCommand {
   public static class RollbackCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
+    protected void execute(DeployApplicationContext deployApplicationContext) {
 
       printRuntime(() -> {
 
-        cli.main().rollback(version);
+        deployApplicationContext.main().rollback(deployApplicationContext.commander(), version);
 
       });
 
@@ -128,8 +129,8 @@ public class MainCliCommand extends BaseCliCommand {
   public static class DetailsCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.main().details();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.main().details(deployApplicationContext.commander());
     }
 
   }
@@ -140,8 +141,8 @@ public class MainCliCommand extends BaseCliCommand {
   public static class AuditCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.main().audit();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.main().audit(deployApplicationContext.commander());
     }
 
   }
@@ -152,8 +153,8 @@ public class MainCliCommand extends BaseCliCommand {
   public static class ConfigCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.main().config();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.main().config(deployApplicationContext.commander());
     }
 
   }
@@ -167,8 +168,8 @@ public class MainCliCommand extends BaseCliCommand {
     private boolean bundle;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.main().init(bundle);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.main().init(bundle);
     }
 
   }
@@ -182,8 +183,8 @@ public class MainCliCommand extends BaseCliCommand {
     private boolean skipPush;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.main().envify(skipPush, destination);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.main().envify(deployApplicationContext.commander(), skipPush, destination);
     }
 
   }
@@ -194,8 +195,8 @@ public class MainCliCommand extends BaseCliCommand {
   public static class RemoveCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.main().remove();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.main().remove(deployApplicationContext.commander());
     }
 
   }
@@ -206,8 +207,8 @@ public class MainCliCommand extends BaseCliCommand {
   public static class VersionCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.main().version();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.main().version();
     }
 
   }

@@ -2,7 +2,9 @@ package dev.deploy4j.deploy.host.commands;
 
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.rebelcraft.cmd.Cmd;
+import dev.rebelcraft.cmd.Cmds;
 
+import static dev.rebelcraft.cmd.Cmds.*;
 import static dev.rebelcraft.cmd.pkgs.Docker.docker;
 
 public class BuilderHostCommands extends BaseHostCommands {

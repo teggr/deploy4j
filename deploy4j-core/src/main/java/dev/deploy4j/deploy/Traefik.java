@@ -2,6 +2,7 @@ package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.host.commands.RegistryHostCommands;
 import dev.deploy4j.deploy.host.commands.TraefikHostCommands;
+import dev.deploy4j.deploy.host.ssh.SshHosts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,11 +10,13 @@ public class Traefik extends Base {
 
   private static final Logger log = LoggerFactory.getLogger(Traefik.class);
 
+  private final LockManager lockManager;
   private final RegistryHostCommands registry;
   private final TraefikHostCommands traefik;
 
-  public Traefik(Commander commander, RegistryHostCommands registry, TraefikHostCommands traefik) {
-    super(commander);
+  public Traefik(SshHosts sshHosts, LockManager lockManager, RegistryHostCommands registry, TraefikHostCommands traefik) {
+    super(sshHosts);
+    this.lockManager = lockManager;
     this.registry = registry;
     this.traefik = traefik;
   }
@@ -21,11 +24,11 @@ public class Traefik extends Base {
   /**
    * Boot Traefik on servers
    */
-  public void boot() {
+  public void boot(Commander commander) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      on(commander().traefikHosts(), host -> {
+      on(commander.traefikHosts(), host -> {
 
         host.execute(registry.login());
         host.execute(traefik.startOrRun());
@@ -43,13 +46,13 @@ public class Traefik extends Base {
    *
    * @param rolling Reboot traefik on hosts in sequence, rather than in parallel
    */
-  public void reboot(boolean rolling) {
+  public void reboot(Commander commander, boolean rolling) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      on(commander().traefikHosts(), host -> {
+      on(commander.traefikHosts(), host -> {
 
-        host.execute(commander().auditor().record("Rebooted traefik"));
+        host.execute(commander.auditor().record("Rebooted traefik"));
         host.execute(registry.login());
         host.execute(traefik.stop());
         host.execute(traefik.removeContainer());
@@ -64,13 +67,13 @@ public class Traefik extends Base {
   /**
    * Start existing Traefik container on servers
    */
-  public void start() {
+  public void start(Commander commander) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      on(commander().traefikHosts(), host -> {
+      on(commander.traefikHosts(), host -> {
 
-        host.execute(commander().auditor().record("Started traefik"));
+        host.execute(commander.auditor().record("Started traefik"));
         host.execute(traefik.start());
 
 
@@ -83,13 +86,13 @@ public class Traefik extends Base {
   /**
    * Stop existing Traefik container on servers
    */
-  public void stop() {
+  public void stop(Commander commander) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      on(commander().traefikHosts(), host -> {
+      on(commander.traefikHosts(), host -> {
 
-        host.execute(commander().auditor().record("Stopped traefik"));
+        host.execute(commander.auditor().record("Stopped traefik"));
         host.execute(traefik.stop());
 
 
@@ -102,12 +105,12 @@ public class Traefik extends Base {
   /**
    * Restart existing Traefik container on servers
    */
-  public void restart() {
+  public void restart(Commander commander) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      stop();
-      start();
+      stop(commander);
+      start(commander);
 
     });
 
@@ -116,9 +119,9 @@ public class Traefik extends Base {
   /**
    * Show details about Traefik container from servers
    */
-  public void details() {
+  public void details(Commander commander) {
 
-    on(commander().traefikHosts(), host -> {
+    on(commander.traefikHosts(), host -> {
 
       System.out.println(host.capture(traefik.info()));
 
@@ -136,6 +139,7 @@ public class Traefik extends Base {
    * @param follow      Follow logs on primary server (or specific host set by --hosts)
    */
   public void logs(
+    Commander commander,
     String since,
     Integer lines,
     String grep,
@@ -150,7 +154,7 @@ public class Traefik extends Base {
 //      lines = 100;
 //    }
 
-    on(commander().traefikHosts(), host -> {
+    on(commander.traefikHosts(), host -> {
 
       System.out.println(host.capture(traefik.logs(since, lines != null ? lines.toString() : null, grep, grepOptions)));
 
@@ -161,13 +165,13 @@ public class Traefik extends Base {
   /**
    * Remove Traefik container and image from servers
    */
-  public void remove() {
+  public void remove(Commander commander) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      stop();
-      removeContainer();
-      removeImage();
+      stop(commander);
+      removeContainer(commander);
+      removeImage(commander);
 
     });
 
@@ -177,13 +181,13 @@ public class Traefik extends Base {
   /**
    * Remove Traefik container from servers
    */
-  public void removeContainer() {
+  public void removeContainer(Commander commander) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      on(commander().traefikHosts(), host -> {
+      on(commander.traefikHosts(), host -> {
 
-        host.execute(commander().auditor().record("Removed traefik container"));
+        host.execute(commander.auditor().record("Removed traefik container"));
         host.execute(traefik.removeContainer());
 
       });
@@ -195,13 +199,13 @@ public class Traefik extends Base {
   /**
    * Remove Traefik image from servers
    */
-  public void removeImage() {
+  public void removeImage(Commander commander) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      on(commander().traefikHosts(), host -> {
+      on(commander.traefikHosts(), host -> {
 
-        host.execute(commander().auditor().record("Removed traefik image"));
+        host.execute(commander.auditor().record("Removed traefik image"));
         host.execute(traefik.removeImage());
 
       });

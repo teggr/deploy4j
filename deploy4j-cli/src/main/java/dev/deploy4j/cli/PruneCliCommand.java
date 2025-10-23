@@ -1,5 +1,6 @@
 package dev.deploy4j.cli;
 
+import dev.deploy4j.deploy.DeployApplicationContext;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -19,8 +20,8 @@ public class PruneCliCommand {
   public static class AllCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.prune().all();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.prune().all(deployApplicationContext.commander());
     }
 
   }
@@ -31,8 +32,8 @@ public class PruneCliCommand {
   public static class ImagesCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.prune().images();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.prune().images(deployApplicationContext.commander());
     }
 
   }
@@ -46,8 +47,8 @@ public class PruneCliCommand {
     private Integer retain;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.prune().containers(retain);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.prune().containers(deployApplicationContext.commander(), retain);
     }
 
   }

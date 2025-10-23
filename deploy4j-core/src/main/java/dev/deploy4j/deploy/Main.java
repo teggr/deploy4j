@@ -1,6 +1,7 @@
 package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.configuration.Role;
+import dev.deploy4j.deploy.host.ssh.SshHosts;
 import dev.deploy4j.deploy.utils.erb.ERB;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ public class Main extends Base {
 
   private static final Logger log = LoggerFactory.getLogger(Main.class);
 
+  private final LockManager lockManager;
   private final App app;
   private final Server server;
   private final Env env;
@@ -26,8 +28,9 @@ public class Main extends Base {
   private final Environment environment;
   private final Traefik traefik;
 
-  public Main(Commander commander, App app, Server server, Env env, Accessory accessory, Registry registry, Build build, Prune prune, Environment environment, Traefik traefik) {
-    super(commander);
+  public Main(SshHosts sshHosts, LockManager lockManager, App app, Server server, Env env, Accessory accessory, Registry registry, Build build, Prune prune, Environment environment, Traefik traefik) {
+    super(sshHosts);
+    this.lockManager = lockManager;
     this.app = app;
     this.server = server;
     this.env = env;
@@ -44,20 +47,20 @@ public class Main extends Base {
    *
    * @param skipPush Skip image build and push
    */
-  public void setup(boolean skipPush) {
+  public void setup(Commander commander, boolean skipPush) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
       System.out.println("Ensure Docker is installed...");
-      server.bootstrap();
+      server.bootstrap(commander);
 
       System.out.println("Evaluate and push env files...");
-      envify(false, null);
-      env.push();
+      envify(commander, false, null);
+      env.push(commander);
 
-      accessory.boot("all", true);
+      accessory.boot(commander, "all", true);
 
-      deploy(skipPush);
+      deploy(commander, skipPush);
 
     });
 
@@ -69,28 +72,28 @@ public class Main extends Base {
    *
    * @param skipPush Skip image build and push
    */
-  public void deploy(boolean skipPush) {
+  public void deploy(Commander commander, boolean skipPush) {
 
     System.out.println("Log into image registry...");
-    registry.login();
+    registry.login(commander);
 
     if (skipPush) {
       System.out.println("Pull app image...");
-      build.pull();
+      build.pull(commander);
     }
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
       System.out.println("Ensure Traefik is running...");
-      traefik.boot();
+      traefik.boot(commander);
 
       System.out.println("Detect stale containers...");
-      app.staleContainers();
+      app.staleContainers(commander);
 
-      app.boot();
+      app.boot(commander);
 
       System.out.println("Prune old containers and images...");
-      prune.all();
+      prune.all(commander);
 
     });
 
@@ -101,19 +104,19 @@ public class Main extends Base {
    *
    * @param skipPush Skip image build and push
    */
-  public void redeploy(boolean skipPush) {
+  public void redeploy(Commander commander, boolean skipPush) {
 
     if (skipPush) {
       System.out.println("Pull app image...");
-      build.pull();
+      build.pull(commander);
     }
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
       System.out.println("Detect stale containers...");
-      app.staleContainers();
+      app.staleContainers(commander);
 
-      app.boot();
+      app.boot(commander);
 
     });
 
@@ -123,18 +126,18 @@ public class Main extends Base {
   /**
    * Rollback app to VERSION
    */
-  public void rollback(String version) {
+  public void rollback(Commander commander, String version) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
       boolean rolledBack = false;
 
-      commander().config().version(version);
+      commander.config().version(version);
       String oldVersion = null;
 
-      if (containerAvailable(version)) {
+      if (containerAvailable(commander, version)) {
 
-        app.boot();
+        app.boot(commander);
         rolledBack = true;
       } else {
         System.err.println("The app version '%s' is not available as a container (use 'deploy4j app containers' for available versions)".formatted(version));
@@ -147,27 +150,27 @@ public class Main extends Base {
   /**
    * Show details about all containers
    */
-  public void details() {
-    traefik.details();
-    app.details();
-    accessory.details("all");
+  public void details(Commander commander) {
+    traefik.details(commander);
+    app.details(commander);
+    accessory.details(commander, "all");
   }
 
   /**
    * Show audit log from servers
    */
-  public void audit() {
-    on(commander().hosts(), host -> {
-      System.out.println(host.capture(commander().auditor().reveal()));
+  public void audit(Commander commander) {
+    on(commander.hosts(), host -> {
+      System.out.println(host.capture(commander.auditor().reveal()));
     });
   }
 
   /**
    * Show combined config (including secrets!)
    */
-  public void config() {
+  public void config(Commander commander) {
     // TODO: run locallu
-    System.out.println(commander().config());
+    System.out.println(commander.config());
   }
 
   // TODO: docs
@@ -218,7 +221,7 @@ public class Main extends Base {
    * @param skipPush    Skip .env file push
    * @param destination
    */
-  public void envify(boolean skipPush, String destination) {
+  public void envify(Commander commander, boolean skipPush, String destination) {
 
     String envTemplatePath;
     String envPath;
@@ -242,7 +245,7 @@ public class Main extends Base {
 
       if (skipPush) {
         environment.reloadEnv();
-        env.push();
+        env.push(commander);
       }
 
     } else {
@@ -255,14 +258,14 @@ public class Main extends Base {
   /**
    * Remove Traefik, app, accessories, and registry session from servers
    */
-  public void remove() {
+  public void remove(Commander commander) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      traefik.remove();
-      app.remove();
-      accessory.remove("all");
-      registry.logout();
+      traefik.remove(commander);
+      app.remove(commander);
+      accessory.remove(commander, "all");
+      registry.logout(commander);
 
     });
 
@@ -274,15 +277,15 @@ public class Main extends Base {
 
   // private
 
-  private boolean containerAvailable(String version) {
+  private boolean containerAvailable(Commander commander, String version) {
 
     try {
 
-      on(commander().hosts(), host -> {
+      on(commander.hosts(), host -> {
 
-        for (Role role : commander().rolesOn(host.hostName())) {
+        for (Role role : commander.rolesOn(host.hostName())) {
 
-          String containerId = host.capture(commander().app(role, host.hostName()).containerIdForVersion(version));
+          String containerId = host.capture(commander.app(role, host.hostName()).containerIdForVersion(version));
           if (containerId == null) {
             throw new RuntimeException("Container not found");
           }
@@ -304,9 +307,9 @@ public class Main extends Base {
     return true;
   }
 
-  private Map<String, String> deployOptions() {
+  private Map<String, String> deployOptions(Commander commander) {
     return Map.of(
-      "version", commander().config().version()
+      "version", commander.config().version()
     );
     // TODO: merge with options
   }

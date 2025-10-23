@@ -1,25 +1,28 @@
 package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.host.commands.PruneHostCommands;
+import dev.deploy4j.deploy.host.ssh.SshHosts;
 
 public class Prune extends Base {
 
+  private final LockManager lockManager;
   private final PruneHostCommands prune;
 
-  public Prune(Commander commander, PruneHostCommands prune) {
-    super(commander);
+  public Prune(SshHosts sshHosts, LockManager lockManager, PruneHostCommands prune) {
+    super(sshHosts);
+    this.lockManager = lockManager;
     this.prune = prune;
   }
 
   /**
    * Prune unused images and stopped containers
    */
-  public void all() {
+  public void all(Commander commander) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      containers();
-      images();
+      containers(commander);
+      images(commander);
 
     });
 
@@ -28,13 +31,13 @@ public class Prune extends Base {
   /**
    * Prune unused images
    */
-  public void images() {
+  public void images(Commander commander) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      on(commander().hosts(), host -> {
+      on(commander.hosts(), host -> {
 
-        host.execute(commander().auditor().record("Pruned images"));
+        host.execute(commander.auditor().record("Pruned images"));
         host.execute(prune.danglingImages());
         host.execute(prune.taggedImages());
 
@@ -45,8 +48,8 @@ public class Prune extends Base {
 
   }
 
-  public void containers() {
-    containers(null);
+  public void containers(Commander commander) {
+    containers(commander, null);
   }
 
   /**
@@ -54,10 +57,10 @@ public class Prune extends Base {
    *
    * @param retain Number of containers to retain
    */
-  public void containers(Integer retain) {
+  public void containers(Commander commander, Integer retain) {
 
     if (retain == null) {
-      retain = commander().config().retainContainer();
+      retain = commander.config().retainContainer();
     }
     Integer finalRetain = retain;
 
@@ -65,11 +68,11 @@ public class Prune extends Base {
       throw new RuntimeException("retain must be at least 1");
     }
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      on(commander().hosts(), host -> {
+      on(commander.hosts(), host -> {
 
-        host.execute(commander().auditor().record("Pruned containers"));
+        host.execute(commander.auditor().record("Pruned containers"));
         host.execute(prune.appContainers(finalRetain));
         host.execute(prune.healthcheckContainers());
 

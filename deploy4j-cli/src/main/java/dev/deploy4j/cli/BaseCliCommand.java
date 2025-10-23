@@ -1,7 +1,9 @@
 package dev.deploy4j.cli;
 
 import dev.deploy4j.deploy.Commander;
+import dev.deploy4j.deploy.DeployApplicationContext;
 import dev.deploy4j.deploy.Environment;
+import dev.deploy4j.deploy.host.ssh.SshHosts;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
@@ -32,25 +34,26 @@ public abstract class BaseCliCommand implements Callable<Integer> {
 
     Environment environment = new Environment(destination);
 
-    try (Commander commander = new Commander( )) {
+    // local logging
+    if (quiet) {
+      System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
+    } else if (verbose) {
+      System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
+    } else {
+      System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
+    }
 
-      // local logging
-      if (quiet) {
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
-      } else if (verbose) {
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
-      } else {
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
-      }
+    Commander commander = new Commander( );
+    commander.configure(configFile, destination, version);
+    commander.specificHosts(hosts);
+    commander.specificRoles(roles);
+    if (primary != null) commander.specificPrimary(primary);
 
-      commander.configure(configFile, destination, version);
-      commander.specificHosts(hosts);
-      commander.specificRoles(roles);
-      if (primary != null) commander.specificPrimary(primary);
+    try (SshHosts sshHosts = new SshHosts(commander.config())) {
 
-      Cli cli = new Cli(environment, commander);
+      DeployApplicationContext deployApplicationContext = new DeployApplicationContext(environment, sshHosts, commander);
 
-      execute(cli);
+      execute(deployApplicationContext);
 
     } catch (Exception e) {
 
@@ -83,7 +86,7 @@ public abstract class BaseCliCommand implements Callable<Integer> {
 
   }
 
-  protected abstract void execute(Cli cli);
+  protected abstract void execute(DeployApplicationContext deployApplicationContext);
 
 
 }

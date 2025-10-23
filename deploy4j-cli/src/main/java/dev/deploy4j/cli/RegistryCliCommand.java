@@ -1,5 +1,6 @@
 package dev.deploy4j.cli;
 
+import dev.deploy4j.deploy.DeployApplicationContext;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -23,9 +24,9 @@ public class RegistryCliCommand {
     private boolean skipRemote;
 
     @Override
-    protected void execute(Cli cli) {
+    protected void execute(DeployApplicationContext deployApplicationContext) {
       // TODO: skips
-      cli.registry().login();
+      deployApplicationContext.registry().login(deployApplicationContext.commander());
     }
 
   }
@@ -42,9 +43,9 @@ public class RegistryCliCommand {
     private boolean skipRemote;
 
     @Override
-    protected void execute(Cli cli) {
+    protected void execute(DeployApplicationContext deployApplicationContext) {
       // TODO: skips
-      cli.registry().logout();
+      deployApplicationContext.registry().logout(deployApplicationContext.commander());
     }
 
   }

@@ -2,6 +2,7 @@ package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.host.commands.AccessoryHostCommands;
 import dev.deploy4j.deploy.host.commands.RegistryHostCommands;
+import dev.deploy4j.deploy.host.ssh.SshHosts;
 import dev.rebelcraft.cmd.Cmd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,19 +16,21 @@ public class Accessory extends Base {
 
   private static final Logger log = LoggerFactory.getLogger(Accessory.class);
 
+  private final LockManager lockManager;
   private final RegistryHostCommands registry;
 
-  public Accessory(Commander commander, RegistryHostCommands registry) {
-    super(commander);
+  public Accessory(SshHosts sshHosts, LockManager lockManager, RegistryHostCommands registry) {
+    super(sshHosts);
+    this.lockManager = lockManager;
     this.registry = registry;
   }
 
   /**
    * Boot new accessory service on host (use NAME=all to boot all accessories)
    */
-  public void boot() {
+  public void boot(Commander commander) {
 
-    boot(null, true);
+    boot(commander, null, true);
 
   }
 
@@ -37,28 +40,28 @@ public class Accessory extends Base {
    * @param name  (use NAME=all to boot all accessories)
    * @param login
    */
-  public void boot(String name, boolean login) {
+  public void boot(Commander commander, String name, boolean login) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
       if ("all".equalsIgnoreCase(name)) {
 
-        commander().accessoryNames()
-          .forEach(accessoryName -> boot(accessoryName, login));
+        commander.accessoryNames()
+          .forEach(accessoryName -> boot(commander, accessoryName, login));
 
       } else {
 
-        withAccessory(name, (accessory, hosts) -> {
+        withAccessory(commander, name, (accessory, hosts) -> {
 
-          directories(name);
-          upload(name);
+          directories(commander, name);
+          upload(commander, name);
 
           on(hosts, host -> {
 
             if (login) {
               host.execute(registry.login());
             }
-            host.execute(commander().auditor().record("Booted " + name + " accessory"));
+            host.execute(commander.auditor().record("Booted " + name + " accessory"));
             host.execute(accessory.run());
 
           });
@@ -74,11 +77,11 @@ public class Accessory extends Base {
   /**
    * Upload accessory files to host
    */
-  public void upload(String name) {
+  public void upload(Commander commander, String name) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      withAccessory(name, (accessory, hosts) -> {
+      withAccessory(commander, name, (accessory, hosts) -> {
 
         on(hosts, host -> {
 
@@ -102,11 +105,11 @@ public class Accessory extends Base {
   /**
    * Create accessory directories on host
    */
-  public void directories(String name) {
+  public void directories(Commander commander, String name) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      withAccessory(name, (accessory, hosts) -> {
+      withAccessory(commander, name, (accessory, hosts) -> {
 
         on(hosts, host -> {
 
@@ -125,18 +128,18 @@ public class Accessory extends Base {
   /**
    * Reboot existing accessory on host (stop container, remove container, start new container; use NAME=all to boot all accessories)
    */
-  public void reboot(String name) {
+  public void reboot(Commander commander, String name) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
       if ("all".equalsIgnoreCase(name)) {
 
-        commander().accessoryNames()
-          .forEach(accessoryName -> reboot(accessoryName));
+        commander.accessoryNames()
+          .forEach(accessoryName -> reboot(commander, accessoryName));
 
       } else {
 
-        withAccessory(name, (accessory, hosts) -> {
+        withAccessory(commander, name, (accessory, hosts) -> {
 
           on(hosts, host -> {
 
@@ -146,9 +149,9 @@ public class Accessory extends Base {
 
         });
 
-        stop(name);
-        removeContainer(name);
-        boot(name, false);
+        stop(commander, name);
+        removeContainer(commander, name);
+        boot(commander, name, false);
 
       }
 
@@ -159,15 +162,15 @@ public class Accessory extends Base {
   /**
    * Start existing accessory container on host
    */
-  public void start(String name) {
+  public void start(Commander commander, String name) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      withAccessory(name, (accessory, hosts) -> {
+      withAccessory(commander, name, (accessory, hosts) -> {
 
         on(hosts, host -> {
 
-          host.execute(commander().auditor().record("Started " + name + " accessory"));
+          host.execute(commander.auditor().record("Started " + name + " accessory"));
           host.execute(accessory.start());
 
         });
@@ -181,15 +184,15 @@ public class Accessory extends Base {
   /**
    * Stop existing accessory container on host
    */
-  public void stop(String name) {
+  public void stop(Commander commander, String name) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      withAccessory(name, (accessory, hosts) -> {
+      withAccessory(commander, name, (accessory, hosts) -> {
 
         on(hosts, host -> {
 
-          host.execute(commander().auditor().record("Stopped " + name + " accessory"));
+          host.execute(commander.auditor().record("Stopped " + name + " accessory"));
           host.execute(accessory.stop());
 
         });
@@ -203,14 +206,14 @@ public class Accessory extends Base {
   /**
    * Restart existing accessory container on host
    */
-  public void restart(String name) {
+  public void restart(Commander commander, String name) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      withAccessory(name, (accessory, hosts) -> {
+      withAccessory(commander, name, (accessory, hosts) -> {
 
-        stop(name);
-        start(name);
+        stop(commander, name);
+        start(commander, name);
 
       });
 
@@ -221,18 +224,18 @@ public class Accessory extends Base {
   /**
    * Show details about accessory on host (use NAME=all to show all accessories)
    */
-  public void details(String name) {
+  public void details(Commander commander, String name) {
 
     if ("all".equalsIgnoreCase(name)) {
 
-      commander().accessoryNames()
-        .forEach(accessoryName -> details(accessoryName));
+      commander.accessoryNames()
+        .forEach(accessoryName -> details(commander, accessoryName));
 
     } else {
 
       String type = "Accessory " + name;
 
-      withAccessory(type, (accessory, hosts) -> {
+      withAccessory(commander, type, (accessory, hosts) -> {
 
         on(hosts, host -> {
 
@@ -254,16 +257,16 @@ public class Accessory extends Base {
    * @param name
    * @param cmd
    */
-  public void exec(boolean interactive, boolean reuse, String name, String cmd) {
+  public void exec(Commander commander, boolean interactive, boolean reuse, String name, String cmd) {
 
     // TODO: interactive and not reuse
 
-    withAccessory(name, (accessory, hosts) -> {
+    withAccessory(commander, name, (accessory, hosts) -> {
 
       System.out.println("Launching command from existing container...");
       on(hosts, host -> {
 
-        host.execute(commander().auditor().record("Executed cmd '" + cmd + "' on " + name + " accessory"));
+        host.execute(commander.auditor().record("Executed cmd '" + cmd + "' on " + name + " accessory"));
         host.capture(accessory.executeInExistingContainer(cmd));
 
       });
@@ -282,6 +285,7 @@ public class Accessory extends Base {
    * @param follow      Follow logs on primary server (or specific host set by --hosts)
    */
   public void logs(
+    Commander commander,
     String since,
     Integer lines,
     String grep,
@@ -290,7 +294,7 @@ public class Accessory extends Base {
     String name
   ) {
 
-    withAccessory(name, (accessory, hosts) -> {
+    withAccessory(commander, name, (accessory, hosts) -> {
 
 //      // TODO: follow
 //      if (lines != null || (since != null || grep != null)) {
@@ -313,18 +317,18 @@ public class Accessory extends Base {
   /**
    * Remove accessory container, image and data directory from host (use NAME=all to remove all accessories)
    */
-  public void remove(String name) {
+  public void remove(Commander commander, String name) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
       if ("all".equalsIgnoreCase(name)) {
 
-        commander().accessoryNames()
-          .forEach(accessoryName -> remove(accessoryName));
+        commander.accessoryNames()
+          .forEach(accessoryName -> remove(commander, accessoryName));
 
       } else {
 
-        removeAccessory(name);
+        removeAccessory(commander, name);
 
       }
 
@@ -336,15 +340,15 @@ public class Accessory extends Base {
   /**
    * Remove accessory container from host
    */
-  public void removeContainer(String name) {
+  public void removeContainer(Commander commander, String name) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      withAccessory(name, (accessory, hosts) -> {
+      withAccessory(commander, name, (accessory, hosts) -> {
 
         on(hosts, host -> {
 
-          host.execute(commander().auditor().record("Remove " + name + " accessory container"));
+          host.execute(commander.auditor().record("Remove " + name + " accessory container"));
           host.execute(accessory.removeContainer());
 
         });
@@ -359,15 +363,15 @@ public class Accessory extends Base {
   /**
    * Remove accessory image from host
    */
-  public void removeImage(String name) {
+  public void removeImage(Commander commander, String name) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      withAccessory(name, (accessory, hosts) -> {
+      withAccessory(commander, name, (accessory, hosts) -> {
 
         on(hosts, host -> {
 
-          host.execute(commander().auditor().record("Removed " + name + " accessory image"));
+          host.execute(commander.auditor().record("Removed " + name + " accessory image"));
           host.execute(accessory.removeImage());
 
         });
@@ -381,11 +385,11 @@ public class Accessory extends Base {
   /**
    * Remove accessory directory used for uploaded files and data directories from host
    */
-  public void removeServiceDirectory(String name) {
+  public void removeServiceDirectory(Commander commander, String name) {
 
-    withLock(() -> {
+    lockManager.withLock(commander, () -> {
 
-      withAccessory(name, (accessory, hosts) -> {
+      withAccessory(commander, name, (accessory, hosts) -> {
 
         on(hosts, host -> {
 
@@ -401,23 +405,23 @@ public class Accessory extends Base {
 
   // private
 
-  private void withAccessory(String name, BiConsumer<AccessoryHostCommands, List<String>> block) {
-    if (commander().config().accessory(name) != null) {
-      AccessoryHostCommands accessory = commander().accessory(name);
-      block.accept(accessory, accessoryHosts(accessory));
+  private void withAccessory(Commander commander, String name, BiConsumer<AccessoryHostCommands, List<String>> block) {
+    if (commander.config().accessory(name) != null) {
+      AccessoryHostCommands accessory = commander.accessory(name);
+      block.accept(accessory, accessoryHosts(commander, accessory));
     } else {
-      errorOnMissingAccessory(name);
+      errorOnMissingAccessory(commander, name);
     }
   }
 
-  private void errorOnMissingAccessory(String name) {
-    List<String> options = commander().accessoryNames();
+  private void errorOnMissingAccessory(Commander commander, String name) {
+    List<String> options = commander.accessoryNames();
     throw new RuntimeException("No accessory by the name of '" + name + "'" + (options != null ? " (options:" + options.stream().collect(Collectors.joining(",")) + ")" : ""));
   }
 
-  private List<String> accessoryHosts(AccessoryHostCommands accessory) {
-    if (!commander().specificHosts().isEmpty()) {
-      List<String> intersection = new ArrayList<>(commander().specificHosts());
+  private List<String> accessoryHosts(Commander commander, AccessoryHostCommands accessory) {
+    if (!commander.specificHosts().isEmpty()) {
+      List<String> intersection = new ArrayList<>(commander.specificHosts());
       intersection.retainAll(accessory.hosts());
       return intersection;
     } else {
@@ -425,14 +429,14 @@ public class Accessory extends Base {
     }
   }
 
-  private void removeAccessory(String name) {
+  private void removeAccessory(Commander commander, String name) {
 
-    withAccessory(name, (accessory, hosts) -> {
+    withAccessory(commander, name, (accessory, hosts) -> {
 
-      stop(name);
-      removeContainer(name);
-      removeImage(name);
-      removeServiceDirectory(name);
+      stop(commander, name);
+      removeContainer(commander, name);
+      removeImage(commander, name);
+      removeServiceDirectory(commander, name);
 
     });
 

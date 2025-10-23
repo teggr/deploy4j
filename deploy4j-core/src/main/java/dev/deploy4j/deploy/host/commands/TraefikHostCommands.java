@@ -3,12 +3,15 @@ package dev.deploy4j.deploy.host.commands;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.configuration.Env;
 import dev.rebelcraft.cmd.Cmd;
+import dev.rebelcraft.cmd.Cmds;
 
 import java.util.List;
 import java.util.Map;
 
 import static dev.rebelcraft.cmd.CmdUtils.argumentize;
 import static dev.rebelcraft.cmd.CmdUtils.optionize;
+import static dev.rebelcraft.cmd.Cmds.*;
+import static dev.rebelcraft.cmd.Cmds.any;
 import static dev.rebelcraft.cmd.pkgs.Docker.docker;
 
 public class TraefikHostCommands extends BaseHostCommands {

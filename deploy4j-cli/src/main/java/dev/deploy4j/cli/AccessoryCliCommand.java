@@ -1,5 +1,6 @@
 package dev.deploy4j.cli;
 
+import dev.deploy4j.deploy.DeployApplicationContext;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -34,8 +35,8 @@ public class AccessoryCliCommand {
     private boolean login;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.accessory().boot(name, login);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.accessory().boot(deployApplicationContext.commander(), name, login);
     }
 
   }
@@ -51,8 +52,8 @@ public class AccessoryCliCommand {
     private String name;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.accessory().upload(name);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.accessory().upload(deployApplicationContext.commander(), name);
     }
 
   }
@@ -68,8 +69,8 @@ public class AccessoryCliCommand {
     private String name;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.accessory().directories(name);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.accessory().directories(deployApplicationContext.commander(), name);
     }
 
   }
@@ -85,8 +86,8 @@ public class AccessoryCliCommand {
     private String name;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.accessory().reboot(name);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.accessory().reboot(deployApplicationContext.commander(), name);
     }
 
   }
@@ -102,8 +103,8 @@ public class AccessoryCliCommand {
     private String name;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.accessory().start(name);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.accessory().start(deployApplicationContext.commander(), name);
     }
 
   }
@@ -119,8 +120,8 @@ public class AccessoryCliCommand {
     private String name;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.accessory().stop(name);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.accessory().stop(deployApplicationContext.commander(), name);
     }
 
   }
@@ -136,8 +137,8 @@ public class AccessoryCliCommand {
     private String name;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.accessory().restart(name);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.accessory().restart(deployApplicationContext.commander(), name);
     }
 
   }
@@ -153,8 +154,8 @@ public class AccessoryCliCommand {
     private String name;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.accessory().details(name);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.accessory().details(deployApplicationContext.commander(), name);
     }
 
   }
@@ -177,8 +178,8 @@ public class AccessoryCliCommand {
     private String cmd;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.accessory().exec(interactive, reuse, name, cmd);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.accessory().exec(deployApplicationContext.commander(), interactive, reuse, name, cmd);
     }
 
   }
@@ -207,8 +208,8 @@ public class AccessoryCliCommand {
     private String name;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.app().logs(since,lines, grep, grepOptions, follow);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.app().logs(deployApplicationContext.commander(), since,lines, grep, grepOptions, follow);
     }
 
   }
@@ -227,9 +228,9 @@ public class AccessoryCliCommand {
     private String name;
 
     @Override
-    protected void execute(Cli cli) {
+    protected void execute(DeployApplicationContext deployApplicationContext) {
       // TODO: confirmation
-      cli.accessory().remove(name);
+      deployApplicationContext.accessory().remove(deployApplicationContext.commander(), name);
     }
 
   }
@@ -245,8 +246,8 @@ public class AccessoryCliCommand {
     private String name;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.accessory().removeContainer(name);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.accessory().removeContainer(deployApplicationContext.commander(), name);
     }
 
   }
@@ -262,8 +263,8 @@ public class AccessoryCliCommand {
     private String name;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.accessory().removeImage(name);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.accessory().removeImage(deployApplicationContext.commander(), name);
     }
 
   }
@@ -279,8 +280,8 @@ public class AccessoryCliCommand {
     private String name;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.accessory().removeServiceDirectory(name);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.accessory().removeServiceDirectory(deployApplicationContext.commander(), name);
     }
 
   }

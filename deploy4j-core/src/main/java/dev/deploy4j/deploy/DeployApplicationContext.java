@@ -1,9 +1,9 @@
-package dev.deploy4j.cli;
+package dev.deploy4j.deploy;
 
-import dev.deploy4j.deploy.*;
 import dev.deploy4j.deploy.host.commands.*;
+import dev.deploy4j.deploy.host.ssh.SshHosts;
 
-public class Cli {
+public class DeployApplicationContext {
 
   private final Environment environment;
   private final Main main;
@@ -16,8 +16,12 @@ public class Cli {
   private final Accessory accessory;
   private final Lock lock;
   private final Env env;
+  private final Commander commander;
+  private final LockManager lockManager;
 
-  public Cli(Environment environment, Commander commander) {
+  public DeployApplicationContext(Environment environment, SshHosts sshHosts, Commander commander) {
+
+    this.commander = commander;
 
     BuilderHostCommands builder = new BuilderHostCommands(commander.config());
 
@@ -37,17 +41,19 @@ public class Cli {
 
     TraefikHostCommands traefik = new TraefikHostCommands(commander.config());
 
-    this.app = new App(commander);
-    this.server = new Server(commander, docker, server);
-    this.env = new Env(commander, traefik);
-    this.accessory = new Accessory(commander, registry);
-    this.registry = new Registry(commander, registry);
-    this.build = new Build(commander, builder);
-    this.prune = new Prune(commander, prune);
+    this.lockManager = new LockManager(sshHosts, lock,server);
+
+    this.app = new App(sshHosts, lockManager);
+    this.server = new Server(sshHosts, lockManager, docker, server);
+    this.env = new Env(sshHosts, lockManager, traefik);
+    this.accessory = new Accessory(sshHosts, lockManager, registry);
+    this.registry = new Registry(sshHosts, registry);
+    this.build = new Build(sshHosts, builder);
+    this.prune = new Prune(sshHosts, lockManager, prune);
     this.environment = environment;
-    this.traefik = new Traefik(commander, registry, traefik);
-    this.lock = new Lock(commander, server, lock);
-    this.main = new Main(commander, this.app, this.server, this.env, this.accessory, this.registry, build, this.prune, this.environment, this.traefik);
+    this.traefik = new Traefik(sshHosts, lockManager, registry, traefik);
+    this.lock = new Lock(sshHosts, lockManager, server, lock);
+    this.main = new Main(sshHosts, lockManager, this.app, this.server, this.env, this.accessory, this.registry, build, this.prune, this.environment, this.traefik);
 
   }
 
@@ -93,6 +99,14 @@ public class Cli {
 
   public Lock lock() {
     return lock;
+  }
+
+  public Commander commander() {
+    return commander;
+  }
+
+  public LockManager lockManager() {
+    return lockManager;
   }
 
 }

@@ -1,5 +1,6 @@
 package dev.deploy4j.cli;
 
+import dev.deploy4j.deploy.DeployApplicationContext;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -19,8 +20,8 @@ public class LockCliCommand {
   public static class StatusCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.lock().status();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.lock().status(deployApplicationContext.commander());
     }
 
   }
@@ -34,8 +35,8 @@ public class LockCliCommand {
     private String message;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.lock().acquire(message);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.lock().acquire(deployApplicationContext.commander(), message);
     }
 
   }
@@ -46,8 +47,8 @@ public class LockCliCommand {
   public static class ReleaseCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.lock().release();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.lock().release(deployApplicationContext.commander());
     }
 
   }

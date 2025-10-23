@@ -1,13 +1,14 @@
 package dev.deploy4j.deploy.host.commands;
 
-import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.configuration.Accessory;
+import dev.deploy4j.deploy.configuration.Configuration;
 import dev.rebelcraft.cmd.Cmd;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import static dev.rebelcraft.cmd.Cmds.pipe;
 import static dev.rebelcraft.cmd.pkgs.Docker.docker;
 import static dev.rebelcraft.cmd.pkgs.Grep.grep;
 

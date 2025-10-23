@@ -1,5 +1,6 @@
 package dev.deploy4j.cli;
 
+import dev.deploy4j.deploy.DeployApplicationContext;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -24,8 +25,8 @@ public class ServerCliCommand {
     private String cmd;
 
     @Override
-    protected void execute(Cli cli) {
-      cli.server().exec(interactive, cmd);
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.server().exec(deployApplicationContext.commander(), interactive, cmd);
     }
 
   }
@@ -36,8 +37,8 @@ public class ServerCliCommand {
   public static class BootstrapCliCommand extends BaseCliCommand {
 
     @Override
-    protected void execute(Cli cli) {
-      cli.server().bootstrap();
+    protected void execute(DeployApplicationContext deployApplicationContext) {
+      deployApplicationContext.server().bootstrap(deployApplicationContext.commander());
     }
 
   }

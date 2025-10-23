@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static dev.rebelcraft.cmd.CmdUtils.argumentize;
+import static dev.rebelcraft.cmd.Cmds.*;
 import static dev.rebelcraft.cmd.pkgs.Docker.docker;
 import static dev.rebelcraft.cmd.pkgs.Grep.grep;
 
@@ -148,7 +149,7 @@ public class AppHostCommands extends BaseHostCommands {
 
   public Cmd currentRunningContainer(String format) {
     return pipe(
-      shell(
+     shell(
         chain(
           latestImageContainer(format),
           latestContainer(format)
@@ -207,14 +208,13 @@ public class AppHostCommands extends BaseHostCommands {
     String assetContainer = role().containerPrefix() + "-assets";
 
     return combine(
-      new Cmd[]{
+      "&&", new Cmd[]{
         makeDirectory(role().assetExtractedPath(null)),
         any(docker().stop().args("-t 1", assetContainer, "2> /dev/null"), Cmd.cmd("true")),
         docker().run().args("--name", assetContainer, "--detach", "--rm", config().absoluteImage(), "sleep 1000000"),
         docker().cp().args("-L", assetContainer + ":" + role().assetPath() + "/.", role().assetExtractedPath(null)),
         docker().stop().args("-t 1", assetContainer)
-      },
-      "&&"
+      }
 
     );
   }
