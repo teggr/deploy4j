@@ -1,6 +1,14 @@
 # deploy4j
 
-Caught between the inspiration of the [MRSK](https://mrsk.dev/) project for deploy web applications and the closure of the heroku free tier the aim of this project is to enable the low cost deployment of (mainly java) web applications onto self hosted VMs such as droplets on [Digital Ocean](https://www.digitalocean.com/products/droplets).
+## What?
+
+A Java port of the [Kamal](https://kamal-deploy.org/) project for deploying web applications to self hosted VMs.
+
+Supports both [cli](#command-line) and [maven](#maven-plugin) modes.
+
+## Why?
+
+Deploy4j is designed to make it easy to deploy Java web applications to self hosted VMs using Docker. Deploying a simple web application can be a complex process involving multiple steps and configurations. Deploy4j simplifies this process by automating the deployment steps and providing a consistent deployment experience.
 
 Some advantages:
 
@@ -8,7 +16,7 @@ Some advantages:
 * No build service required. Works locally and also well from a pipeline
 * Cheaper to run multiple services on a single vm compared to entry level tiers on some PAAS. $6 per month on Digital Ocean.
 
-## What does the project do?
+## How?
 
 * Connects to server
 * Installs docker
@@ -16,6 +24,50 @@ Some advantages:
 * Builds image
 * Starts traefik proxy
 * Starts the service
+
+## Command Line
+
+[View all commands on Kamal docs for now](https://kamal-deploy.org/v1/docs/commands/view-all-commands/).
+
+Requires Java 21.
+
+Install via JBang:
+
+`deploy4j` is currently available via JitPack.
+
+```shell
+jbang app install --name deploy4j --repos jitpack=jitpack=https://jitpack.io https://jitpack.io com.github.teggr.deploy4j:deploy4j-cli:main-SNAPSHOT
+```
+
+```shell
+Usage: deploy4j [--help] [COMMAND]
+Deploy web apps anywhere. From bare metal to cloud VMs.
+      --help   Display help about a command
+Commands:
+  accessory  Manage accessories (db/redis/search)
+  app        Manage application
+  audit      Show audit log from servers
+  build      Build application image
+  config     Show combined config (including secrets!)
+  deploy     Deploy app to servers
+  details    Show details about all containers
+  env        Manage environment files
+  envify     Create .env by evaluating .env.thyme (or .env.staging.thyme -> .
+               env.staging when using -d staging)
+  init       Create config stub in config/deploy.yml and env stub in .env
+  lock       Manage the deploy lock
+  prune      Prune old application images and containers
+  redeploy   Deploy app to servers without bootstrapping servers, starting
+               Traefik, pruning, and registry login
+  registry   Login and out of the image registry
+  remove     Remove Traefik, app, accessories, and registry session from servers
+  rollback   Rollback app to VERSION
+  server     Boostrap servers with curl and Docker
+  setup      Setup all accessories, push the env, and deploy app to servers
+  test       Test connectivity to servers
+  traefik    Manage Traefik load balancer
+  version    Show Deploy4j version
+```
 
 ## Maven Plugin
 
