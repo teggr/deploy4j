@@ -1,10 +1,13 @@
 package dev.deploy4j.cli;
 
-import dev.deploy4j.deploy.DeployContext;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import dev.deploy4j.deploy.DeployApplicationContext;
+import dev.deploy4j.deploy.DeployContext;
 import dev.deploy4j.deploy.Environment;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
@@ -38,14 +41,14 @@ public abstract class BaseCliCommand implements Callable<Integer> {
 
     Environment environment = new Environment(destination);
 
-    // local logging
-    System.setProperty("org.slf4j.simpleLogger.showShortLogName ", "true");
-    if (quiet != null && quiet) {
-      System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
-    } else if (verbose != null && verbose) {
-      System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
+    // configure Logback root logger level based on CLI flags
+    Logger root = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+    if (( quiet != null && quiet) || (verbose != null && !verbose)) {
+      root.setLevel(Level.ERROR);
+    } else if ((verbose != null && verbose) || ( quiet != null && !quiet)) {
+      root.setLevel(Level.DEBUG);
     } else {
-      System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
+      root.setLevel(Level.INFO);
     }
 
     Configuration configuration = Configuration.createFrom(configFile, destination, version);
