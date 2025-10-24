@@ -2,7 +2,7 @@
 
 ## What?
 
-A Java port of the [Kamal](https://kamal-deploy.org/) project for deploying web applications to self hosted VMs.
+A Java port of the [Kamal](https://kamal-deploy.org/) [v1](https://kamal-deploy.org/v1/docs/installation/) project for deploying web applications to self hosted VMs.
 
 Supports both [cli](#command-line) and [maven](#maven-plugin) modes.
 
@@ -17,6 +17,8 @@ Some advantages:
 * Cheaper to run multiple services on a single vm compared to entry level tiers on some PAAS. $6 per month on Digital Ocean.
 
 ## How?
+
+See https://github.com/teggr/deploy4j when it's available for further documentation.
 
 * Connects to server
 * Installs docker
@@ -74,40 +76,33 @@ Commands:
 ### Configure
 
 ```xml
-<plugin>
-    <groupId>dev.deploy4j</groupId>
-    <artifactId>deploy4j-maven-plugin</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <configuration>
-        <sshUsername>root</sshUsername>
-        <sshPrivateKeyPath>C:\Users\someuser\.ssh\id_rsa</sshPrivateKeyPath>
-        <sshPassPhrase>******</sshPassPhrase>
-        <sshKnownHostsPath>C:\Users\someuser\.ssh\known_hosts</sshKnownHostsPath>
-        <host>123.123.123.123</host>
-    </configuration>
-</plugin>
+<pluginRepositories>
+    <pluginRepository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </pluginRepository>
+</pluginRepositories>
+
+<build>
+    <plugin>
+        <groupId>com.github.teggr.deploy4j</groupId>
+        <artifactId>deploy4j-maven-plugin</artifactId>
+        <version>-SNAPSHOT</version>
+    </plugin>
+</build>
 ```
 
-See https://deploy4j.dev when it's available for further documentation.
-
-The configuration can also be set on the command line via `-D` arguments or set globally in the maven `settings.xml` file. See the docs for further information.
-
-## Run
+### Run
 
 ```shell
 mvn verify deploy4j:deploy
 
-...
-[INFO] --- deploy4j:1.0-SNAPSHOT:deploy (default-cli) @ spring-boot-web-application ---
-[INFO] Deploy4J Deploying
-[INFO] working directory: C:\Users\robin\IdeaProjects\deploy4j\spring-boot-web-application
-[INFO] serviceName:       spring-boot-web-application
-[INFO] version:           0.0.1-SNAPSHOT
-[INFO] jarFilePath:       target\spring-boot-web-application-0.0.1-SNAPSHOT.jar
-[INFO] dockerFilePath:    Dockerfile
-[INFO] host:              123.123.123.123
-[INFO] sshUsername:       root
-...
+[INFO] ---------------------< dev.deploy4j:deploy4j-demo >---------------------
+[INFO] Building deploy4j-demo 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- deploy4j:1.0-SNAPSHOT:deploy (default-cli) @ deploy4j-demo ---
 ```
 
 ## Testing
@@ -124,3 +119,9 @@ ssh -o StrictHostKeyChecking=no -p 2222 root@localhost
 # connect to shell
 docker exec -it deploy4j-droplet /bin/bash
 ```
+
+## Notes on the Kamal Port
+
+The current port is based on Kamal v1. Once the v2 changes have been assessed then a decision can be made on whether to port those changes over.
+
+It's likely that v1 will remain the baseline for future enhancements as we start to look at introducing more Java focussed enhancements.
