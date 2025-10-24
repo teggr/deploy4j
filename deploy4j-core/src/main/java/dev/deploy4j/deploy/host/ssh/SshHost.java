@@ -1,7 +1,8 @@
 package dev.deploy4j.deploy.host.ssh;
 
-import dev.rebelcraft.cmd.Cmd;
 import dev.deploy4j.deploy.configuration.Ssh;
+import dev.rebelcraft.cmd.Cmd;
+import dev.rebelcraft.ssh.ExecResult;
 import dev.rebelcraft.ssh.SSHTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +38,18 @@ public class SshHost {
   }
 
   public boolean execute(Cmd cmd) {
-    return sshTemplate
-             .exec(command(cmd)).exitStatus() == 0;
+    return execute(cmd, true);
+  }
+
+  public boolean execute(Cmd cmd, boolean raiseOnNonZeroExit) {
+    String command = command(cmd);
+    ExecResult result = sshTemplate
+      .exec(command);
+    boolean zeroExit = result.exitStatus() == 0;
+    if (!zeroExit && raiseOnNonZeroExit) {
+      throw new RuntimeException("Command failed on host " + hostName + ": " + command + " with error " + result.execErrorOutput());
+    }
+    return zeroExit;
   }
 
   private String command(Cmd command) {
@@ -49,18 +60,42 @@ public class SshHost {
   }
 
   public String capture(Cmd cmd) {
-    return sshTemplate
-      .exec(command(cmd))
+    return capture(cmd, true);
+  }
+
+  public String capture(Cmd cmd, boolean raiseOnNonZeroExit) {
+    String command = command(cmd);
+    ExecResult result = sshTemplate
+      .exec(command);
+    boolean zeroExit = result.exitStatus() == 0;
+    if (!zeroExit && raiseOnNonZeroExit) {
+      throw new RuntimeException("Command failed on host " + hostName + ": " + command + " with error " + result.execErrorOutput());
+    }
+    return result
       .execOutput();
   }
 
   public String capture(String cmd) {
-    return sshTemplate
-      .exec(cmd)
+    return capture(cmd, true);
+  }
+
+  public String capture(String cmd, boolean raiseOnNonZeroExit) {
+    ExecResult result = sshTemplate
+      .exec(cmd);
+    boolean zeroExit = result.exitStatus() == 0;
+    if (!zeroExit && raiseOnNonZeroExit) {
+      throw new RuntimeException("Command failed on host " + hostName + ": " + cmd + " with error " + result.execErrorOutput());
+    }
+    return result
       .execOutput();
   }
 
-  public void upload(String local, String remote, int mode) {
-    sshTemplate.upload(local, remote);
+  public void upload(String content, String remote, int mode) {
+    sshTemplate.upload(content, remote);
   }
+
+  public void copy(String local, String remote, int mode) {
+    sshTemplate.copy(local, remote);
+  }
+
 }

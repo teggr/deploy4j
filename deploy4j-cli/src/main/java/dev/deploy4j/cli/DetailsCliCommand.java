@@ -10,7 +10,7 @@ public class DetailsCliCommand extends BaseCliCommand {
 
   @Override
   protected void execute(DeployApplicationContext deployApplicationContext) {
-    deployApplicationContext.deploy().details(deployApplicationContext.commander());
+    deployApplicationContext.deploy().details(deployApplicationContext.deployContext());
   }
 
 }

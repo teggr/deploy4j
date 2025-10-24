@@ -37,7 +37,7 @@ public class AppCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.app().boot(deployApplicationContext.commander());
+      deployApplicationContext.app().boot(deployApplicationContext.deployContext());
     }
 
   }
@@ -49,7 +49,7 @@ public class AppCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.app().start(deployApplicationContext.commander());
+      deployApplicationContext.app().start(deployApplicationContext.deployContext());
     }
 
   }
@@ -61,7 +61,7 @@ public class AppCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.app().stop(deployApplicationContext.commander());
+      deployApplicationContext.app().stop(deployApplicationContext.deployContext());
     }
 
   }
@@ -73,7 +73,7 @@ public class AppCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.app().details(deployApplicationContext.commander());
+      deployApplicationContext.app().details(deployApplicationContext.deployContext());
     }
 
   }
@@ -97,7 +97,7 @@ public class AppCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.app().exec(deployApplicationContext.commander(), interactive, reuse, env, cmd);
+      deployApplicationContext.app().exec(deployApplicationContext.deployContext(), interactive, reuse, env, cmd);
     }
 
   }
@@ -109,7 +109,7 @@ public class AppCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.app().containers(deployApplicationContext.commander());
+      deployApplicationContext.app().containers(deployApplicationContext.deployContext());
     }
 
   }
@@ -124,7 +124,7 @@ public class AppCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.app().staleContainers(deployApplicationContext.commander(), stop);
+      deployApplicationContext.app().staleContainers(deployApplicationContext.deployContext(), stop);
     }
 
   }
@@ -136,7 +136,7 @@ public class AppCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.app().images(deployApplicationContext.commander());
+      deployApplicationContext.app().images(deployApplicationContext.deployContext());
     }
 
   }
@@ -163,7 +163,7 @@ public class AppCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.app().logs(deployApplicationContext.commander(), since,lines, grep, grepOptions, follow);
+      deployApplicationContext.app().logs(deployApplicationContext.deployContext(), since,lines, grep, grepOptions, follow);
     }
 
   }
@@ -175,7 +175,7 @@ public class AppCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.app().containers(deployApplicationContext.commander());
+      deployApplicationContext.app().containers(deployApplicationContext.deployContext());
     }
 
   }
@@ -190,7 +190,7 @@ public class AppCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.app().removeContainer(deployApplicationContext.commander(), version);
+      deployApplicationContext.app().removeContainer(deployApplicationContext.deployContext(), version);
     }
 
   }
@@ -202,7 +202,7 @@ public class AppCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.app().removeContainers(deployApplicationContext.commander());
+      deployApplicationContext.app().removeContainers(deployApplicationContext.deployContext());
     }
 
   }
@@ -214,7 +214,7 @@ public class AppCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.app().removeImages(deployApplicationContext.commander());
+      deployApplicationContext.app().removeImages(deployApplicationContext.deployContext());
     }
 
   }
@@ -226,7 +226,7 @@ public class AppCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.app().version(deployApplicationContext.commander());
+      deployApplicationContext.app().version(deployApplicationContext.deployContext());
     }
 
   }

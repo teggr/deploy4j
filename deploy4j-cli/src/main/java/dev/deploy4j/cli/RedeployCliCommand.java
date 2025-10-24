@@ -16,7 +16,7 @@ public class RedeployCliCommand extends BaseCliCommand {
 
     printRuntime(() -> {
 
-      deployApplicationContext.deploy().redeploy(deployApplicationContext.commander(), skipPush);
+      deployApplicationContext.deploy().redeploy(deployApplicationContext.deployContext(), skipPush);
 
     });
 

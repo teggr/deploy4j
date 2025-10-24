@@ -30,6 +30,9 @@ public class Registry {
   // private
 
   private String lookup(PlainValueOrSecretKey key) {
+    if( key == null ) {
+      return null;
+    }
     if (key.isKey()) {
       return ENV.fetch(key.key());
     } else {

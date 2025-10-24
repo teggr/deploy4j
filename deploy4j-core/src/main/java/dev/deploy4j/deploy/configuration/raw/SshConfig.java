@@ -7,23 +7,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SshConfig {
 
-  private final String user;
+  private final PlainValueOrSecretKey user;
   private final Integer port;
   private final String proxy;
   private final String proxyCommand;
   private final String logLevel;
-  private final String keyPath;
+  private final PlainValueOrSecretKey keyPath;
   private final PlainValueOrSecretKey keyPassphrase;
   private final Boolean strictHostKeyChecking;
 
   @JsonCreator
   public SshConfig(
-    @JsonProperty("user") String user,
+    @JsonProperty("user") PlainValueOrSecretKey user,
     @JsonProperty("port") Integer port,
     @JsonProperty("proxy") String proxy,
     @JsonProperty("proxy_command") String proxyCommand,
     @JsonProperty("log_level") String logLevel,
-    @JsonProperty("key_path") String keyPath,
+    @JsonProperty("key_path") PlainValueOrSecretKey keyPath,
     @JsonProperty("key_passphrase") PlainValueOrSecretKey keyPassphrase,
     @JsonProperty("strict_host_key_checking") Boolean strictHostKeyChecking
   ) {
@@ -48,7 +48,7 @@ public class SshConfig {
     this.strictHostKeyChecking = null;
   }
 
-  public String user() {
+  public PlainValueOrSecretKey user() {
     return user;
   }
 
@@ -68,7 +68,7 @@ public class SshConfig {
     return logLevel;
   }
 
-  public String keyPath() {
+  public PlainValueOrSecretKey keyPath() {
     return keyPath;
   }
 

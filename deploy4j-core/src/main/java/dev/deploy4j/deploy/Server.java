@@ -5,6 +5,7 @@ import dev.deploy4j.deploy.host.commands.DockerHostCommands;
 import dev.deploy4j.deploy.host.commands.ServerHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHost;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.rebelcraft.cmd.Cmd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,4 +90,7 @@ public class Server extends Base {
 
   }
 
+  public Cmd test() {
+    return Cmd.cmd("pwd");
+  }
 }

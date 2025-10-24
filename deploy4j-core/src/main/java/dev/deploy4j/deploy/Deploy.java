@@ -73,10 +73,11 @@ public class Deploy extends Base {
     System.out.println("Log into image registry...");
     registry.login(deployContext);
 
-    if (skipPush) {
+    // TODO: we don't build so alwyays pull?
+//    if (!skipPush) {
       System.out.println("Pull app image...");
       build.pull(deployContext);
-    }
+//    }
 
     lockManager.withLock(deployContext, () -> {
 
@@ -217,4 +218,15 @@ public class Deploy extends Base {
     // TODO: merge with options
   }
 
+  public void test(DeployContext deployContext) {
+
+    on(deployContext.hosts(), host -> {
+
+      System.out.println("Testing connectivity to " + host.hostName() + "...");
+      host.execute( server.test() );
+      System.out.println("Connected to " + host.hostName() + " successfully.");
+
+    });
+
+  }
 }

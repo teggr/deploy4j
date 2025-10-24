@@ -13,7 +13,7 @@ public class EnvifyCliCommand extends BaseCliCommand {
 
   @Override
   protected void execute(DeployApplicationContext deployApplicationContext) {
-    deployApplicationContext.env().envify(deployApplicationContext.commander(), skipPush, destination);
+    deployApplicationContext.env().envify(deployApplicationContext.deployContext(), skipPush, destination);
   }
 
 }

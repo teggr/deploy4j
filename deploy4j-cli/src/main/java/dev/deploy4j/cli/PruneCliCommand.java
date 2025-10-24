@@ -24,7 +24,7 @@ public class PruneCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.prune().all(deployApplicationContext.commander());
+      deployApplicationContext.prune().all(deployApplicationContext.deployContext());
     }
 
   }
@@ -36,13 +36,13 @@ public class PruneCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.prune().images(deployApplicationContext.commander());
+      deployApplicationContext.prune().images(deployApplicationContext.deployContext());
     }
 
   }
 
   @CommandLine.Command(
-    name = "container",
+    name = "containers",
     description = "Prune all stopped containers, except the last n (default 5)")
   public static class ContainersCliCommand extends BaseCliCommand {
 
@@ -51,7 +51,7 @@ public class PruneCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.prune().containers(deployApplicationContext.commander(), retain);
+      deployApplicationContext.prune().containers(deployApplicationContext.deployContext(), retain);
     }
 
   }

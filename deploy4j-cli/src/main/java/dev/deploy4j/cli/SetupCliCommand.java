@@ -16,9 +16,9 @@ public class SetupCliCommand extends BaseCliCommand {
 
     printRuntime(() -> {
 
-      deployApplicationContext.lockManager().withLock(deployApplicationContext.commander(), () -> {
+      deployApplicationContext.lockManager().withLock(deployApplicationContext.deployContext(), () -> {
 
-        deployApplicationContext.deploy().setup(deployApplicationContext.commander(), skipPush);
+        deployApplicationContext.deploy().setup(deployApplicationContext.deployContext(), skipPush);
 
       });
 

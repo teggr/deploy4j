@@ -29,7 +29,7 @@ public class ServerCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.server().exec(deployApplicationContext.commander(), interactive, cmd);
+      deployApplicationContext.server().exec(deployApplicationContext.deployContext(), interactive, cmd);
     }
 
   }
@@ -41,7 +41,7 @@ public class ServerCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.server().bootstrap(deployApplicationContext.commander());
+      deployApplicationContext.server().bootstrap(deployApplicationContext.deployContext());
     }
 
   }

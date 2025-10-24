@@ -23,7 +23,7 @@ public class DockerHostCommands extends BaseHostCommands {
 
   // Checks the Docker client version. Fails if Docker is not installed.
   public Cmd installed() {
-    return docker().version().description("installed");
+    return docker().v().description("installed");
   }
 
   // Checks the Docker server version. Fails if Docker is not running.

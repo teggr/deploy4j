@@ -111,7 +111,7 @@ public class DeployApplicationContext {
     return lock;
   }
 
-  public DeployContext commander() {
+  public DeployContext deployContext() {
     return deployContext;
   }
 

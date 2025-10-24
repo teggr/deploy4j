@@ -1,5 +1,6 @@
 package dev.deploy4j.deploy;
 
+import dev.deploy4j.deploy.configuration.Accessory;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.configuration.Role;
 
@@ -58,12 +59,17 @@ public class Specifics {
   }
 
   public List<String> traefikHosts() {
-    return config.traefikHosts(); // specifiedHosts
+    List<String> list = new ArrayList();
+    list.addAll(config().traefikHosts());
+    list.addAll(specifiedHosts());
+    return list;
   }
 
   public List<String> accessoryHosts() {
-    // config.accessories.flat_map(&:hosts) & specified_hosts
-    return List.of();
+    List<String> accessoryHosts = new ArrayList();
+    accessoryHosts.addAll(config().accessories().stream().flatMap(a -> a.hosts().stream()).toList());
+    accessoryHosts.addAll(specifiedHosts());
+    return accessoryHosts;
   }
 
   // private

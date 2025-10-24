@@ -22,7 +22,7 @@ public class BuildCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.build().pull(deployApplicationContext.commander());
+      deployApplicationContext.build().pull(deployApplicationContext.deployContext());
     }
 
   }

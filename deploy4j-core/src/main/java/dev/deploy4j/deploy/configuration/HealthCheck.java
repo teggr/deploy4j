@@ -30,11 +30,11 @@ public class HealthCheck {
   }
 
   public Integer port() {
-    return healthCheckConfig().port() != null ? healthCheckConfig().port() : 3000;
+    return healthCheckConfig().port() != null ? healthCheckConfig().port() : 8080;
   }
 
   public String path() {
-    return healthCheckConfig().path() != null ? healthCheckConfig().path() : "/up";
+    return healthCheckConfig().path() != null ? healthCheckConfig().path() : "/actuator/health";
   }
 
   public Integer maxAttempts() {
@@ -64,7 +64,7 @@ public class HealthCheck {
       String hostPort = "http://localhost:%s".formatted(port());
       String uriJoin = Stream.of(hostPort, path())
         .filter(Objects::nonNull)
-        .collect(Collectors.joining("/"));
+        .collect(Collectors.joining());
       return "curl -f %s || exit 1".formatted(uriJoin);
     } else {
       return null;

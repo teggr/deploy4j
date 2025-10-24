@@ -24,7 +24,7 @@ public class LockCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.lock().status(deployApplicationContext.commander());
+      deployApplicationContext.lock().status(deployApplicationContext.deployContext());
     }
 
   }
@@ -39,7 +39,7 @@ public class LockCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.lock().acquire(deployApplicationContext.commander(), message);
+      deployApplicationContext.lock().acquire(deployApplicationContext.deployContext(), message);
     }
 
   }
@@ -51,7 +51,7 @@ public class LockCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.lock().release(deployApplicationContext.commander());
+      deployApplicationContext.lock().release(deployApplicationContext.deployContext());
     }
 
   }

@@ -41,7 +41,7 @@ public class AppHostCommands extends BaseHostCommands {
     cmd = cmd.args("-e", "DEPLOY4J_CONTAINER_NAME=\"" + containerName() + "\"")
       .args("-e", "DEPLOY4J_VERSION=\"" + config().version() + "\"")
       .args(role().envArgs(host()))
-      .args(role().healthCheckArgs())
+      //.args(role().healthCheckArgs()) TODO: bring this back - acuator and possibly ignore
       .args(role().loggingArgs())
       .args(config().volumeArgs())
       .args(role().assetVolumeArgs())
@@ -141,7 +141,7 @@ public class AppHostCommands extends BaseHostCommands {
   private Cmd latestImageId() {
     return docker().image().args("ls")
       .args(argumentize("--filter",
-        List.of("reference=" + config.latestImage())
+        List.of("reference=" + config().latestImage())
       )).
       args("--format", "'{{.ID}}'")
       .description("latest image id");
@@ -190,10 +190,12 @@ public class AppHostCommands extends BaseHostCommands {
 
   private List<String> filters(List<String> statuses) {
     List<String> filters = new ArrayList<>();
-    filters.add("label=service=" + config.service());
-    filters.add("label=destination=" + config.destination());
+    filters.add("label=service=" + config().service());
+    if(config().destination() != null){
+      filters.add("label=destination=" + config().destination());
+    }
     if (role != null) {
-      filters.add("label=role=" + role.name());
+      filters.add("label=role=" + role().name());
     }
     statuses.forEach(s -> filters.add("status=" + s));
     return filters;

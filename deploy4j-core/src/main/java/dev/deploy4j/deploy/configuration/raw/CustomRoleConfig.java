@@ -53,7 +53,7 @@ public class CustomRoleConfig {
 
   public CustomRoleConfig() {
     this.hosts = List.of();
-    this.traefik = false;
+    this.traefik = null;
     this.cmd = null;
     this.env = null;
     this.logging = null;

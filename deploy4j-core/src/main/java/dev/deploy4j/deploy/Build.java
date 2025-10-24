@@ -32,7 +32,7 @@ public class Build extends Base {
     on(hosts, host -> {
 
       host.execute(audit.record("Pulled image with version " + deployContext.config().version()));
-      host.execute(builder.clean());
+      host.execute(builder.clean(), false);
       host.execute(builder.pull());
       host.execute(builder.validateImage());
 

@@ -19,12 +19,12 @@ public class BuilderHostCommands extends BaseHostCommands {
   }
 
   public Cmd pull() {
-    return docker().args(config().absoluteImage()).description("pull");
+    return docker().pull().args(config().absoluteImage()).description("pull");
   }
 
   public Cmd validateImage() {
     return pipe(
-      docker().args("-f", "'{{ .Config.Labels.service }}'", config().absoluteImage()),
+      docker().inspect().args("-f", "'{{ .Config.Labels.service }}'", config().absoluteImage()),
       any(
         Cmd.cmd("grep", "-x", config().absoluteImage()),
         Cmd.cmd("(echo \"Image " + config().absoluteImage() + " is missing the 'service' label\" && exit 1)")

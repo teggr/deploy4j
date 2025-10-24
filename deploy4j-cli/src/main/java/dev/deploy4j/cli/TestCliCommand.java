@@ -4,13 +4,16 @@ import dev.deploy4j.deploy.DeployApplicationContext;
 import picocli.CommandLine;
 
 @CommandLine.Command(
-  name = "audit",
-  description = "Show audit log from servers")
-public class AuditCliCommand extends BaseCliCommand {
+  name = "test",
+  description = "Test connectivity to servers"
+)
+public class TestCliCommand extends BaseCliCommand {
 
   @Override
   protected void execute(DeployApplicationContext deployApplicationContext) {
-    deployApplicationContext.audit().audit(deployApplicationContext.deployContext());
+
+    deployApplicationContext.deploy().test(deployApplicationContext.deployContext());
+
   }
 
 }

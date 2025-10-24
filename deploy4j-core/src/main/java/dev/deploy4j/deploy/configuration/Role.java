@@ -133,15 +133,15 @@ public class Role {
 
   private List<String> healthCheckArgs(boolean cord) {
 
-    if( runningTraefik() || healthcheck().setPortOrPath() ) {
-      if( cord && usesCord() ) {
+    if (runningTraefik() || healthcheck().setPortOrPath()) {
+      if (cord && usesCord()) {
         List<String> optionize = optionize(Map.of(
           "health-cmd", healthCheckCmdWithCord(),
           "health-interval", healthcheck().interval()
         ));
         return Stream.concat(
           optionize.stream(),
-          Stream.of( cordVolume().dockerArgs() )
+          Stream.of(cordVolume().dockerArgs())
         ).toList();
       } else {
         return optionize(Map.of(
@@ -157,7 +157,7 @@ public class Role {
   }
 
   public HealthCheck healthcheck() {
-    if(healthCheck == null) {
+    if (healthCheck == null) {
       if (runningTraefik()) {
         return config().healthcheck().merge(specializedHealthCheck()); // merge specialised
       } else {
@@ -169,11 +169,11 @@ public class Role {
 
   public String healthCheckCmdWithCord() {
     return "(%s) && (stat %s > /dev/null || exit 1)"
-      .formatted( healthcheck().cmd(), cordContainerFile() );
+      .formatted(healthcheck().cmd(), cordContainerFile());
   }
 
   public boolean runningTraefik() {
-    if( specializations().traefik() == null ) {
+    if (specializations().traefik() == null) {
       return primary();
     } else {
       return specializations().traefik();
@@ -189,15 +189,15 @@ public class Role {
   }
 
   public String cordHostDirectory() {
-    return File.join( config().runDirectoryAsDockerVolume(), "cords", Stream.of( containerPrefix(), config().runId() ).collect(Collectors.joining("-"))  );
+    return File.join(config().runDirectoryAsDockerVolume(), "cords", Stream.of(containerPrefix(), config().runId()).collect(Collectors.joining("-")));
   }
 
   public Volume cordVolume() {
     String cord = healthcheck().cord();
-    if(cord != null) {
-      if(cordVolume == null) {
+    if (cord != null) {
+      if (cordVolume == null) {
         cordVolume = new Volume(
-          File.join( config().runDirectory(), "cords", Stream.of( containerPrefix(), config().runId() ).collect(Collectors.joining("-"))  ),
+          File.join(config().runDirectory(), "cords", Stream.of(containerPrefix(), config().runId()).collect(Collectors.joining("-"))),
           cord
         );
       }
@@ -206,7 +206,7 @@ public class Role {
   }
 
   public String cordHostFile() {
-    return File.join( cordVolume().hostPath(), CORD_FILE );
+    return File.join(cordVolume().hostPath(), CORD_FILE);
   }
 
   // TODO: unused?
@@ -215,13 +215,13 @@ public class Role {
 //  }
 
   public String cordContainerFile() {
-    return File.join( cordVolume().containerPath(), CORD_FILE );
+    return File.join(cordVolume().containerPath(), CORD_FILE);
   }
 
   public String containerName(String version) {
     return Stream.of(
         containerPrefix(),
-        version != null ? version  : config().version()
+        version != null ? version : config().version()
       ).filter(Objects::nonNull)
       .collect(Collectors.joining("-"));
   }
@@ -257,11 +257,11 @@ public class Role {
   }
 
   public String assetExtractedPath(String version) {
-    return File.join( config().runDirectory(), "assets", "extracted", containerName(version) );
+    return File.join(config().runDirectory(), "assets", "extracted", containerName(version));
   }
 
   public String assetVolumePath(String version) {
-    return File.join( config().runDirectory(), "assets", "volumes", containerName(version) );
+    return File.join(config().runDirectory(), "assets", "volumes", containerName(version));
   }
 
   // private
@@ -280,7 +280,7 @@ public class Role {
       return config().rawConfig().servers().list();
     } else {
       RoleConfig servers = config().rawConfig().servers().roles().get(name());
-      if(servers.isAList()) {
+      if (servers.isAList()) {
         return servers.list();
       } else {
         return servers.customRole().hosts();
@@ -329,8 +329,9 @@ public class Role {
 
   private Map<String, String> customLabels() {
     Map<String, String> labels = new HashMap<>();
-    labels.putAll(config().labels());
-    if(specializations().labels() != null) labels.putAll( specializations().labels() );
+
+    if (config().labels() != null) { labels.putAll(config().labels()); }
+    if (specializations().labels() != null) labels.putAll(specializations().labels());
     return labels;
   }
 
@@ -355,4 +356,9 @@ public class Role {
   public HealthCheck specializedHealthCheck() {
     return specializedHealthCheck;
   }
+
+  public String toString() {
+    return name();
+  }
+
 }

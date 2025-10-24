@@ -33,11 +33,11 @@ registry:
 ssh:
   user: root
   port: 2222
-  privateKey:
+  key_path:
     - PRIVATE_KEY
-  privateKeyPassphrase:
+  key_passphrase:
     - PRIVATE_KEY_PASSPHRASE
-  strictHostChecking: false
+  strict_host_key_checking: false
 
 # Use accessory services (secrets come from .env).
 # accessories:

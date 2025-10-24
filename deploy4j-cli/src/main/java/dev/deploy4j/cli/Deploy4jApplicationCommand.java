@@ -26,6 +26,7 @@ import java.util.concurrent.Callable;
     RollbackCliCommand.class,
     ServerCliCommand.class,
     SetupCliCommand.class,
+    TestCliCommand.class,
     TraefikCliCommand.class,
     VersionCliCommand.class
   }

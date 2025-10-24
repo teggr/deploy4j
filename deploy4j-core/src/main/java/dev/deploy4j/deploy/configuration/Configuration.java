@@ -206,6 +206,7 @@ public class Configuration {
 
   public String latestTag() {
     return Stream.of("latest", destination())
+      .filter(Objects::nonNull)
       .collect(Collectors.joining("-"));
   }
 

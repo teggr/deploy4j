@@ -29,7 +29,7 @@ public class RegistryCliCommand {
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
       // TODO: skips
-      deployApplicationContext.registry().login(deployApplicationContext.commander());
+      deployApplicationContext.registry().login(deployApplicationContext.deployContext());
     }
 
   }
@@ -48,7 +48,7 @@ public class RegistryCliCommand {
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
       // TODO: skips
-      deployApplicationContext.registry().logout(deployApplicationContext.commander());
+      deployApplicationContext.registry().logout(deployApplicationContext.deployContext());
     }
 
   }

@@ -51,6 +51,7 @@ public class Boot {
     try {
       startNewVersion();
     } catch (RuntimeException e) {
+      e.printStackTrace();
       if (gatekeeper()) {
         closeBarrier();
       }
@@ -72,7 +73,7 @@ public class Boot {
   // private
 
   private String oldVersionRenamedIfClashing() {
-    String containerIdForVersion = sshHost().capture(app().containerIdForVersion(version()));
+    String containerIdForVersion = sshHost().capture(app().containerIdForVersion(version()), false);
     if (StringUtils.isNotBlank(containerIdForVersion)) {
       String renamedVersion = version() + "_replaced_" + RandomHex.randomHex(8);
       log.info( "Renaming container {} to {} as already deployed on {}", version(), renamedVersion, host() );
@@ -80,7 +81,7 @@ public class Boot {
       sshHost().execute(app().renameContainer(version, renamedVersion));
     }
 
-    return sshHost().capture(app().currentRunningVersion());
+    return sshHost().capture(app().currentRunningVersion(), false);
   }
 
 
@@ -110,20 +111,20 @@ public class Boot {
   }
 
   private void stopNewVersion() {
-    sshHost().execute(app().stop(version()));
+    sshHost().execute(app().stop(version()), false);
   }
 
   private void stopOldVersion(String version) {
 
     if(usesCord()) {
-      String cord = sshHost().capture(app().cord(version));
+      String cord = sshHost().capture(app().cord(version), false);
       if(StringUtils.isNotBlank(cord)) {
         sshHost().execute( app().cutCord(cord) );
         new Poller(deployContext).waitForUnhealthy(true, () -> sshHost().capture( app().status(version()) ) );
       }
     }
 
-    sshHost().execute(app().stop(version));
+    sshHost().execute(app().stop(version), false);
 
     if(assets()) {
       sshHost().execute(app().cleanUpAssets());

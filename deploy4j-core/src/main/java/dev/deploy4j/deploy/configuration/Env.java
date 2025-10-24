@@ -3,6 +3,7 @@ package dev.deploy4j.deploy.configuration;
 import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
 import dev.deploy4j.deploy.env.ENV;
 import dev.deploy4j.deploy.env.EnvFile;
+import dev.deploy4j.deploy.utils.file.File;
 
 import java.nio.file.Paths;
 import java.util.*;
@@ -61,7 +62,7 @@ public class Env {
   }
 
   public String secretsDirectory() {
-    return Paths.get(secretsFile()).getParent().toString();
+    return File.dirname(secretsFile());
   }
 
   public Env merge(Env other) {

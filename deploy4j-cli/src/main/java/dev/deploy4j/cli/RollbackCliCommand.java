@@ -13,7 +13,7 @@ public class RollbackCliCommand extends BaseCliCommand {
 
     printRuntime(() -> {
 
-      deployApplicationContext.deploy().rollback(deployApplicationContext.commander(), version);
+      deployApplicationContext.deploy().rollback(deployApplicationContext.deployContext(), version);
 
     });
 

@@ -1,9 +1,6 @@
 package dev.rebelcraft.ssh;
 
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
+import com.jcraft.jsch.*;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,7 +119,28 @@ public class SSHTemplate {
     }
   }
 
-  public void upload(String local, String remote) {
+  public void upload(String content, String remote) {
+    ChannelExec channel = null;
+    try {
+      Session session = getSession();
+      if (!session.isConnected()) {
+        session.connect();
+      }
+      // Use SFTP channel for file upload
+      com.jcraft.jsch.ChannelSftp sftp = (com.jcraft.jsch.ChannelSftp) session.openChannel("sftp");
+      sftp.connect();
+
+      sftp.put(IOUtils.toInputStream(content, StandardCharsets.UTF_8), remote, ChannelSftp.OVERWRITE);
+
+      sftp.disconnect();
+      log.info("Uploaded content to {}", remote);
+    } catch (Exception e) {
+      log.error("Failed to upload content to {}", remote, e);
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void copy(String local, String remote) {
     ChannelExec channel = null;
     try {
       Session session = getSession();

@@ -18,7 +18,7 @@ public class Ssh {
 
   public String user() {
     return sshConfig.user() != null ?
-      sshConfig.user() : "root";
+      lookup( sshConfig.user() ) : "root";
   }
 
   public Integer port() {
@@ -31,7 +31,7 @@ public class Ssh {
   }
 
   public String keyPath() {
-    return sshConfig().keyPath();
+    return lookup( sshConfig().keyPath() );
   }
 
   public String keyPassphrase() {
@@ -77,6 +77,9 @@ public class Ssh {
   }
 
   private String lookup(PlainValueOrSecretKey key) {
+    if( key == null ) {
+      return null;
+    }
     if (key.isKey()) {
       return ENV.fetch(key.key());
     } else {
@@ -96,6 +99,7 @@ public class Ssh {
     map.put("port", port());
     map.put("proxy", proxy());
     map.put("keyPath", keyPath());
+    map.put("keyPassphrase", keyPassphrase());
     map.put("strictHostKeyChecking", strictHostKeyChecking());
     map.put("options", options());
     return map;

@@ -39,7 +39,7 @@ public class AccessoryCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.accessory().boot(deployApplicationContext.commander(), name, login);
+      deployApplicationContext.accessory().boot(deployApplicationContext.deployContext(), name, login);
     }
 
   }
@@ -56,7 +56,7 @@ public class AccessoryCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.accessory().upload(deployApplicationContext.commander(), name);
+      deployApplicationContext.accessory().upload(deployApplicationContext.deployContext(), name);
     }
 
   }
@@ -73,7 +73,7 @@ public class AccessoryCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.accessory().directories(deployApplicationContext.commander(), name);
+      deployApplicationContext.accessory().directories(deployApplicationContext.deployContext(), name);
     }
 
   }
@@ -90,7 +90,7 @@ public class AccessoryCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.accessory().reboot(deployApplicationContext.commander(), name);
+      deployApplicationContext.accessory().reboot(deployApplicationContext.deployContext(), name);
     }
 
   }
@@ -107,7 +107,7 @@ public class AccessoryCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.accessory().start(deployApplicationContext.commander(), name);
+      deployApplicationContext.accessory().start(deployApplicationContext.deployContext(), name);
     }
 
   }
@@ -124,7 +124,7 @@ public class AccessoryCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.accessory().stop(deployApplicationContext.commander(), name);
+      deployApplicationContext.accessory().stop(deployApplicationContext.deployContext(), name);
     }
 
   }
@@ -141,7 +141,7 @@ public class AccessoryCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.accessory().restart(deployApplicationContext.commander(), name);
+      deployApplicationContext.accessory().restart(deployApplicationContext.deployContext(), name);
     }
 
   }
@@ -158,7 +158,7 @@ public class AccessoryCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.accessory().details(deployApplicationContext.commander(), name);
+      deployApplicationContext.accessory().details(deployApplicationContext.deployContext(), name);
     }
 
   }
@@ -182,7 +182,7 @@ public class AccessoryCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.accessory().exec(deployApplicationContext.commander(), interactive, reuse, name, cmd);
+      deployApplicationContext.accessory().exec(deployApplicationContext.deployContext(), interactive, reuse, name, cmd);
     }
 
   }
@@ -212,7 +212,7 @@ public class AccessoryCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.app().logs(deployApplicationContext.commander(), since,lines, grep, grepOptions, follow);
+      deployApplicationContext.app().logs(deployApplicationContext.deployContext(), since,lines, grep, grepOptions, follow);
     }
 
   }
@@ -233,7 +233,7 @@ public class AccessoryCliCommand {
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
       // TODO: confirmation
-      deployApplicationContext.accessory().remove(deployApplicationContext.commander(), name);
+      deployApplicationContext.accessory().remove(deployApplicationContext.deployContext(), name);
     }
 
   }
@@ -250,7 +250,7 @@ public class AccessoryCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.accessory().removeContainer(deployApplicationContext.commander(), name);
+      deployApplicationContext.accessory().removeContainer(deployApplicationContext.deployContext(), name);
     }
 
   }
@@ -267,7 +267,7 @@ public class AccessoryCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.accessory().removeImage(deployApplicationContext.commander(), name);
+      deployApplicationContext.accessory().removeImage(deployApplicationContext.deployContext(), name);
     }
 
   }
@@ -284,7 +284,7 @@ public class AccessoryCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.accessory().removeServiceDirectory(deployApplicationContext.commander(), name);
+      deployApplicationContext.accessory().removeServiceDirectory(deployApplicationContext.deployContext(), name);
     }
 
   }

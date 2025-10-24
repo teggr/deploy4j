@@ -55,7 +55,8 @@ public class Tags {
   }
 
   public Tags except(String... tags) {
-    Map<String, String> exceptTags = Map.copyOf(tags());
+    Map<String, String> exceptTags = new HashMap<>();
+    if(tags != null) { exceptTags.putAll(tags()); }
     Stream.of(tags).forEach(exceptTags::remove);
     return new Tags(exceptTags);
   }

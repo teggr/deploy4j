@@ -37,7 +37,8 @@ public class App extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      // "Get most recent version available as an image..."
+      System.out.println( "Get most recent version available as an image..." );
+
       usingVersion(deployContext, versionOrLatest(deployContext), (version) -> {
 
         log.info("Start container with version " + version + " using a " + deployContext.config().readinessDelay() + "s readiness delay (or reboot if already running)..." );
@@ -203,13 +204,13 @@ public class App extends Base {
         for (Role role : roles) {
 
           AppHostCommands app = apps.app(role, host.hostName());
-          List<String> versions = new java.util.ArrayList<>(Stream.of(host.capture(app.listVersions()).split("\n")).toList());
-          versions.remove(host.capture(app.currentRunningVersion()).trim());
+          List<String> versions = new java.util.ArrayList<>(Stream.of(host.capture(app.listVersions(), false).split("\n")).toList());
+          versions.remove(host.capture(app.currentRunningVersion(), false).trim());
 
           for (String version : versions) {
             if (stop) {
               System.out.println( "Stopping stale container for role #{role} with version #{version}" );
-              host.execute(app.stop(version));
+              host.execute(app.stop(version), false);
             } else {
               System.out.println(  "Detected stale container for role #{role} with version #{version} (use `kamal app stale_containers --stop` to stop)" );
             }

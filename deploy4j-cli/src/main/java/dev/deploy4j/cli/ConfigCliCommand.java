@@ -10,7 +10,7 @@ public class ConfigCliCommand extends BaseCliCommand {
 
   @Override
   protected void execute(DeployApplicationContext deployApplicationContext) {
-    deployApplicationContext.deploy().config(deployApplicationContext.commander());
+    deployApplicationContext.deploy().config(deployApplicationContext.deployContext());
   }
 
 }

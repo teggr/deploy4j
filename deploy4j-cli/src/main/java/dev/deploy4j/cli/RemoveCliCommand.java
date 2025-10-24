@@ -10,7 +10,7 @@ public class RemoveCliCommand extends BaseCliCommand {
 
   @Override
   protected void execute(DeployApplicationContext deployApplicationContext) {
-    deployApplicationContext.deploy().remove(deployApplicationContext.commander());
+    deployApplicationContext.deploy().remove(deployApplicationContext.deployContext());
   }
 
 }

@@ -31,7 +31,7 @@ public class TraefikCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().boot(deployApplicationContext.commander());
+      deployApplicationContext.traefik().boot(deployApplicationContext.deployContext());
     }
 
   }
@@ -50,7 +50,7 @@ public class TraefikCliCommand {
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
       // TODO: confirmation prompt
-      deployApplicationContext.traefik().reboot(deployApplicationContext.commander(), rolling);
+      deployApplicationContext.traefik().reboot(deployApplicationContext.deployContext(), rolling);
     }
 
   }
@@ -62,7 +62,7 @@ public class TraefikCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().start(deployApplicationContext.commander());
+      deployApplicationContext.traefik().start(deployApplicationContext.deployContext());
     }
 
   }
@@ -74,7 +74,7 @@ public class TraefikCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().stop(deployApplicationContext.commander());
+      deployApplicationContext.traefik().stop(deployApplicationContext.deployContext());
     }
 
   }
@@ -86,7 +86,7 @@ public class TraefikCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().restart(deployApplicationContext.commander());
+      deployApplicationContext.traefik().restart(deployApplicationContext.deployContext());
     }
 
   }
@@ -98,7 +98,7 @@ public class TraefikCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().details(deployApplicationContext.commander());
+      deployApplicationContext.traefik().details(deployApplicationContext.deployContext());
     }
 
   }
@@ -125,7 +125,7 @@ public class TraefikCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().logs(deployApplicationContext.commander(), since,lines, grep, grepOptions, follow);
+      deployApplicationContext.traefik().logs(deployApplicationContext.deployContext(), since,lines, grep, grepOptions, follow);
     }
 
   }
@@ -137,7 +137,7 @@ public class TraefikCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().remove(deployApplicationContext.commander());
+      deployApplicationContext.traefik().remove(deployApplicationContext.deployContext());
     }
 
   }
@@ -149,7 +149,7 @@ public class TraefikCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().removeContainer(deployApplicationContext.commander());
+      deployApplicationContext.traefik().removeContainer(deployApplicationContext.deployContext());
     }
 
   }
@@ -161,7 +161,7 @@ public class TraefikCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().removeImage(deployApplicationContext.commander());
+      deployApplicationContext.traefik().removeImage(deployApplicationContext.deployContext());
     }
 
   }
