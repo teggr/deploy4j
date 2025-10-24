@@ -1,22 +1,23 @@
 # Name of your application. Used to uniquely configure containers.
-service: my-app
+service: deploy4j-demo
 
 # Name of the container image.
-image: user/my-app
+image: teggr/deploy4j-demo
 
 # Deploy to these servers.
 servers:
-  - 192.168.0.1
+  - localhost
 
 # Credentials for your image host.
 registry:
   # Specify the registry server, if you're not using Docker Hub
   # server: registry.digitalocean.com / ghcr.io / ...
-  username: my-user
+  username:
+    - DOCKER_USERNAME
 
   # Always use an access token rather than real password when possible.
   password:
-    - KAMAL_REGISTRY_PASSWORD
+    - DOCKER_PASSWORD
 
 # Inject ENV variables into containers (secrets come from .env).
 # Remember to run `kamal env push` after making changes!
@@ -29,16 +30,14 @@ registry:
 # Use a different ssh user than root
 # ssh:
 #   user: app
-
-# Configure builder setup.
-# builder:
-#   args:
-#     RUBY_VERSION: 3.2.0
-#   secrets:
-#     - GITHUB_TOKEN
-#   remote:
-#     arch: amd64
-#     host: ssh://app@192.168.0.1
+ssh:
+  user: root
+  port: 2222
+  privateKey:
+    - PRIVATE_KEY
+  privateKeyPassphrase:
+    - PRIVATE_KEY_PASSPHRASE
+  strictHostChecking: false
 
 # Use accessory services (secrets come from .env).
 # accessories:
@@ -68,6 +67,12 @@ registry:
 #   args:
 #     accesslog: true
 #     accesslog.format: json
+traefik:
+  publish: true
+  args:
+    api.insecure: true
+  options:
+    publish: "8080:8080"
 
 # Configure a custom healthcheck (default is /up on port 3000)
 # healthcheck:

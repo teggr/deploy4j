@@ -1,5 +1,6 @@
 package dev.deploy4j.deploy;
 
+import dev.deploy4j.deploy.configuration.ConfigurationPrinter;
 import dev.deploy4j.deploy.configuration.Role;
 import dev.deploy4j.deploy.host.commands.AppHostCommandsFactory;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
@@ -155,14 +156,11 @@ public class Deploy extends Base {
    * Show combined config (including secrets!)
    */
   public void config(DeployContext deployContext) {
-    // TODO: run locallu
-    System.out.println(deployContext.config());
+
+    ConfigurationPrinter configurationPrinter = new ConfigurationPrinter();
+    configurationPrinter.print(deployContext.config());
+
   }
-
-  // TODO: docs
-
-
-
 
   /**
    * Remove Traefik, app, accessories, and registry session from servers

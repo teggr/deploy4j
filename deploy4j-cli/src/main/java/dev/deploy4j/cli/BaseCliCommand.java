@@ -11,6 +11,9 @@ import java.util.concurrent.Callable;
 
 public abstract class BaseCliCommand implements Callable<Integer> {
 
+  @CommandLine.Mixin
+  private HelpOptions helpOptions = new HelpOptions();
+
   @CommandLine.Option(names = {"-v", "--verbose"}, description = "Detailed logging", negatable = true)
   Boolean verbose;
   @CommandLine.Option(names = {"-q", "--quiet"}, description = "Minimal logging", negatable = true)
@@ -36,9 +39,9 @@ public abstract class BaseCliCommand implements Callable<Integer> {
     Environment environment = new Environment(destination);
 
     // local logging
-    if (quiet) {
+    if (quiet != null && quiet) {
       System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
-    } else if (verbose) {
+    } else if (verbose != null && verbose) {
       System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
     } else {
       System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");

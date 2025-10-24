@@ -21,6 +21,9 @@ import picocli.CommandLine;
 )
 public class TraefikCliCommand {
 
+  @CommandLine.Mixin
+  private HelpOptions helpOptions = new HelpOptions();
+
   @CommandLine.Command(
     name = "boot",
     description = "Boot Traefik on servers")

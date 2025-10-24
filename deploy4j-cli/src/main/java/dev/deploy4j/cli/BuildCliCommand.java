@@ -12,6 +12,9 @@ import picocli.CommandLine;
 )
 public class BuildCliCommand {
 
+  @CommandLine.Mixin
+  private HelpOptions helpOptions = new HelpOptions();
+
   @CommandLine.Command(
     name = "pull",
     description = "Pull app image from registry onto servers")

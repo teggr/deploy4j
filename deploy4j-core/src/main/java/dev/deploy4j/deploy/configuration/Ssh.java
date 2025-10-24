@@ -90,4 +90,14 @@ public class Ssh {
     return sshConfig;
   }
 
+  public Map<String, Object> resolve() {
+    Map<String, Object> map = new HashMap<>();
+    map.put("user", user());
+    map.put("port", port());
+    map.put("proxy", proxy());
+    map.put("keyPath", keyPath());
+    map.put("strictHostKeyChecking", strictHostKeyChecking());
+    map.put("options", options());
+    return map;
+  }
 }

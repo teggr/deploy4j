@@ -1,8 +1,8 @@
 package dev.deploy4j.deploy.configuration;
 
-import dev.deploy4j.deploy.env.EnvFile;
-import dev.deploy4j.deploy.env.ENV;
 import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
+import dev.deploy4j.deploy.env.ENV;
+import dev.deploy4j.deploy.env.EnvFile;
 
 import java.nio.file.Paths;
 import java.util.*;
@@ -24,10 +24,17 @@ public class Env {
   }
 
   public Env(EnvironmentConfig config, String secretsFile, String context) {
-    this.clear = config.isAMap() ? config.map() : config.isClearAndSecrets() ? config.clear() : Map.of();
-    this.secretsKeys = config.secrets() != null ? config.secrets() : List.of();
-    this.secretsFile = secretsFile;
-    this.context = context;
+    if (config == null) {
+      this.clear = Map.of();
+      this.secretsKeys = List.of();
+      this.secretsFile = secretsFile;
+      this.context = context;
+    } else {
+      this.clear = config.isAMap() ? config.map() : config.isClearAndSecrets() ? config.clear() : Map.of();
+      this.secretsKeys = config.secrets() != null ? config.secrets() : List.of();
+      this.secretsFile = secretsFile;
+      this.context = context;
+    }
     // TODO: context to be used with validation/error messages
   }
 

@@ -14,6 +14,9 @@ import picocli.CommandLine;
 )
 public class PruneCliCommand {
 
+  @CommandLine.Mixin
+  private HelpOptions helpOptions = new HelpOptions();
+
   @CommandLine.Command(
     name = "all",
     description = "Prune unused images and stopped containers")

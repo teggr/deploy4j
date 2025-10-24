@@ -7,4 +7,8 @@ import picocli.CommandLine;
   description = "Manage environment files"
 )
 public class EnvCliCommand {
+
+  @CommandLine.Mixin
+  private HelpOptions helpOptions = new HelpOptions();
+
 }

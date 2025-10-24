@@ -27,6 +27,9 @@ import java.util.Map;
 )
 public class AppCliCommand {
 
+  @CommandLine.Mixin
+  private HelpOptions helpOptions = new HelpOptions();
+
   @CommandLine.Command(
     name = "boot",
     description = "Boot app on servers (or reboot app if already running)")

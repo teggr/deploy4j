@@ -13,6 +13,9 @@ import picocli.CommandLine;
 )
 public class ServerCliCommand {
 
+  @CommandLine.Mixin
+  private HelpOptions helpOptions = new HelpOptions();
+
   @CommandLine.Command(
     name = "exec",
     description = "Run a custom command on the server (use --help to show options)")

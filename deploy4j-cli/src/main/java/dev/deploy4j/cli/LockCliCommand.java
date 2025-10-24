@@ -14,6 +14,9 @@ import picocli.CommandLine;
 )
 public class LockCliCommand {
 
+  @CommandLine.Mixin
+  private HelpOptions helpOptions = new HelpOptions();
+
   @CommandLine.Command(
     name = "status",
     description = "Report lock status")

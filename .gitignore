@@ -36,6 +36,7 @@ build/
 .env
 external/
 config/
+.test-deploy/
 
 ### VS Code ###
 .vscode/

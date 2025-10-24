@@ -5,12 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.io.IOException;
+import java.util.List;
 
 public class DeployConfigYamlReader {
 
   private final static ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
-  public static DeployConfig loadConfigFiles(String... files) {
+  public static DeployConfig loadConfigFiles(List<String> files) {
     try {
       com.fasterxml.jackson.databind.JsonNode merged = null;
       for (String file : files) {

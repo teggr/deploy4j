@@ -1,19 +1,16 @@
 package dev.deploy4j.deploy.configuration;
 
-import dev.deploy4j.deploy.utils.RandomHex;
 import dev.deploy4j.deploy.configuration.env.Tag;
-import dev.deploy4j.deploy.env.ENV;
-import dev.deploy4j.deploy.utils.file.File;
 import dev.deploy4j.deploy.configuration.raw.DeployConfig;
 import dev.deploy4j.deploy.configuration.raw.DeployConfigYamlReader;
 import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
+import dev.deploy4j.deploy.env.ENV;
+import dev.deploy4j.deploy.utils.RandomHex;
+import dev.deploy4j.deploy.utils.file.File;
 import org.apache.commons.lang.StringUtils;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,8 +20,11 @@ public class Configuration {
 
   public static Configuration createFrom(ConfigureArgs configureArgs) {
     DeployConfig rawConfig = DeployConfigYamlReader.loadConfigFiles(
-      configureArgs.configFile(),
-      destinationConfigFile(configureArgs.configFile(), configureArgs.destination()));
+      Stream.of(
+          configureArgs.configFile(),
+          destinationConfigFile(configureArgs.configFile(), configureArgs.destination()))
+        .filter(Objects::nonNull).toList()
+    );
     return new Configuration(rawConfig, configureArgs.destination(), configureArgs.version());
   }
 
@@ -296,23 +296,22 @@ public class Configuration {
       .toList();
   }
 
-  @Override
-  public String toString() {
-    return "Configuration{" +
-           "roles=" + roleNames() +
-           ", hosts='" + allHosts() + '\'' +
-           ", primaryHost='" + primaryHost() + '\'' +
-           ", version=" + version() +
-           ", repository=" + repository() +
-           ", absoluteImage=" + absoluteImage() +
-           ", serviceWithVersion=" + serviceWithVersion() +
-           ", volumeArgs=" + volumeArgs() +
-           ", sshOptions=" + ssh() +
-           ", builder=" + builder() +
-           ", accessories=" + rawConfig().accessories() +
-           ", logging=" + loggingArgs() +
-           ", healthCheck=" + healthcheck() +
-           '}';
+  public Map<String, Object> resolve() {
+    Map<String, Object> map = new HashMap<>();
+    map.put("roles", roleNames());
+    map.put("hosts", allHosts());
+    map.put("primaryHost", primaryHost());
+    map.put("version", version());
+    map.put("repository", repository());
+    map.put("absoluteImage", absoluteImage());
+    map.put("serviceWithVersion", serviceWithVersion());
+    map.put("volumeArgs", volumeArgs());
+    map.put("ssh", ssh().resolve());
+    map.put("builder", builder().resolve());
+    map.put("accessories", rawConfig().accessories());
+    map.put("logging", loggingArgs());
+    map.put("healthcheck", healthcheck().resolve());
+    return map;
   }
 
   // private

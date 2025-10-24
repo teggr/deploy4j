@@ -38,8 +38,8 @@ public class Logging {
   public String[] args() {
     if (driver() != null || options() != null) {
       List<String> args = new ArrayList<>();
-      args.addAll(optionize(Map.of("log-driver", driver())));
-      args.addAll(Arrays.stream(argumentize("--log-opt", options())).toList());
+      if(driver() != null) { args.addAll(optionize(Map.of("log-driver", driver()))); }
+      if(options() != null) {  args.addAll(Arrays.stream(argumentize("--log-opt", options())).toList()); }
       return args.toArray(new String[0]);
     } else {
       return argumentize("--log-opt", Map.of("max-size", "10m"));

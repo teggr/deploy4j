@@ -2,6 +2,8 @@ package dev.deploy4j.deploy.configuration;
 
 import dev.deploy4j.deploy.configuration.raw.HealthCheckConfig;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -75,4 +77,11 @@ public class HealthCheck {
     return healthCheckConfig;
   }
 
+  public Map<String, Object> resolve() {
+    Map<String, Object> map = new HashMap<>();
+    map.put("cmd", cmd());
+    map.put("port", port());
+    map.put("path", path());
+    return map;
+  }
 }

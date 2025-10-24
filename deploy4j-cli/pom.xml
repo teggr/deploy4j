@@ -57,7 +57,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>dev.deploy4j.Deploy4jCliApplication</mainClass>
+                                    <mainClass>dev.deploy4j.cli.Deploy4jApplicationCommand</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

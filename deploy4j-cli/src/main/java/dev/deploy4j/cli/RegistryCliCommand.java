@@ -12,6 +12,9 @@ import picocli.CommandLine;
 )
 public class RegistryCliCommand {
 
+  @CommandLine.Mixin
+  private HelpOptions helpOptions = new HelpOptions();
+
   @CommandLine.Command(
     name = "login",
     description = "Log in to registry locally and remotely")

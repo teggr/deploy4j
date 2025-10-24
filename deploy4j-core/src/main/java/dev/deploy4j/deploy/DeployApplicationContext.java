@@ -2,7 +2,6 @@ package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.host.commands.*;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
-import dev.deploy4j.init.Initializer;
 
 import java.util.Map;
 
@@ -21,9 +20,7 @@ public class DeployApplicationContext {
   private final Env env;
   private final DeployContext deployContext;
   private final LockManager lockManager;
-  private final Initializer initializer;
   private final Audit audit;
-  private final Version version;
 
   public DeployApplicationContext(Environment environment, SshHosts sshHosts, DeployContext deployContext) {
 
@@ -65,9 +62,7 @@ public class DeployApplicationContext {
     this.traefik = new Traefik(sshHosts, lockManager, registry, traefik, audit);
     this.lock = new Lock(sshHosts, lockManager, server, lock);
 
-    this.initializer = new Initializer();
     this.audit = new Audit(sshHosts, audit);
-    this.version = new Version();
     this.deploy = new Deploy(sshHosts, lockManager, this.app, this.server, this.env, this.accessory, this.registry, build, this.prune, this.traefik, apps);
 
   }
@@ -124,16 +119,8 @@ public class DeployApplicationContext {
     return lockManager;
   }
 
-  public Initializer initializer() {
-    return initializer;
-  }
-
   public Audit audit() {
     return audit;
-  }
-
-  public Version version() {
-    return version;
   }
 
 }

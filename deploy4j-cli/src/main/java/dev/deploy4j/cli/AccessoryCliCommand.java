@@ -21,6 +21,9 @@ import picocli.CommandLine;
   })
 public class AccessoryCliCommand {
 
+  @CommandLine.Mixin
+  private HelpOptions helpOptions = new HelpOptions();
+
   @CommandLine.Command(
     name = "boot",
     mixinStandardHelpOptions = true,
