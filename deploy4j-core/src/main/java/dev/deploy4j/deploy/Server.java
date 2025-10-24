@@ -41,12 +41,12 @@ public class Server extends Base {
     hosts.addAll(deployContext.accessoryHosts());
 
     // TODO: interactive mode
-    System.out.println( "Running '"+cmd+"' on " + String.join(",", hosts) +  "..." );
+    log.info( "Running '"+cmd+"' on " + String.join(",", hosts) +  "..." );
 
     on(hosts, host -> {
 
       host.execute( audit.record( "Executed cmd '" + cmd + "' on " + host.hostName() ) );
-      System.out.println( host.capture( cmd ) );
+      log.info( host.capture( cmd ) );
 
     });
 
@@ -67,9 +67,9 @@ public class Server extends Base {
 
       on(hosts, host -> {
 
-        if (!host.execute( docker.installed() ) ) {
-          if (host.execute( docker.superUser() ) ) {
-            log.info("Missing Docker on {}. Installing...", host.hostName());
+        if (!host.execute( docker.installed(), false ) ) {
+          if (host.execute( docker.superUser(), false ) ) {
+            log.debug("Missing Docker on {}. Installing...", host.hostName());
             host.execute( docker.install() );
           } else {
             missing.add(host);

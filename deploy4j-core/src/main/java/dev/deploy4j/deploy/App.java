@@ -37,11 +37,11 @@ public class App extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      System.out.println( "Get most recent version available as an image..." );
+      log.info( "Get most recent version available as an image..." );
 
       usingVersion(deployContext, versionOrLatest(deployContext), (version) -> {
 
-        log.info("Start container with version " + version + " using a " + deployContext.config().readinessDelay() + "s readiness delay (or reboot if already running)..." );
+        log.debug("Start container with version " + version + " using a " + deployContext.config().readinessDelay() + "s readiness delay (or reboot if already running)..." );
 
         on(deployContext.hosts(), host -> {
 
@@ -133,7 +133,7 @@ public class App extends Base {
 
       for (Role role : deployContext.rolesOn(host.hostName())) {
 
-        System.out.println(host.capture(apps.app(role, host.hostName()).info()));
+        log.info(host.capture(apps.app(role, host.hostName()).info()));
 
       }
 
@@ -152,18 +152,18 @@ public class App extends Base {
 
     // TODO: all the interactive stuff. we are reusing
 
-    System.out.println("Get most recent version available as an image...");
+    log.info("Get most recent version available as an image...");
 
     usingVersion(deployContext, versionOrLatest(deployContext), (version) -> {
 
-      System.out.println("Launching command with version " + version + " from existing container...");
+      log.info("Launching command with version " + version + " from existing container...");
 
       on(deployContext.hosts(), host -> {
 
         for (Role role : deployContext.rolesOn(host.hostName())) {
 
           host.execute(audit.record("Executed cmd '" + cmd + "' on app version " + version));
-          System.out.println(host.capture(apps.app(role, host.hostName()).executeInExistingContainer(cmd, env)));
+          log.info(host.capture(apps.app(role, host.hostName()).executeInExistingContainer(cmd, env)));
 
         }
 
@@ -180,7 +180,7 @@ public class App extends Base {
 
     on(deployContext.hosts(), host -> {
 
-      System.out.println(host.capture(apps.app(null, host.hostName()).listContainers()));
+      log.info(host.capture(apps.app(null, host.hostName()).listContainers()));
 
     });
 
@@ -209,10 +209,10 @@ public class App extends Base {
 
           for (String version : versions) {
             if (stop) {
-              System.out.println( "Stopping stale container for role #{role} with version #{version}" );
+              log.info( "Stopping stale container for role #{role} with version #{version}" );
               host.execute(app.stop(version), false);
             } else {
-              System.out.println(  "Detected stale container for role #{role} with version #{version} (use `kamal app stale_containers --stop` to stop)" );
+              log.info(  "Detected stale container for role #{role} with version #{version} (use `kamal app stale_containers --stop` to stop)" );
             }
           }
 
@@ -231,7 +231,7 @@ public class App extends Base {
 
     on(deployContext.hosts(), host -> {
 
-      System.out.println(host.capture(apps.app(null, host.hostName()).listImages()));
+      log.info(host.capture(apps.app(null, host.hostName()).listImages()));
 
     });
 
@@ -266,7 +266,7 @@ public class App extends Base {
 
       for (Role role : deployContext.rolesOn(host.hostName())) {
 
-        System.out.println(host.capture(apps.app(role, host.hostName()).logs(null, since, lines != null ? lines.toString() : null, grep, grepOptions)));
+        log.info(host.capture(apps.app(role, host.hostName()).logs(null, since, lines != null ? lines.toString() : null, grep, grepOptions)));
 
       }
 
@@ -360,7 +360,7 @@ public class App extends Base {
 
       Role role = deployContext.rolesOn(host.hostName()).getFirst();
 
-      System.out.println(host.capture(apps.app(role, host.hostName()).currentRunningVersion()));
+      log.info(host.capture(apps.app(role, host.hostName()).currentRunningVersion()));
 
 
     });

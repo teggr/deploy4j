@@ -50,7 +50,7 @@ public class Poller {
         }
 
         if(attempt <= maxAttempts) {
-          log.info( "{}, retrying in {}s (attempt {}/{})...", status, attempt, attempt, maxAttempts );
+          log.debug( "{}, retrying in {}s (attempt {}/{})...", status, attempt, attempt, maxAttempts );
           Thread.sleep( attempt * TRAEFIK_UPDATE_DELAY );
           attempt = attempt + 1;
         } else {
@@ -64,7 +64,7 @@ public class Poller {
 
     }
 
-    log.info("Container is healthy");
+    log.debug("Container is healthy");
 
   }
 
@@ -94,7 +94,7 @@ public class Poller {
         }
 
         if(attempt <= maxAttempts) {
-          log.info( "{}, retrying in {}s (attempt {}/{})...", status, attempt, attempt, maxAttempts );
+          log.debug( "{}, retrying in {}s (attempt {}/{})...", status, attempt, attempt, maxAttempts );
           Thread.sleep( attempt * TRAEFIK_UPDATE_DELAY );
           attempt = attempt + 1;
         } else {
@@ -108,7 +108,7 @@ public class Poller {
 
     }
 
-    log.info("Container is unhealthy!");
+    log.debug("Container is unhealthy!");
 
   }
 

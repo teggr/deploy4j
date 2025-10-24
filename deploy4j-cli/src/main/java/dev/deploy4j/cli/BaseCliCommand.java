@@ -39,6 +39,7 @@ public abstract class BaseCliCommand implements Callable<Integer> {
     Environment environment = new Environment(destination);
 
     // local logging
+    System.setProperty("org.slf4j.simpleLogger.showShortLogName ", "true");
     if (quiet != null && quiet) {
       System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
     } else if (verbose != null && verbose) {

@@ -13,6 +13,8 @@ import java.nio.charset.StandardCharsets;
 
 public class Env extends Base {
 
+  private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Env.class);
+
   private final LockManager lockManager;
   private final TraefikHostCommands traefik;
   private final Environment environment;
@@ -147,7 +149,7 @@ public class Env extends Base {
       }
 
     } else {
-      System.out.println("Skipping envify (no " + envTemplatePath + " exists)");
+      log.info("Skipping envify (no " + envTemplatePath + " exists)");
     }
 
   }

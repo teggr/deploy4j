@@ -126,7 +126,7 @@ public class Traefik extends Base {
 
     on(deployContext.traefikHosts(), host -> {
 
-      System.out.println(host.capture(traefik.info()));
+      log.info(host.capture(traefik.info()));
 
     });
 
@@ -159,7 +159,7 @@ public class Traefik extends Base {
 
     on(deployContext.traefikHosts(), host -> {
 
-      System.out.println(host.capture(traefik.logs(since, lines != null ? lines.toString() : null, grep, grepOptions)));
+      log.info(host.capture(traefik.logs(since, lines != null ? lines.toString() : null, grep, grepOptions)));
 
     });
 

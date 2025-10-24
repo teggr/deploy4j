@@ -8,6 +8,8 @@ import java.util.List;
 
 public class LockManager {
 
+  private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LockManager.class);
+
   private final SshHosts sshHosts;
   private final LockHostCommands lock;
   private final ServerHostCommands server;
@@ -39,7 +41,7 @@ public class LockManager {
 
   private void acquireLock(LockContext lockContext) {
 
-    System.out.println("Acquiring the deploy lock...");
+    log.info("Acquiring the deploy lock...");
 
     sshHosts.on(List.of(lockContext.primaryHost()), host -> {
 
@@ -52,7 +54,7 @@ public class LockManager {
   }
 
   private void releaseLock(LockContext lockContext) {
-    System.out.println("Releasing the deploy lock...");
+    log.info("Releasing the deploy lock...");
 
     sshHosts.on(List.of(lockContext.primaryHost()), host -> {
 
@@ -69,11 +71,11 @@ public class LockManager {
       runnable.run();
     } catch (RuntimeException e) {
       if (e.getMessage().contains("cannot create directory")) {
-        System.out.println("Deploy lock already in place!");
+        log.info("Deploy lock already in place!");
 
         sshHosts.on(List.of(lockContext.primaryHost()), host -> {
 
-          System.out.println(host.capture(lock.status()));
+          log.info(host.capture(lock.status()));
 
         });
 

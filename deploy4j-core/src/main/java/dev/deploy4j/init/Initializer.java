@@ -7,6 +7,8 @@ import java.io.IOException;
 
 public class Initializer {
 
+  private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Initializer.class);
+
   /**
    * Create config stub in config/deploy.yml and env stub in .env
    */
@@ -14,7 +16,7 @@ public class Initializer {
 
     File deployFile = new File("config/deploy.yml");
     if (deployFile.exists()) {
-      System.out.println("Config file already exists in config/deploy.yml (remove first to create a new one)");
+      log.info("Config file already exists in config/deploy.yml (remove first to create a new one)");
     } else {
       deployFile.getParentFile().mkdirs();
       try {
@@ -25,7 +27,7 @@ public class Initializer {
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
-      System.out.println("Created configuration file in config/deploy.yml");
+      log.info("Created configuration file in config/deploy.yml");
     }
 
     deployFile = new File(".env");
@@ -38,7 +40,7 @@ public class Initializer {
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
-      System.out.println("Created .env file");
+      log.info("Created .env file");
     }
 
     // TODO: hooks

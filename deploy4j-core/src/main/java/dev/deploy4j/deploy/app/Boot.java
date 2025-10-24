@@ -76,7 +76,7 @@ public class Boot {
     String containerIdForVersion = sshHost().capture(app().containerIdForVersion(version()), false);
     if (StringUtils.isNotBlank(containerIdForVersion)) {
       String renamedVersion = version() + "_replaced_" + RandomHex.randomHex(8);
-      log.info( "Renaming container {} to {} as already deployed on {}", version(), renamedVersion, host() );
+      log.debug( "Renaming container {} to {} as already deployed on {}", version(), renamedVersion, host() );
       audit("Renaming container " + version() + " to " + renamedVersion);
       sshHost().execute(app().renameContainer(version, renamedVersion));
     }
@@ -134,18 +134,18 @@ public class Boot {
 
   private void releaseBarrier() {
     if (barrier().open()) {
-      log.info("First " + deployContext.primaryRole() + " container is healthy on " + host + ", booting any other roles");
+      log.debug("First " + deployContext.primaryRole() + " container is healthy on " + host + ", booting any other roles");
     }
   }
 
   private void waitAtBarrier() {
 
     try {
-      log.info("Waiting for the first healthy " + deployContext.primaryRole() + " container before booting " + role() + " on " + host + "...");
+      log.debug("Waiting for the first healthy " + deployContext.primaryRole() + " container before booting " + role() + " on " + host + "...");
       barrier().waitFor();
-      log.info("First " + deployContext.primaryRole() + " container is healthy, booting " + role() + " on " + host + "...");
+      log.debug("First " + deployContext.primaryRole() + " container is healthy, booting " + role() + " on " + host + "...");
     } catch (RuntimeException e) {
-      log.info("First " + deployContext.primaryRole() + " container is unhealthy, not booting " + role() + " on " + host + "...");
+      log.debug("First " + deployContext.primaryRole() + " container is unhealthy, not booting " + role() + " on " + host + "...");
       throw e;
     }
 
@@ -155,7 +155,7 @@ public class Boot {
 
     if (barrier().close()) {
 
-      log.info("First " + deployContext.primaryRole() + " container is unhealthy on " + host + ", not booting any other roles");
+      log.debug("First " + deployContext.primaryRole() + " container is unhealthy on " + host + ", not booting any other roles");
       log.error(sshHost.capture(app().logs(version(), null, null, null, null)));
       log.error(sshHost.capture(app().containerHealthLog(version())));
     }

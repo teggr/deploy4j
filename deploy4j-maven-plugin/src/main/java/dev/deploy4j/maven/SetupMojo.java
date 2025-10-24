@@ -1,7 +1,7 @@
 package dev.deploy4j.maven;
 
-import dev.deploy4j.deploy.DeployContext;
 import dev.deploy4j.deploy.DeployApplicationContext;
+import dev.deploy4j.deploy.DeployContext;
 import dev.deploy4j.deploy.Environment;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
@@ -15,8 +15,8 @@ import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 
-@Mojo(name = "deploy", defaultPhase = LifecyclePhase.NONE)
-public class DeployMojo extends AbstractMojo {
+@Mojo(name = "setup", defaultPhase = LifecyclePhase.NONE)
+public class SetupMojo extends AbstractMojo {
 
   @Parameter(defaultValue = "${project}", required = true, readonly = true)
   MavenProject project;
@@ -26,7 +26,7 @@ public class DeployMojo extends AbstractMojo {
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
 
-    getLog().info("Deploy4J Deploying");
+    getLog().info("Deploy4J Setup");
 
     String version = project.getVersion();
     String destination = null;
@@ -42,7 +42,7 @@ public class DeployMojo extends AbstractMojo {
 
       DeployApplicationContext deployApplicationContext = new DeployApplicationContext(environment, sshHosts, deployContext);
 
-      deployApplicationContext.deploy().deploy(deployContext, false);
+      deployApplicationContext.deploy().setup(deployContext, false);
 
     } catch (Exception e) {
 

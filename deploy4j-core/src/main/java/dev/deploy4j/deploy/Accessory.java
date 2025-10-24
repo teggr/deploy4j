@@ -245,7 +245,7 @@ public class Accessory extends Base {
 
         on(hosts, host -> {
 
-          System.out.println(host.capture(accessory.info()));
+          log.info(host.capture(accessory.info()));
 
         });
 
@@ -269,7 +269,7 @@ public class Accessory extends Base {
 
     withAccessory(deployContext, name, (accessory, hosts) -> {
 
-      System.out.println("Launching command from existing container...");
+      log.info("Launching command from existing container...");
       on(hosts, host -> {
 
         host.execute(audit.record("Executed cmd '" + cmd + "' on " + name + " accessory"));
@@ -312,7 +312,7 @@ public class Accessory extends Base {
 //      Integer finalLines = lines;
       on(hosts, host -> {
 
-        System.out.println(host.capture(accessory.logs(since, lines != null ? lines.toString() : null, grep, grepOptions)));
+        log.info(host.capture(accessory.logs(since, lines != null ? lines.toString() : null, grep, grepOptions)));
 
       });
 

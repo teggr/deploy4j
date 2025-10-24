@@ -34,7 +34,7 @@ public class SSHTemplate {
   private Session getSession() throws JSchException {
     if (session == null) {
 
-      log.info("Creating session for {}@{}:{}", username, host, port);
+      log.debug("Creating session for {}@{}:{}", username, host, port);
 
       // setup ssh environment for host
       JSch jsch = new JSch();
@@ -65,7 +65,7 @@ public class SSHTemplate {
       }
 
       channel = (ChannelExec) session.openChannel("exec");
-      log.info("exec__: {}", command);
+      log.debug("exec__: {}", command);
       channel.setCommand(command);
       channel.setInputStream(null);
       channel.setErrStream(capturedErrorStream);
@@ -102,9 +102,9 @@ public class SSHTemplate {
       capturedErrorStream.toString(StandardCharsets.UTF_8)
     );
 
-    log.info("result: {}", exec.exitStatus());
-    log.info("stdout: {}", exec.execOutput());
-    log.info("stderr: {}", exec.execErrorOutput());
+    log.debug("result: {}", exec.exitStatus());
+    log.debug("stdout: {}", exec.execOutput());
+    log.debug("stderr: {}", exec.execErrorOutput());
 
     return exec;
 
@@ -133,7 +133,7 @@ public class SSHTemplate {
       sftp.put(IOUtils.toInputStream(content, StandardCharsets.UTF_8), remote, ChannelSftp.OVERWRITE);
 
       sftp.disconnect();
-      log.info("Uploaded content to {}", remote);
+      log.debug("Uploaded content to {}", remote);
     } catch (Exception e) {
       log.error("Failed to upload content to {}", remote, e);
       throw new RuntimeException(e);
@@ -152,7 +152,7 @@ public class SSHTemplate {
       sftp.connect();
       sftp.put(local, remote);
       sftp.disconnect();
-      log.info("Uploaded file from {} to {}", local, remote);
+      log.debug("Uploaded file from {} to {}", local, remote);
     } catch (Exception e) {
       log.error("Failed to upload file from {} to {}", local, remote, e);
       throw new RuntimeException(e);

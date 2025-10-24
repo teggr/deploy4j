@@ -53,7 +53,7 @@ public class SshHost {
   }
 
   private String command(Cmd command) {
-    log.info("cmd___: {}", command.description());
+    log.debug("cmd___: {}", command.description());
     return Stream.of(command)
       .flatMap(cmd -> cmd.build().stream())
       .collect(Collectors.joining(" "));

@@ -8,6 +8,8 @@ import java.util.List;
 
 public class Lock extends Base {
 
+  private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Lock.class);
+
   private final LockManager lockManager;
   private final ServerHostCommands server;
   private final LockHostCommands lock;
@@ -29,7 +31,7 @@ public class Lock extends Base {
       on(List.of(deployContext.primaryHost()), host -> {;
 
         host.execute(server.ensureRunDirectory());
-        System.out.println( host.capture( lock.status() ) );
+        log.info( host.capture( lock.status() ) );
 
       });
 
@@ -53,7 +55,7 @@ public class Lock extends Base {
 
       });
 
-      System.out.println("Acquired the deploy lock");
+      log.info("Acquired the deploy lock");
 
     });
 
@@ -73,7 +75,7 @@ public class Lock extends Base {
 
       });
 
-      System.out.println("Released the deploy lock");
+      log.info("Released the deploy lock");
 
     });
 
@@ -87,7 +89,7 @@ public class Lock extends Base {
       runnable.run();
     } catch (RuntimeException e) {
       if (e.getMessage().contains("No such file or directory")) {
-        System.out.println("There is no deploy lock");
+        log.info("There is no deploy lock");
       } else {
         throw e;
       }

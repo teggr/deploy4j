@@ -48,10 +48,10 @@ public class Deploy extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      System.out.println("Ensure Docker is installed...");
+      log.info("Ensure Docker is installed...");
       server.bootstrap(deployContext);
 
-      System.out.println("Evaluate and push env files...");
+      log.info("Evaluate and push env files...");
       env.envify(deployContext, false, null);
       env.push(deployContext);
 
@@ -70,26 +70,26 @@ public class Deploy extends Base {
    */
   public void deploy(DeployContext deployContext, boolean skipPush) {
 
-    System.out.println("Log into image registry...");
+    log.info("Log into image registry...");
     registry.login(deployContext);
 
     // TODO: we don't build so alwyays pull?
 //    if (!skipPush) {
-      System.out.println("Pull app image...");
+    log.info("Pull app image...");
       build.pull(deployContext);
 //    }
 
     lockManager.withLock(deployContext, () -> {
 
-      System.out.println("Ensure Traefik is running...");
+      log.info("Ensure Traefik is running...");
       traefik.boot(deployContext);
 
-      System.out.println("Detect stale containers...");
+      log.info("Detect stale containers...");
       app.staleContainers(deployContext);
 
       app.boot(deployContext);
 
-      System.out.println("Prune old containers and images...");
+      log.info("Prune old containers and images...");
       prune.all(deployContext);
 
     });
@@ -104,13 +104,13 @@ public class Deploy extends Base {
   public void redeploy(DeployContext deployContext, boolean skipPush) {
 
     if (skipPush) {
-      System.out.println("Pull app image...");
+      log.info("Pull app image...");
       build.pull(deployContext);
     }
 
     lockManager.withLock(deployContext, () -> {
 
-      System.out.println("Detect stale containers...");
+      log.info("Detect stale containers...");
       app.staleContainers(deployContext);
 
       app.boot(deployContext);
@@ -222,9 +222,9 @@ public class Deploy extends Base {
 
     on(deployContext.hosts(), host -> {
 
-      System.out.println("Testing connectivity to " + host.hostName() + "...");
+      log.info("Testing connectivity to " + host.hostName() + "...");
       host.execute( server.test() );
-      System.out.println("Connected to " + host.hostName() + " successfully.");
+      log.info("Connected to " + host.hostName() + " successfully.");
 
     });
 
