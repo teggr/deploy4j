@@ -99,10 +99,25 @@ The project is distributed via JitPack. Add the JitPack repository and configure
 ```xml
 <pluginRepositories>
     <pluginRepository>
+        <id>central</id>
+        <url>https://repo.maven.apache.org/maven2</url>
+    </pluginRepository>
+    <pluginRepository>
         <id>jitpack.io</id>
         <url>https://jitpack.io</url>
     </pluginRepository>
 </pluginRepositories>
+
+<repositories>
+    <repository>
+        <id>central</id>
+        <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
 
 <build>
     <plugin>
