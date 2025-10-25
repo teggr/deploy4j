@@ -94,6 +94,8 @@ deploy4j deploy --version 0.0.2
 
 ### Configure
 
+The project is distributed via JitPack. Add the JitPack repository and configure the plugin:
+
 ```xml
 <pluginRepositories>
     <pluginRepository>
@@ -110,6 +112,15 @@ deploy4j deploy --version 0.0.2
     </plugin>
 </build>
 ```
+
+#### JitPack Configuration
+
+The project includes a `jitpack.yml` configuration file that ensures proper version resolution during JitPack builds. When JitPack builds the project from a commit, tag, or branch, it automatically replaces all internal version references (currently `0.0.2-SNAPSHOT`) with the actual JitPack version. This ensures that inter-module dependencies resolve correctly.
+
+You can use any JitPack version format:
+- Commit hash: `com.github.teggr.deploy4j:deploy4j-maven-plugin:abc123`
+- Branch: `com.github.teggr.deploy4j:deploy4j-maven-plugin:main-SNAPSHOT`
+- Tag: `com.github.teggr.deploy4j:deploy4j-maven-plugin:v1.0.0`
 
 ### Run
 
