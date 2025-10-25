@@ -117,11 +117,11 @@ deploy4j deploy --version 0.0.2
 mvn verify deploy4j:deploy
 
 [INFO] ---------------------< dev.deploy4j:deploy4j-demo >---------------------
-[INFO] Building deploy4j-demo main-SNAPSHOT
+[INFO] Building deploy4j-demo 0.0.2-SNAPSHOT
 [INFO]   from pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
-[INFO] --- deploy4j:main-SNAPSHOT:deploy (default-cli) @ deploy4j-demo ---
+[INFO] --- deploy4j:0.0.2-SNAPSHOT:deploy (default-cli) @ deploy4j-demo ---
 ```
 
 ```shell

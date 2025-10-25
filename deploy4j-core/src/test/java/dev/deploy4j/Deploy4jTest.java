@@ -42,7 +42,7 @@ class Deploy4jTest {
 //    Configuration config = new Configuration(
 //      rawConfig,
 //      "local",
-//      "main-SNAPSHOT"
+//      "0.0.2-SNAPSHOT"
 //    );
 //
 //    // TODO: CLI OPTIONS TO INFLUENCE THESE

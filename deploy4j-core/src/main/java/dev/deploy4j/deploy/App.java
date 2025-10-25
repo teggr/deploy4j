@@ -92,7 +92,7 @@ public class App extends Base {
         for (Role role : deployContext.rolesOn(host.hostName())) {
 
           host.execute(audit.record("Started app version " + deployContext.config().version()));
-          host.execute(apps.app(role, host.hostName()).start());
+          host.execute(apps.app(role, host.hostName()).start(), false);
 
         }
 
@@ -114,7 +114,7 @@ public class App extends Base {
         for (Role role : deployContext.rolesOn(host.hostName())) {
 
           host.execute(audit.record("Stopped app"));
-          host.execute(apps.app(role, host.hostName()).stop());
+          host.execute(apps.app(role, host.hostName()).stop(), false);
 
         }
 

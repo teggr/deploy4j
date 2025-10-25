@@ -57,7 +57,7 @@ public class Traefik extends Base {
 
         host.execute(audit.record("Rebooted traefik"));
         host.execute(registry.login());
-        host.execute(traefik.stop());
+        host.execute(traefik.stop(), false);
         host.execute(traefik.removeContainer());
         host.execute(traefik.run());
 
@@ -96,7 +96,7 @@ public class Traefik extends Base {
       on(deployContext.traefikHosts(), host -> {
 
         host.execute(audit.record("Stopped traefik"));
-        host.execute(traefik.stop());
+        host.execute(traefik.stop(), false);
 
 
       });

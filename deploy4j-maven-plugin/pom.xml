@@ -6,10 +6,9 @@
     <parent>
         <groupId>dev.deploy4j</groupId>
         <artifactId>deploy4j-parent</artifactId>
-        <version>main-SNAPSHOT</version>
+        <version>0.0.2-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.github.teggr.deploy4j</groupId>
     <artifactId>deploy4j-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
 

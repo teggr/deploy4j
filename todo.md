@@ -3,7 +3,6 @@
 * unit tests
 * need to remove config() dependency
 * configuration validation
-* address the execute throws exception to ensure failures are caught properly
 
 # Notes
 

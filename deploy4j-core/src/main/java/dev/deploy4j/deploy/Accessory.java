@@ -199,7 +199,7 @@ public class Accessory extends Base {
         on(hosts, host -> {
 
           host.execute(audit.record("Stopped " + name + " accessory"));
-          host.execute(accessory.stop());
+          host.execute(accessory.stop(), false);
 
         });
 

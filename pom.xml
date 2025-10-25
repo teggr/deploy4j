@@ -6,7 +6,7 @@
 
     <groupId>dev.deploy4j</groupId>
     <artifactId>deploy4j-parent</artifactId>
-    <version>main-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
         <module>deploy4j-ext</module>
