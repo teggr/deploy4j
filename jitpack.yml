@@ -1,0 +1,5 @@
+jdk:
+  - openjdk21
+
+before_install:
+  - find . -name "pom.xml" | xargs sed -i "s/0.0.2-SNAPSHOT/${VERSION}/g"
