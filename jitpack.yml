@@ -3,3 +3,4 @@ jdk:
 
 before_install:
   - find . -name "pom.xml" | xargs sed -i "s/main-SNAPSHOT/${VERSION}/g"
+  - find . -name "pom.xml" | xargs sed -i 's|<groupId>dev.deploy4j</groupId>|<groupId>com.github.teggr.deploy4j</groupId>|g'

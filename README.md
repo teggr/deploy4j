@@ -42,7 +42,7 @@ Install via JBang:
 `deploy4j` is currently available via JitPack.
 
 ```shell
-jbang app install --name deploy4j --repos jitpack=https://jitpack.io com.github.teggr.deploy4j:deploy4j-cli:-SNAPSHOT
+jbang app install --name deploy4j --repos jitpack=https://jitpack.io com.github.teggr.deploy4j:deploy4j-cli:main-SNAPSHOT
 ```
 
 ```shell
