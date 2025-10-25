@@ -115,7 +115,7 @@ The project is distributed via JitPack. Add the JitPack repository and configure
 
 #### JitPack Configuration
 
-The project includes a `jitpack.yml` configuration file that ensures proper version resolution during JitPack builds. When JitPack builds the project from a commit, tag, or branch, it automatically replaces all internal version references (currently `0.0.2-SNAPSHOT`) with the actual JitPack version. This ensures that inter-module dependencies resolve correctly.
+The project includes a `jitpack.yml` configuration file that ensures proper version resolution during JitPack builds. When JitPack builds the project from a commit, tag, or branch, it automatically replaces all internal version references (currently `main-SNAPSHOT`) with the actual JitPack version. This ensures that inter-module dependencies resolve correctly.
 
 You can use any JitPack version format:
 - Commit hash: `com.github.teggr.deploy4j:deploy4j-maven-plugin:abc123`
