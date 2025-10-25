@@ -1,5 +1,7 @@
 # deploy4j
 
+[![](https://jitpack.io/v/teggr/deploy4j.svg)](https://jitpack.io/#teggr/deploy4j/deploy)
+
 ## What?
 
 A Java port of the [Kamal](https://kamal-deploy.org/) [v1](https://kamal-deploy.org/v1/docs/installation/) project for deploying web applications to self hosted VMs.
@@ -18,7 +20,7 @@ Some advantages:
 
 ## How?
 
-See https://github.com/teggr/deploy4j when it's available for further documentation.
+See [Kamal v1](https://kamal-deploy.org/v1/docs/installation/) for further documentation whilst deploy4j documentation is being put together.
 
 * Connects to server
 * Installs docker
@@ -27,11 +29,13 @@ See https://github.com/teggr/deploy4j when it's available for further documentat
 * Starts traefik proxy
 * Starts the service
 
+## Pre-reqs
+
+Requires Java 21.
+
 ## Command Line
 
 [View all commands on Kamal docs for now](https://kamal-deploy.org/v1/docs/commands/view-all-commands/).
-
-Requires Java 21.
 
 Install via JBang:
 
@@ -71,6 +75,21 @@ Commands:
   version    Show Deploy4j version
 ```
 
+### Typical Usage
+
+```shell
+# initialise the project for the first time
+deploy4j init
+
+# edit config/deploy.yml and .env
+
+# setup the servers and deploy the app for the first time
+deploy4j setup 0.0.1
+
+# deploy a new version of the app
+deploy4j deploy --version 0.0.2
+```
+
 ## Maven Plugin
 
 ### Configure
@@ -102,7 +121,22 @@ mvn verify deploy4j:deploy
 [INFO]   from pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
-[INFO] --- deploy4j:1.0-SNAPSHOT:deploy (default-cli) @ deploy4j-demo ---
+[INFO] --- deploy4j:0.0.1-SNAPSHOT:deploy (default-cli) @ deploy4j-demo ---
+```
+
+```shell
+# add the plugin to your build
+
+# initialise the project for the first time
+mvn deploy4j:init
+
+# edit config/deploy.yml and .env
+
+# setup the servers and deploy the app for the first time
+mvn deploy4j:setup
+
+# deploy a new version of the app
+mvn deploy4j:deploy
 ```
 
 ## Testing

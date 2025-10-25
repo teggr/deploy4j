@@ -21,8 +21,6 @@ public class SetupMojo extends AbstractMojo {
   @Parameter(defaultValue = "${project}", required = true, readonly = true)
   MavenProject project;
 
-  // TODO: start with the existing config files
-
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
 
