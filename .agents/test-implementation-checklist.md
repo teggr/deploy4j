@@ -73,14 +73,14 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 
 ### Other P1 Classes
 - ⬜ `Accessory` (deploy) - Accessory deployment logic
-- ⬜ `Audit` - Audit operations
-- ⬜ `Base` - Base deployment operations
+- ✅ `Audit` - Audit operations (NEWLY ADDED)
+- ✅ `Base` - Base deployment operations (NEWLY ADDED)
 - ⬜ `DeployApplicationContext` - Application context
 - ⬜ `DeployContext` - Deployment context
 - ⬜ `Env` (deploy) - Environment deployment
 - ⬜ `Environment` - Environment management
-- ⬜ `Lock` - Lock operations
-- ⬜ `Registry` (deploy) - Registry operations
+- ✅ `Lock` - Lock operations (NEWLY ADDED)
+- ✅ `Registry` (deploy) - Registry operations (NEWLY ADDED)
 - ⬜ `Server` - Server management
 - ⬜ `Traefik` (deploy) - Traefik deployment
 - ✅ `PlainValueOrSecretKey` - Secret handling
@@ -89,15 +89,15 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ✅ `Barrier` - Health check barrier
 - ✅ `Poller` - Health check poller
 
-**Phase 2 Progress:** 21/41 classes
+**Phase 2 Progress:** 25/41 classes (61%)
 
 ---
 
 ## Phase 3: Medium Priority (P2) - Weeks 5-6
 
 ### Remaining Deploy Operations
-- ⬜ `Prune` - Cleanup operations
-- ⬜ `Version` - Version handling
+- ✅ `Prune` - Cleanup operations (NEWLY ADDED)
+- ✅ `Version` - Version handling (NEWLY ADDED)
 - ✅ `Tags` - Tag management
 - ⬜ `Specifics` - Specific configurations
 - ⬜ `LockContext` - Lock context
@@ -137,7 +137,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 ### Ext Module P2 Classes
 - ✅ `Curl` - Curl command wrapper
 
-**Phase 3 Progress:** 20/29 classes (69%)
+**Phase 3 Progress:** 22/29 classes (76%)
 
 ---
 
@@ -157,10 +157,10 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 | Phase | Total Classes | Completed | In Progress | Not Started | Progress % |
 |-------|--------------|-----------|-------------|-------------|------------|
 | Phase 1 (P0) | 8 | 7 | 0 | 1 | 88% |
-| Phase 2 (P1) | 41 | 21 | 0 | 20 | 51% |
-| Phase 3 (P2) | 29 | 20 | 0 | 9 | 69% |
+| Phase 2 (P1) | 41 | 25 | 0 | 16 | 61% |
+| Phase 3 (P2) | 29 | 22 | 0 | 7 | 76% |
 | Phase 4 (P3) | 3 | 3 | 0 | 0 | 100% |
-| **Total** | **81** | **51** | **0** | **30** | **63%** |
+| **Total** | **81** | **57** | **0** | **24** | **70%** |
 
 *Note: This excludes the 10 classes that already have tests*
 
