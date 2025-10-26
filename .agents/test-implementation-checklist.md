@@ -19,7 +19,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ✅ `Cmd` - Command builder (verify completeness of existing tests)
 
 ### Core Configuration
-- ⬜ `Configuration` - Main configuration class (complex, break into test suites)
+- ✅ `Configuration` - Main configuration class (complex, break into test suites)
 - ⬜ `DeployConfigYamlReader` - YAML config reader (expand existing tests)
 
 ### Command Generation
@@ -29,7 +29,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 ### SSH Operations
 - ⬜ `SSHTemplate` - SSH execution template (use mocks or TestContainers)
 
-**Phase 1 Progress:** 5/8 classes
+**Phase 1 Progress:** 6/8 classes
 
 ---
 
@@ -59,7 +59,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ✅ `ERB` - Template processing
 
 ### Host Commands
-- ⬜ `AppHostCommands` - Application-specific commands
+- ✅ `AppHostCommands` - Application-specific commands
 - ✅ `BuilderHostCommands` - Builder commands
 
 ### SSH Management
@@ -89,7 +89,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ✅ `Barrier` - Health check barrier
 - ✅ `Poller` - Health check poller
 
-**Phase 2 Progress:** 19/41 classes
+**Phase 2 Progress:** 20/41 classes
 
 ---
 
@@ -156,11 +156,11 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 
 | Phase | Total Classes | Completed | In Progress | Not Started | Progress % |
 |-------|--------------|-----------|-------------|-------------|------------|
-| Phase 1 (P0) | 8 | 5 | 0 | 3 | 63% |
-| Phase 2 (P1) | 41 | 19 | 0 | 22 | 46% |
+| Phase 1 (P0) | 8 | 6 | 0 | 2 | 75% |
+| Phase 2 (P1) | 41 | 20 | 0 | 21 | 49% |
 | Phase 3 (P2) | 29 | 4 | 0 | 25 | 14% |
 | Phase 4 (P3) | 3 | 3 | 0 | 0 | 100% |
-| **Total** | **81** | **31** | **0** | **50** | **38%** |
+| **Total** | **81** | **33** | **0** | **48** | **41%** |
 
 *Note: This excludes the 10 classes that already have tests*
 
