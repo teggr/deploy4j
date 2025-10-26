@@ -47,8 +47,8 @@ class PruneTest {
     }
 
     @Test
-    @DisplayName("should call lockManager for all operation")
-    void shouldCallLockManagerForAllOperation() {
+    @DisplayName("should call lockManager for all operations")
+    void shouldCallLockManagerForAllOperations() {
         // Act
         prune.all(deployContext);
 
@@ -57,8 +57,8 @@ class PruneTest {
     }
 
     @Test
-    @DisplayName("should call lockManager for images operation")
-    void shouldCallLockManagerForImagesOperation() {
+    @DisplayName("should call lockManager for images operations")
+    void shouldCallLockManagerForImagesOperations() {
         // Act
         prune.images(deployContext);
 
@@ -67,8 +67,8 @@ class PruneTest {
     }
 
     @Test
-    @DisplayName("should call lockManager for containers operation")
-    void shouldCallLockManagerForContainersOperation() {
+    @DisplayName("should call lockManager for containers operations")
+    void shouldCallLockManagerForContainersOperations() {
         // Arrange
         when(deployContext.config()).thenReturn(configuration);
         when(configuration.retainContainer()).thenReturn(5);
