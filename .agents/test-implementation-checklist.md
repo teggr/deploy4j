@@ -50,7 +50,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ⬜ `Boot` (configuration) - Boot configuration
 - ⬜ `Builder` - Builder configuration
 - ⬜ `Env` (configuration) - Environment configuration
-- ⬜ `Logging` - Logging configuration
+- ✅ `Logging` - Logging configuration
 - ⬜ `Accessory` (configuration) - Accessory configuration
 
 ### Environment & Files
@@ -89,7 +89,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ✅ `Barrier` - Health check barrier
 - ✅ `Poller` - Health check poller
 
-**Phase 2 Progress:** 12/41 classes
+**Phase 2 Progress:** 13/41 classes
 
 ---
 
@@ -157,10 +157,10 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 | Phase | Total Classes | Completed | In Progress | Not Started | Progress % |
 |-------|--------------|-----------|-------------|-------------|------------|
 | Phase 1 (P0) | 8 | 5 | 0 | 3 | 63% |
-| Phase 2 (P1) | 41 | 12 | 0 | 29 | 29% |
+| Phase 2 (P1) | 41 | 13 | 0 | 28 | 32% |
 | Phase 3 (P2) | 29 | 4 | 0 | 25 | 14% |
 | Phase 4 (P3) | 3 | 3 | 0 | 0 | 100% |
-| **Total** | **81** | **24** | **0** | **57** | **30%** |
+| **Total** | **81** | **25** | **0** | **56** | **31%** |
 
 *Note: This excludes the 10 classes that already have tests*
 
