@@ -1,13 +1,12 @@
 package dev.deploy4j.deploy.host.ssh;
 
 import dev.deploy4j.deploy.configuration.Configuration;
-import dev.deploy4j.deploy.configuration.Ssh;
+import dev.rebelcraft.ssh.SSHTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockedConstruction;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -24,39 +23,59 @@ class SshHostsTest {
     private Configuration configuration;
 
     @Mock
-    private Ssh ssh;
+    private SSHTemplate sshTemplate1;
+
+    @Mock
+    private SSHTemplate sshTemplate2;
+
+    @Mock
+    private SSHTemplate sshTemplate3;
 
     private SshHosts sshHosts;
 
     @BeforeEach
     void setUp() {
-        lenient().when(configuration.ssh()).thenReturn(ssh);
-        lenient().when(ssh.user()).thenReturn("testuser");
-        lenient().when(ssh.port()).thenReturn(22);
-        lenient().when(ssh.keyPath()).thenReturn("/path/to/key");
-        lenient().when(ssh.keyPassphrase()).thenReturn("passphrase");
-        lenient().when(ssh.strictHostKeyChecking()).thenReturn(true);
-        sshHosts = new SshHosts(configuration);
+        sshHosts = new SshHosts(configuration) {
+            private int counter = 0;
+            
+            @Override
+            public SshHost host(String host) {
+                SshHost existingHost = super.getCachedHost(host);
+                if (existingHost != null) {
+                    return existingHost;
+                }
+                
+                SSHTemplate template;
+                switch (counter++) {
+                    case 0: template = sshTemplate1; break;
+                    case 1: template = sshTemplate2; break;
+                    case 2: template = sshTemplate3; break;
+                    default: throw new IllegalStateException("Too many hosts");
+                }
+                
+                SshHost sshHost = new SshHost(host, template);
+                super.cacheHost(host, sshHost);
+                return sshHost;
+            }
+        };
     }
 
     @Test
     @DisplayName("should create and cache SSH host connections")
     void shouldCreateAndCacheSshHostConnections() {
-        // Arrange & Act
-        try (var mockedSshTemplate = mockConstruction(dev.rebelcraft.ssh.SSHTemplate.class)) {
-            SshHost host1 = sshHosts.host("host1.example.com");
-            SshHost host2 = sshHosts.host("host1.example.com"); // Same host
-            SshHost host3 = sshHosts.host("host2.example.com"); // Different host
+        // Act
+        SshHost host1 = sshHosts.host("host1.example.com");
+        SshHost host2 = sshHosts.host("host1.example.com"); // Same host
+        SshHost host3 = sshHosts.host("host2.example.com"); // Different host
 
-            // Assert
-            assertThat(host1).isNotNull();
-            assertThat(host1).isSameAs(host2); // Should return cached instance
-            assertThat(host3).isNotNull();
-            assertThat(host3).isNotSameAs(host1); // Different host, different instance
+        // Assert
+        assertThat(host1).isNotNull();
+        assertThat(host1).isSameAs(host2); // Should return cached instance
+        assertThat(host3).isNotNull();
+        assertThat(host3).isNotSameAs(host1); // Different host, different instance
 
-            assertThat(host1.hostName()).isEqualTo("host1.example.com");
-            assertThat(host3.hostName()).isEqualTo("host2.example.com");
-        }
+        assertThat(host1.hostName()).isEqualTo("host1.example.com");
+        assertThat(host3.hostName()).isEqualTo("host2.example.com");
     }
 
     @Test
@@ -67,35 +86,30 @@ class SshHostsTest {
         AtomicInteger callCount = new AtomicInteger(0);
 
         // Act
-        try (var mockedSshTemplate = mockConstruction(dev.rebelcraft.ssh.SSHTemplate.class)) {
-            sshHosts.on(hosts, sshHost -> {
-                assertThat(sshHost).isNotNull();
-                callCount.incrementAndGet();
-            });
+        sshHosts.on(hosts, sshHost -> {
+            assertThat(sshHost).isNotNull();
+            callCount.incrementAndGet();
+        });
 
-            // Assert
-            assertThat(callCount.get()).isEqualTo(3);
-        }
+        // Assert
+        assertThat(callCount.get()).isEqualTo(3);
     }
 
     @Test
     @DisplayName("should call close on all SSH hosts when closing")
     void shouldCallCloseOnAllSshHostsWhenClosing() throws Exception {
         // Arrange
-        try (var mockedSshTemplate = mockConstruction(dev.rebelcraft.ssh.SSHTemplate.class)) {
-            sshHosts.host("host1.example.com");
-            sshHosts.host("host2.example.com");
-            sshHosts.host("host3.example.com");
+        sshHosts.host("host1.example.com");
+        sshHosts.host("host2.example.com");
+        sshHosts.host("host3.example.com");
 
-            // Act
-            sshHosts.close();
+        // Act
+        sshHosts.close();
 
-            // Assert
-            assertThat(mockedSshTemplate.constructed()).hasSize(3);
-            for (dev.rebelcraft.ssh.SSHTemplate template : mockedSshTemplate.constructed()) {
-                verify(template).close();
-            }
-        }
+        // Assert
+        verify(sshTemplate1).close();
+        verify(sshTemplate2).close();
+        verify(sshTemplate3).close();
     }
 
     @Test

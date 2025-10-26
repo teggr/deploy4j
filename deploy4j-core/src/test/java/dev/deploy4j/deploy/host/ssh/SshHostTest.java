@@ -1,6 +1,5 @@
 package dev.deploy4j.deploy.host.ssh;
 
-import dev.deploy4j.deploy.configuration.Ssh;
 import dev.rebelcraft.cmd.Cmd;
 import dev.rebelcraft.ssh.ExecResult;
 import dev.rebelcraft.ssh.SSHTemplate;
@@ -9,45 +8,35 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockedConstruction;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SshHost")
 class SshHostTest {
 
     @Mock
-    private Ssh ssh;
+    private SSHTemplate sshTemplate;
 
     private SshHost sshHost;
 
     @BeforeEach
     void setUp() {
-        when(ssh.user()).thenReturn("testuser");
-        when(ssh.port()).thenReturn(22);
-        when(ssh.keyPath()).thenReturn("/path/to/key");
-        when(ssh.keyPassphrase()).thenReturn("passphrase");
-        when(ssh.strictHostKeyChecking()).thenReturn(true);
+        sshHost = new SshHost("test-host", sshTemplate);
     }
 
     @Test
     @DisplayName("should return host name")
     void shouldReturnHostName() {
-        // Arrange
-        try (MockedConstruction<SSHTemplate> mocked = mockConstruction(SSHTemplate.class)) {
-            sshHost = new SshHost("test-host", ssh);
+        // Act
+        String hostName = sshHost.hostName();
 
-            // Act
-            String hostName = sshHost.hostName();
-
-            // Assert
-            assertThat(hostName).isEqualTo("test-host");
-        }
+        // Assert
+        assertThat(hostName).isEqualTo("test-host");
     }
 
     @Test
@@ -55,18 +44,14 @@ class SshHostTest {
     void shouldExecuteCommandSuccessfully() {
         // Arrange
         ExecResult successResult = new ExecResult(0, "output", "");
+        when(sshTemplate.exec(anyString())).thenReturn(successResult);
+        Cmd cmd = Cmd.cmd("echo", "hello");
 
-        try (MockedConstruction<SSHTemplate> mocked = mockConstruction(SSHTemplate.class,
-                (mock, context) -> when(mock.exec(anyString())).thenReturn(successResult))) {
-            sshHost = new SshHost("test-host", ssh);
-            Cmd cmd = Cmd.cmd("echo", "hello");
+        // Act
+        boolean result = sshHost.execute(cmd);
 
-            // Act
-            boolean result = sshHost.execute(cmd);
-
-            // Assert
-            assertThat(result).isTrue();
-        }
+        // Assert
+        assertThat(result).isTrue();
     }
 
     @Test
@@ -74,17 +59,13 @@ class SshHostTest {
     void shouldThrowExceptionOnNonZeroExitWithRaiseFlag() {
         // Arrange
         ExecResult failureResult = new ExecResult(1, "", "error message");
+        when(sshTemplate.exec(anyString())).thenReturn(failureResult);
+        Cmd cmd = Cmd.cmd("failing-command");
 
-        try (MockedConstruction<SSHTemplate> mocked = mockConstruction(SSHTemplate.class,
-                (mock, context) -> when(mock.exec(anyString())).thenReturn(failureResult))) {
-            sshHost = new SshHost("test-host", ssh);
-            Cmd cmd = Cmd.cmd("failing-command");
-
-            // Act & Assert
-            assertThatThrownBy(() -> sshHost.execute(cmd, true))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Command failed on host test-host");
-        }
+        // Act & Assert
+        assertThatThrownBy(() -> sshHost.execute(cmd, true))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("Command failed on host test-host");
     }
 
     @Test
@@ -92,18 +73,14 @@ class SshHostTest {
     void shouldNotThrowExceptionOnNonZeroExitWithoutRaiseFlag() {
         // Arrange
         ExecResult failureResult = new ExecResult(1, "", "error message");
+        when(sshTemplate.exec(anyString())).thenReturn(failureResult);
+        Cmd cmd = Cmd.cmd("failing-command");
 
-        try (MockedConstruction<SSHTemplate> mocked = mockConstruction(SSHTemplate.class,
-                (mock, context) -> when(mock.exec(anyString())).thenReturn(failureResult))) {
-            sshHost = new SshHost("test-host", ssh);
-            Cmd cmd = Cmd.cmd("failing-command");
+        // Act
+        boolean result = sshHost.execute(cmd, false);
 
-            // Act
-            boolean result = sshHost.execute(cmd, false);
-
-            // Assert
-            assertThat(result).isFalse();
-        }
+        // Assert
+        assertThat(result).isFalse();
     }
 
     @Test
@@ -111,18 +88,14 @@ class SshHostTest {
     void shouldCaptureCommandOutputSuccessfully() {
         // Arrange
         ExecResult result = new ExecResult(0, "captured output", "");
+        when(sshTemplate.exec(anyString())).thenReturn(result);
+        Cmd cmd = Cmd.cmd("ls");
 
-        try (MockedConstruction<SSHTemplate> mocked = mockConstruction(SSHTemplate.class,
-                (mock, context) -> when(mock.exec(anyString())).thenReturn(result))) {
-            sshHost = new SshHost("test-host", ssh);
-            Cmd cmd = Cmd.cmd("ls");
+        // Act
+        String output = sshHost.capture(cmd);
 
-            // Act
-            String output = sshHost.capture(cmd);
-
-            // Assert
-            assertThat(output).isEqualTo("captured output");
-        }
+        // Assert
+        assertThat(output).isEqualTo("captured output");
     }
 
     @Test
@@ -130,17 +103,13 @@ class SshHostTest {
     void shouldCaptureStringCommandOutputSuccessfully() {
         // Arrange
         ExecResult result = new ExecResult(0, "string output", "");
+        when(sshTemplate.exec(anyString())).thenReturn(result);
 
-        try (MockedConstruction<SSHTemplate> mocked = mockConstruction(SSHTemplate.class,
-                (mock, context) -> when(mock.exec(anyString())).thenReturn(result))) {
-            sshHost = new SshHost("test-host", ssh);
+        // Act
+        String output = sshHost.capture("echo test");
 
-            // Act
-            String output = sshHost.capture("echo test");
-
-            // Assert
-            assertThat(output).isEqualTo("string output");
-        }
+        // Assert
+        assertThat(output).isEqualTo("string output");
     }
 
     @Test
@@ -148,17 +117,13 @@ class SshHostTest {
     void shouldThrowExceptionWhenCaptureFailsWithRaiseFlag() {
         // Arrange
         ExecResult failureResult = new ExecResult(1, "", "error");
+        when(sshTemplate.exec(anyString())).thenReturn(failureResult);
+        Cmd cmd = Cmd.cmd("failing-command");
 
-        try (MockedConstruction<SSHTemplate> mocked = mockConstruction(SSHTemplate.class,
-                (mock, context) -> when(mock.exec(anyString())).thenReturn(failureResult))) {
-            sshHost = new SshHost("test-host", ssh);
-            Cmd cmd = Cmd.cmd("failing-command");
-
-            // Act & Assert
-            assertThatThrownBy(() -> sshHost.capture(cmd, true))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Command failed on host test-host");
-        }
+        // Act & Assert
+        assertThatThrownBy(() -> sshHost.capture(cmd, true))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("Command failed on host test-host");
     }
 
     @Test
@@ -166,17 +131,13 @@ class SshHostTest {
     void shouldNotThrowExceptionWhenCaptureFailsWithoutRaiseFlag() {
         // Arrange
         ExecResult failureResult = new ExecResult(1, "", "error");
+        when(sshTemplate.exec(anyString())).thenReturn(failureResult);
+        Cmd cmd = Cmd.cmd("failing-command");
 
-        try (MockedConstruction<SSHTemplate> mocked = mockConstruction(SSHTemplate.class,
-                (mock, context) -> when(mock.exec(anyString())).thenReturn(failureResult))) {
-            sshHost = new SshHost("test-host", ssh);
-            Cmd cmd = Cmd.cmd("failing-command");
+        // Act
+        String output = sshHost.capture(cmd, false);
 
-            // Act
-            String output = sshHost.capture(cmd, false);
-
-            // Assert
-            assertThat(output).isEmpty();
-        }
+        // Assert
+        assertThat(output).isEmpty();
     }
 }

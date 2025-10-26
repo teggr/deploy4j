@@ -26,6 +26,15 @@ public class SshHosts implements AutoCloseable {
     return sshHost;
   }
 
+  // Package-private helper methods for testing
+  SshHost getCachedHost(String host) {
+    return sshHosts.get(host);
+  }
+
+  void cacheHost(String host, SshHost sshHost) {
+    sshHosts.put(host, sshHost);
+  }
+
   public void on(List<String> hosts, Consumer<SshHost> block) {
 
     hosts.stream()
