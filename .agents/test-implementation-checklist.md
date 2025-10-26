@@ -43,7 +43,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 
 ### Configuration Classes
 - ⬜ `Role` - Role management (complex)
-- ⬜ `HealthCheck` - Health check configuration
+- ✅ `HealthCheck` - Health check configuration
 - ⬜ `Registry` (configuration) - Registry configuration
 - ⬜ `Traefik` (configuration) - Traefik configuration
 - ⬜ `Ssh` (configuration) - SSH configuration
@@ -60,11 +60,11 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 
 ### Host Commands
 - ⬜ `AppHostCommands` - Application-specific commands
-- ⬜ `BuilderHostCommands` - Builder commands
+- ✅ `BuilderHostCommands` - Builder commands
 
 ### SSH Management
-- ⬜ `SshHost` - SSH host wrapper
-- ⬜ `SshHosts` - Multiple SSH host management
+- ✅ `SshHost` - SSH host wrapper
+- ✅ `SshHosts` - Multiple SSH host management
 
 ### Ext Module Priority Classes
 - ✅ `FluentCmd` - Fluent command API
@@ -87,9 +87,9 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ✅ `Utils` - General utilities
 - ⬜ `Initializer` - Application initializer
 - ✅ `Barrier` - Health check barrier
-- ⬜ `Poller` - Health check poller
+- ✅ `Poller` - Health check poller
 
-**Phase 2 Progress:** 8/41 classes
+**Phase 2 Progress:** 12/41 classes
 
 ---
 
@@ -157,10 +157,10 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 | Phase | Total Classes | Completed | In Progress | Not Started | Progress % |
 |-------|--------------|-----------|-------------|-------------|------------|
 | Phase 1 (P0) | 8 | 5 | 0 | 3 | 63% |
-| Phase 2 (P1) | 41 | 8 | 0 | 33 | 20% |
+| Phase 2 (P1) | 41 | 12 | 0 | 29 | 29% |
 | Phase 3 (P2) | 29 | 4 | 0 | 25 | 14% |
 | Phase 4 (P3) | 3 | 3 | 0 | 0 | 100% |
-| **Total** | **81** | **20** | **0** | **61** | **25%** |
+| **Total** | **81** | **24** | **0** | **57** | **30%** |
 
 *Note: This excludes the 10 classes that already have tests*
 
