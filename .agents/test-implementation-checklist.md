@@ -20,7 +20,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 
 ### Core Configuration
 - ✅ `Configuration` - Main configuration class (complex, break into test suites)
-- ⬜ `DeployConfigYamlReader` - YAML config reader (expand existing tests)
+- ✅ `DeployConfigYamlReader` - YAML config reader (expand existing tests)
 
 ### Command Generation
 - ✅ `DockerHostCommands` - Docker command generation
@@ -29,7 +29,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 ### SSH Operations
 - ⬜ `SSHTemplate` - SSH execution template (use mocks or TestContainers)
 
-**Phase 1 Progress:** 6/8 classes
+**Phase 1 Progress:** 7/8 classes
 
 ---
 
@@ -106,16 +106,16 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ⬜ `ConfigureArgs` - Configuration arguments
 - ✅ `Volume` - Volume configuration
 - ✅ `Tag` (env) - Environment tag
-- ⬜ `AccessoryConfig` - Accessory raw config
-- ⬜ `BootConfig` - Boot raw config
-- ⬜ `CustomRoleConfig` - Custom role raw config
+- ✅ `AccessoryConfig` - Accessory raw config
+- ✅ `BootConfig` - Boot raw config
+- ✅ `CustomRoleConfig` - Custom role raw config
 - ✅ `HealthCheckConfig` - Health check raw config
-- ⬜ `LoggingConfig` - Logging raw config
-- ⬜ `RegistryConfig` - Registry raw config
-- ⬜ `RoleConfig` - Role raw config
-- ⬜ `ServerConfig` - Server raw config
-- ⬜ `SshConfig` - SSH raw config
-- ⬜ `TraefikConfig` - Traefik raw config
+- ✅ `LoggingConfig` - Logging raw config
+- ✅ `RegistryConfig` - Registry raw config
+- ✅ `RoleConfig` - Role raw config
+- ✅ `ServerConfig` - Server raw config
+- ✅ `SshConfig` - SSH raw config
+- ✅ `TraefikConfig` - Traefik raw config
 
 ### Host Command Implementations
 - ⬜ `AccessoryHostCommands` - Accessory commands
@@ -137,7 +137,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 ### Ext Module P2 Classes
 - ✅ `Curl` - Curl command wrapper
 
-**Phase 3 Progress:** 5/29 classes
+**Phase 3 Progress:** 14/29 classes
 
 ---
 
@@ -156,11 +156,11 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 
 | Phase | Total Classes | Completed | In Progress | Not Started | Progress % |
 |-------|--------------|-----------|-------------|-------------|------------|
-| Phase 1 (P0) | 8 | 6 | 0 | 2 | 75% |
+| Phase 1 (P0) | 8 | 7 | 0 | 1 | 88% |
 | Phase 2 (P1) | 41 | 21 | 0 | 20 | 51% |
-| Phase 3 (P2) | 29 | 5 | 0 | 24 | 17% |
+| Phase 3 (P2) | 29 | 14 | 0 | 15 | 48% |
 | Phase 4 (P3) | 3 | 3 | 0 | 0 | 100% |
-| **Total** | **81** | **35** | **0** | **46** | **43%** |
+| **Total** | **81** | **45** | **0** | **36** | **56%** |
 
 *Note: This excludes the 10 classes that already have tests*
 
