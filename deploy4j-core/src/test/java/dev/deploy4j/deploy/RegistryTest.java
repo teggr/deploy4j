@@ -1,0 +1,104 @@
+package dev.deploy4j.deploy;
+
+import dev.deploy4j.deploy.host.commands.RegistryHostCommands;
+import dev.deploy4j.deploy.host.ssh.SshHosts;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("Registry")
+class RegistryTest {
+
+    @Mock
+    private SshHosts sshHosts;
+
+    @Mock
+    private RegistryHostCommands registryHostCommands;
+
+    @Mock
+    private DeployContext deployContext;
+
+    private Registry registry;
+
+    @BeforeEach
+    void setUp() {
+        registry = new Registry(sshHosts, registryHostCommands);
+    }
+
+    @Test
+    @DisplayName("should execute login on correct hosts")
+    void shouldExecuteLoginOnCorrectHosts() {
+        // Arrange
+        List<String> hosts = Arrays.asList("host1", "host2");
+        when(deployContext.hosts()).thenReturn(hosts);
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<String>> hostsCaptor = ArgumentCaptor.forClass(List.class);
+
+        // Act
+        registry.login(deployContext);
+
+        // Assert
+        verify(sshHosts).on(hostsCaptor.capture(), any());
+        assertThat(hostsCaptor.getValue()).isEqualTo(hosts);
+    }
+
+    @Test
+    @DisplayName("should execute logout on correct hosts")
+    void shouldExecuteLogoutOnCorrectHosts() {
+        // Arrange
+        List<String> hosts = Arrays.asList("host1", "host2");
+        when(deployContext.hosts()).thenReturn(hosts);
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<String>> hostsCaptor = ArgumentCaptor.forClass(List.class);
+
+        // Act
+        registry.logout(deployContext);
+
+        // Assert
+        verify(sshHosts).on(hostsCaptor.capture(), any());
+        assertThat(hostsCaptor.getValue()).isEqualTo(hosts);
+    }
+
+    @Test
+    @DisplayName("should retrieve hosts from context for login")
+    void shouldRetrieveHostsFromContextForLogin() {
+        // Arrange
+        List<String> expectedHosts = Arrays.asList("registry-host.example.com");
+        when(deployContext.hosts()).thenReturn(expectedHosts);
+
+        // Act
+        registry.login(deployContext);
+
+        // Assert
+        verify(deployContext).hosts();
+    }
+
+    @Test
+    @DisplayName("should retrieve hosts from context for logout")
+    void shouldRetrieveHostsFromContextForLogout() {
+        // Arrange
+        List<String> expectedHosts = Arrays.asList("registry-host.example.com");
+        when(deployContext.hosts()).thenReturn(expectedHosts);
+
+        // Act
+        registry.logout(deployContext);
+
+        // Assert
+        verify(deployContext).hosts();
+    }
+}
