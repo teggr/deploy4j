@@ -426,7 +426,7 @@ public class Accessory extends Base {
   }
 
   private List<String> accessoryHosts(DeployContext deployContext, AccessoryHostCommands accessory) {
-    if (!deployContext.specificHosts().isEmpty()) {
+    if (deployContext.specificHosts() != null) {
       List<String> intersection = new ArrayList<>(deployContext.specificHosts());
       intersection.retainAll(accessory.hosts());
       return intersection;

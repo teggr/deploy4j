@@ -1,15 +1,22 @@
 # Next
 
 * unit tests
-* need to remove config() dependency
-* configuration validation
+* need to replace config() dependency with static configuration at construction time
+* configuration validation porting
+* testing with merged env files
+  * two separate ssh host containers 
+* testing with accessories
+* testing with assets
+* tls with let's encrypt
+  * documentation configuration
+  * add configuration options
+* domain routing options
+
+# Spring support
+* support for actuator
+  * readiness
+  * health
+* spring boot dashboard
+* spring boot desktop app
 
 # Notes
-
-Env - https://github.com/cdimascio/dotenv-java
-
-    Manage environment variables in Java applications using .env files. These are read in during the deployment stage.
-    The .env files can be templated to go and fetch secrets from vaults or other secret management systems.
-    The resulting .env file is pushed to the servers during deployment.
-    The .env file is used by docker run --env-file to set environment variables for the containers.
-    For host, accessory and traefik the env files are merged with other values

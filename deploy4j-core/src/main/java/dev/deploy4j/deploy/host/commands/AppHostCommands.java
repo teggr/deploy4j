@@ -370,7 +370,8 @@ public class AppHostCommands extends BaseHostCommands {
 
   public Cmd logs(String version, String since, String lines, String grep, String grepOptions) {
     return pipe(
-      docker().logs().args("traefik", since != null ? "--since " + since : null, lines != null ? "--tail " + lines : null, "--timestamps", "2>&1"),
+      version != null ? containerIdForVersion(version) : currentRunningContainerId(),
+      xargs( docker().logs().args(since != null ? "--since " + since : null, lines != null ? "--tail " + lines : null, "--timestamps", "2>&1") ),
       grep != null ? grep().search(grep)
         .args(grepOptions) : null
     ).description("logs");

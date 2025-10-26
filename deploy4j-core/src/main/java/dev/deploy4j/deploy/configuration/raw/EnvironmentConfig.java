@@ -41,7 +41,7 @@ public class EnvironmentConfig {
   }
 
   public boolean isAMap() {
-    return map != null;
+    return map != null && clear == null && secrets == null;
   }
 
   public boolean isTags() {

@@ -81,7 +81,7 @@ public class Env {
     );
 
     return new Env(
-      null, //config,
+      config,
       secretsFile() != null ? this.secretsFile() : other.secretsFile(),
       "env"
     );

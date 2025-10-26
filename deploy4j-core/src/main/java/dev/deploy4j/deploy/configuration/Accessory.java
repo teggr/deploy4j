@@ -199,8 +199,8 @@ public class Accessory {
     } else {
       return directories.stream().map(hostToContainerMapping -> {
         String[] arr = hostToContainerMapping.split(":");
-        String hostPath = expandRemoteFile(arr[1]);
-        String containerPath = expandRemoteFile(arr[1]);
+        String hostPath = arr[0];
+        String containerPath = arr[1];
         return "%s:%s".formatted(expandHostPath(hostPath), containerPath);
       }).toList();
     }
