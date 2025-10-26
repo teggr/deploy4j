@@ -106,29 +106,29 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ⬜ `ConfigureArgs` - Configuration arguments
 - ✅ `Volume` - Volume configuration
 - ✅ `Tag` (env) - Environment tag
-- ⬜ `AccessoryConfig` - Accessory raw config
-- ⬜ `BootConfig` - Boot raw config
-- ⬜ `CustomRoleConfig` - Custom role raw config
+- ✅ `AccessoryConfig` - Accessory raw config
+- ✅ `BootConfig` - Boot raw config
+- ✅ `CustomRoleConfig` - Custom role raw config
 - ✅ `HealthCheckConfig` - Health check raw config
-- ⬜ `LoggingConfig` - Logging raw config
-- ⬜ `RegistryConfig` - Registry raw config
-- ⬜ `RoleConfig` - Role raw config
-- ⬜ `ServerConfig` - Server raw config
-- ⬜ `SshConfig` - SSH raw config
-- ⬜ `TraefikConfig` - Traefik raw config
+- ✅ `LoggingConfig` - Logging raw config
+- ✅ `RegistryConfig` - Registry raw config
+- ✅ `RoleConfig` - Role raw config
+- ✅ `ServerConfig` - Server raw config
+- ✅ `SshConfig` - SSH raw config
+- ✅ `TraefikConfig` - Traefik raw config
 
 ### Host Command Implementations
-- ⬜ `AccessoryHostCommands` - Accessory commands
+- ✅ `AccessoryHostCommands` - Accessory commands
 - ⬜ `AccessoryHostCommandsFactory` - Accessory command factory
 - ⬜ `AppHostCommandsFactory` - App command factory
 - ⬜ `AuditorHostCommands` - Audit commands
-- ⬜ `HealthcheckHostCommands` - Health check commands
-- ⬜ `HookHostCommands` - Hook execution commands
-- ⬜ `LockHostCommands` - Lock commands
-- ⬜ `PruneHostCommands` - Prune commands
-- ⬜ `RegistryHostCommands` - Registry commands
-- ⬜ `ServerHostCommands` - Server commands
-- ⬜ `TraefikHostCommands` - Traefik commands
+- ✅ `HealthcheckHostCommands` - Health check commands
+- ✅ `HookHostCommands` - Hook execution commands
+- ✅ `LockHostCommands` - Lock commands
+- ✅ `PruneHostCommands` - Prune commands
+- ✅ `RegistryHostCommands` - Registry commands
+- ✅ `ServerHostCommands` - Server commands
+- ✅ `TraefikHostCommands` - Traefik commands
 
 ### Application Bootstrap
 - ⬜ `Boot` (deploy.app) - Application bootstrapping
@@ -137,7 +137,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 ### Ext Module P2 Classes
 - ✅ `Curl` - Curl command wrapper
 
-**Phase 3 Progress:** 5/29 classes
+**Phase 3 Progress:** 18/29 classes
 
 ---
 
@@ -158,9 +158,9 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 |-------|--------------|-----------|-------------|-------------|------------|
 | Phase 1 (P0) | 8 | 6 | 0 | 2 | 75% |
 | Phase 2 (P1) | 41 | 21 | 0 | 20 | 51% |
-| Phase 3 (P2) | 29 | 5 | 0 | 24 | 17% |
+| Phase 3 (P2) | 29 | 18 | 0 | 11 | 62% |
 | Phase 4 (P3) | 3 | 3 | 0 | 0 | 100% |
-| **Total** | **81** | **35** | **0** | **46** | **43%** |
+| **Total** | **81** | **48** | **0** | **33** | **59%** |
 
 *Note: This excludes the 10 classes that already have tests*
 
