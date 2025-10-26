@@ -33,6 +33,31 @@ See [Kamal v1](https://kamal-deploy.org/v1/docs/installation/) for further docum
 
 Requires Java 21.
 
+## HTTPS/TLS Support
+
+Deploy4j supports automatic HTTPS certificate provisioning via [Let's Encrypt](https://letsencrypt.org/) through Traefik.
+
+**Quick Start:**
+1. Point your domain to your server
+2. Configure TLS in `config/deploy.yml`
+3. Deploy with `deploy4j deploy`
+
+See [TRAEFIK_TLS_QUICKSTART.md](TRAEFIK_TLS_QUICKSTART.md) for a step-by-step guide or [TRAEFIK_TLS_PROPOSAL.md](TRAEFIK_TLS_PROPOSAL.md) for comprehensive documentation.
+
+**Example TLS Configuration:**
+```yaml
+traefik:
+  args:
+    entrypoints.http.address: ":80"
+    entrypoints.https.address: ":443"
+    certificatesresolvers.letsencrypt.acme.email: "admin@example.com"
+    certificatesresolvers.letsencrypt.acme.storage: "/letsencrypt/acme.json"
+    certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint: "http"
+  options:
+    publish: "443:443"
+    volume: "/etc/deploy4j/letsencrypt:/letsencrypt"
+```
+
 ## Command Line
 
 [View all commands on Kamal docs for now](https://kamal-deploy.org/v1/docs/commands/view-all-commands/).
