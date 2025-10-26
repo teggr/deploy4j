@@ -3,6 +3,7 @@ package dev.deploy4j.deploy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -140,5 +141,25 @@ class TagsTest {
         // Assert
         assertThat(tags.tags()).containsEntry("service", "myapp");
         assertThat(envTags.tags()).containsEntry("DEPLOY4J_SERVICE", "myapp");
+    }
+
+    @Test
+    @DisplayName("should ignore null values in tags")
+    void shouldIgnoreNullValuesInTags() {
+        // Arrange
+        Map<String, String> tagMap = new HashMap<>();
+        tagMap.put("service", "myapp");
+        tagMap.put("version", null);
+        tagMap.put("destination", "production");
+
+        // Act
+        Tags tags = new Tags(tagMap);
+
+        // Assert
+        assertThat(tags.tags())
+                .containsEntry("service", "myapp")
+                .containsEntry("destination", "production")
+                .doesNotContainKey("version")
+                .hasSize(2);
     }
 }

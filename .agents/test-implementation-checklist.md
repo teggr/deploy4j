@@ -14,8 +14,8 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 ## Phase 1: Critical Foundation (P0) - Weeks 1-2
 
 ### Utilities (Quick Wins)
-- ⬜ `RandomHex` - Simple utility class for generating random hex strings
-- ⬜ `ENV` - Environment variable utilities (expand existing tests)
+- ✅ `RandomHex` - Simple utility class for generating random hex strings
+- ✅ `ENV` - Environment variable utilities (expand existing tests)
 - ⬜ `Cmd` - Command builder (verify completeness of existing tests)
 
 ### Core Configuration
@@ -29,7 +29,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 ### SSH Operations
 - ⬜ `SSHTemplate` - SSH execution template (use mocks or TestContainers)
 
-**Phase 1 Progress:** 0/8 classes
+**Phase 1 Progress:** 2/8 classes
 
 ---
 
@@ -54,8 +54,8 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ⬜ `Accessory` (configuration) - Accessory configuration
 
 ### Environment & Files
-- ⬜ `ENVDotenv` - Dotenv file handling
-- ⬜ `File` - File utilities
+- ✅ `ENVDotenv` - Dotenv file handling
+- ✅ `File` - File utilities
 - ⬜ `ERB` - Template processing
 
 ### Host Commands
@@ -83,13 +83,13 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ⬜ `Registry` (deploy) - Registry operations
 - ⬜ `Server` - Server management
 - ⬜ `Traefik` (deploy) - Traefik deployment
-- ⬜ `PlainValueOrSecretKey` - Secret handling
-- ⬜ `Utils` - General utilities
+- ✅ `PlainValueOrSecretKey` - Secret handling
+- ✅ `Utils` - General utilities
 - ⬜ `Initializer` - Application initializer
-- ⬜ `Barrier` - Health check barrier
+- ✅ `Barrier` - Health check barrier
 - ⬜ `Poller` - Health check poller
 
-**Phase 2 Progress:** 0/41 classes
+**Phase 2 Progress:** 5/41 classes
 
 ---
 
@@ -98,14 +98,14 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 ### Remaining Deploy Operations
 - ⬜ `Prune` - Cleanup operations
 - ⬜ `Version` - Version handling
-- ⬜ `Tags` - Tag management
+- ✅ `Tags` - Tag management
 - ⬜ `Specifics` - Specific configurations
 - ⬜ `LockContext` - Lock context
 
 ### Configuration Data Classes
 - ⬜ `ConfigureArgs` - Configuration arguments
-- ⬜ `Volume` - Volume configuration
-- ⬜ `Tag` (env) - Environment tag
+- ✅ `Volume` - Volume configuration
+- ✅ `Tag` (env) - Environment tag
 - ⬜ `AccessoryConfig` - Accessory raw config
 - ⬜ `BootConfig` - Boot raw config
 - ⬜ `CustomRoleConfig` - Custom role raw config
@@ -137,7 +137,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 ### Ext Module P2 Classes
 - ⬜ `Curl` - Curl command wrapper
 
-**Phase 3 Progress:** 0/29 classes
+**Phase 3 Progress:** 3/29 classes
 
 ---
 
@@ -156,11 +156,11 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 
 | Phase | Total Classes | Completed | In Progress | Not Started | Progress % |
 |-------|--------------|-----------|-------------|-------------|------------|
-| Phase 1 (P0) | 8 | 0 | 0 | 8 | 0% |
-| Phase 2 (P1) | 41 | 0 | 0 | 41 | 0% |
-| Phase 3 (P2) | 29 | 0 | 0 | 29 | 0% |
+| Phase 1 (P0) | 8 | 2 | 0 | 6 | 25% |
+| Phase 2 (P1) | 41 | 5 | 0 | 36 | 12% |
+| Phase 3 (P2) | 29 | 3 | 0 | 26 | 10% |
 | Phase 4 (P3) | 3 | 0 | 0 | 3 | 0% |
-| **Total** | **81** | **0** | **0** | **81** | **0%** |
+| **Total** | **81** | **10** | **0** | **71** | **12%** |
 
 *Note: This excludes the 10 classes that already have tests*
 

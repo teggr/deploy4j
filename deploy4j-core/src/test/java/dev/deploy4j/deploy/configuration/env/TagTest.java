@@ -38,6 +38,7 @@ class TagTest {
 
         // Assert
         assertThat(env).isNotNull();
+        assertThat(env.clear()).containsEntry("APP_NAME", "myapp");
     }
 
     @Test
@@ -49,6 +50,12 @@ class TagTest {
         // Assert
         assertThat(tag.name()).isEqualTo("test");
         assertThat(tag.config()).isNull();
+        
+        // Verify env and args don't error with null config
+        Env env = tag.env();
+        assertThat(env).isNotNull();
+        assertThat(env.clear()).isEmpty();
+        assertThat(env.args()).isNotEmpty(); // Should have --env-file arg
     }
 
     @Test

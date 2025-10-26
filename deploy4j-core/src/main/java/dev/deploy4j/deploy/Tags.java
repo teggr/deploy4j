@@ -37,7 +37,10 @@ public class Tags {
   private final Map<String, String> tags;
 
   public Tags(Map<String, String> tags) {
-    this.tags = tags;
+    // Filter out null values
+    this.tags = tags.entrySet().stream()
+      .filter(e -> e.getValue() != null)
+      .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
   public Tags env() {
