@@ -109,7 +109,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ⬜ `AccessoryConfig` - Accessory raw config
 - ⬜ `BootConfig` - Boot raw config
 - ⬜ `CustomRoleConfig` - Custom role raw config
-- ⬜ `HealthCheckConfig` - Health check raw config
+- ✅ `HealthCheckConfig` - Health check raw config
 - ⬜ `LoggingConfig` - Logging raw config
 - ⬜ `RegistryConfig` - Registry raw config
 - ⬜ `RoleConfig` - Role raw config
@@ -137,7 +137,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 ### Ext Module P2 Classes
 - ✅ `Curl` - Curl command wrapper
 
-**Phase 3 Progress:** 4/29 classes
+**Phase 3 Progress:** 5/29 classes
 
 ---
 
@@ -158,9 +158,9 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 |-------|--------------|-----------|-------------|-------------|------------|
 | Phase 1 (P0) | 8 | 6 | 0 | 2 | 75% |
 | Phase 2 (P1) | 41 | 21 | 0 | 20 | 51% |
-| Phase 3 (P2) | 29 | 4 | 0 | 25 | 14% |
+| Phase 3 (P2) | 29 | 5 | 0 | 24 | 17% |
 | Phase 4 (P3) | 3 | 3 | 0 | 0 | 100% |
-| **Total** | **81** | **34** | **0** | **47** | **42%** |
+| **Total** | **81** | **35** | **0** | **46** | **43%** |
 
 *Note: This excludes the 10 classes that already have tests*
 
