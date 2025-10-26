@@ -1,6 +1,7 @@
 package dev.deploy4j.deploy.configuration;
 
 import dev.deploy4j.deploy.utils.file.File;
+import dev.deploy4j.deploy.utils.file.Pathname;
 
 import java.nio.file.Paths;
 
@@ -23,7 +24,7 @@ public class Volume {
   // private
 
   private String hostPathForDockerVolume() {
-    if (Paths.get(hostPath()).isAbsolute()) {
+    if (Pathname.isAbsolute(hostPath())) {
       return hostPath();
     } else {
       return File.join("$(pwd)", hostPath());
