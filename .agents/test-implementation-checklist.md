@@ -135,20 +135,20 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ⬜ `PrepareAssets` - Asset preparation
 
 ### Ext Module P2 Classes
-- ⬜ `Curl` - Curl command wrapper
+- ✅ `Curl` - Curl command wrapper
 
-**Phase 3 Progress:** 3/29 classes
+**Phase 3 Progress:** 4/29 classes
 
 ---
 
 ## Phase 4: Low Priority (P3) - Week 7
 
 ### Simple Command Wrappers
-- ⬜ `Echo` - Echo command wrapper
-- ⬜ `Grep` - Grep command wrapper
-- ⬜ `Wget` - Wget command wrapper
+- ✅ `Echo` - Echo command wrapper
+- ✅ `Grep` - Grep command wrapper
+- ✅ `Wget` - Wget command wrapper
 
-**Phase 4 Progress:** 0/3 classes
+**Phase 4 Progress:** 3/3 classes
 
 ---
 
@@ -158,9 +158,9 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 |-------|--------------|-----------|-------------|-------------|------------|
 | Phase 1 (P0) | 8 | 5 | 0 | 3 | 63% |
 | Phase 2 (P1) | 41 | 8 | 0 | 33 | 20% |
-| Phase 3 (P2) | 29 | 3 | 0 | 26 | 10% |
-| Phase 4 (P3) | 3 | 0 | 0 | 3 | 0% |
-| **Total** | **81** | **16** | **0** | **65** | **20%** |
+| Phase 3 (P2) | 29 | 4 | 0 | 25 | 14% |
+| Phase 4 (P3) | 3 | 3 | 0 | 0 | 100% |
+| **Total** | **81** | **20** | **0** | **61** | **25%** |
 
 *Note: This excludes the 10 classes that already have tests*
 
