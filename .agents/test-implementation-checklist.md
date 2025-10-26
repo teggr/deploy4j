@@ -20,7 +20,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 
 ### Core Configuration
 - ✅ `Configuration` - Main configuration class (complex, break into test suites)
-- ⬜ `DeployConfigYamlReader` - YAML config reader (expand existing tests)
+- ✅ `DeployConfigYamlReader` - YAML config reader (EXPANDED - 9 additional tests added)
 
 ### Command Generation
 - ✅ `DockerHostCommands` - Docker command generation
@@ -29,7 +29,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 ### SSH Operations
 - ⬜ `SSHTemplate` - SSH execution template (use mocks or TestContainers)
 
-**Phase 1 Progress:** 6/8 classes
+**Phase 1 Progress:** 7/8 classes (88%)
 
 ---
 
@@ -103,7 +103,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ⬜ `LockContext` - Lock context
 
 ### Configuration Data Classes
-- ⬜ `ConfigureArgs` - Configuration arguments
+- ✅ `ConfigureArgs` - Configuration arguments (NEWLY ADDED)
 - ✅ `Volume` - Volume configuration
 - ✅ `Tag` (env) - Environment tag
 - ✅ `AccessoryConfig` - Accessory raw config
@@ -119,9 +119,9 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 
 ### Host Command Implementations
 - ✅ `AccessoryHostCommands` - Accessory commands
-- ⬜ `AccessoryHostCommandsFactory` - Accessory command factory
-- ⬜ `AppHostCommandsFactory` - App command factory
-- ⬜ `AuditorHostCommands` - Audit commands
+- ✅ `AccessoryHostCommandsFactory` - Accessory command factory (NEWLY ADDED)
+- ✅ `AppHostCommandsFactory` - App command factory (NEWLY ADDED)
+- ✅ `AuditorHostCommands` - Audit commands (NEWLY ADDED)
 - ✅ `HealthcheckHostCommands` - Health check commands
 - ✅ `HookHostCommands` - Hook execution commands
 - ✅ `LockHostCommands` - Lock commands
@@ -137,7 +137,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 ### Ext Module P2 Classes
 - ✅ `Curl` - Curl command wrapper
 
-**Phase 3 Progress:** 18/29 classes
+**Phase 3 Progress:** 20/29 classes (69%)
 
 ---
 
@@ -156,11 +156,11 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 
 | Phase | Total Classes | Completed | In Progress | Not Started | Progress % |
 |-------|--------------|-----------|-------------|-------------|------------|
-| Phase 1 (P0) | 8 | 6 | 0 | 2 | 75% |
+| Phase 1 (P0) | 8 | 7 | 0 | 1 | 88% |
 | Phase 2 (P1) | 41 | 21 | 0 | 20 | 51% |
-| Phase 3 (P2) | 29 | 18 | 0 | 11 | 62% |
+| Phase 3 (P2) | 29 | 20 | 0 | 9 | 69% |
 | Phase 4 (P3) | 3 | 3 | 0 | 0 | 100% |
-| **Total** | **81** | **48** | **0** | **33** | **59%** |
+| **Total** | **81** | **51** | **0** | **30** | **63%** |
 
 *Note: This excludes the 10 classes that already have tests*
 
