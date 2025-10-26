@@ -113,7 +113,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ⬜ `LoggingConfig` - Logging raw config
 - ⬜ `RegistryConfig` - Registry raw config
 - ⬜ `RoleConfig` - Role raw config
-- ⬜ `ServerConfig` - Server raw config
+- ✅ `ServerConfig` - Server raw config
 - ⬜ `SshConfig` - SSH raw config
 - ⬜ `TraefikConfig` - Traefik raw config
 
@@ -121,14 +121,14 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ⬜ `AccessoryHostCommands` - Accessory commands
 - ⬜ `AccessoryHostCommandsFactory` - Accessory command factory
 - ⬜ `AppHostCommandsFactory` - App command factory
-- ⬜ `AuditorHostCommands` - Audit commands
+- ✅ `AuditorHostCommands` - Audit commands
 - ⬜ `HealthcheckHostCommands` - Health check commands
 - ⬜ `HookHostCommands` - Hook execution commands
 - ✅ `LockHostCommands` - Lock commands
 - ✅ `PruneHostCommands` - Prune commands
 - ✅ `RegistryHostCommands` - Registry commands
 - ✅ `ServerHostCommands` - Server commands
-- ⬜ `TraefikHostCommands` - Traefik commands
+- ✅ `TraefikHostCommands` - Traefik commands
 
 ### Application Bootstrap
 - ⬜ `Boot` (deploy.app) - Application bootstrapping
@@ -137,7 +137,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 ### Ext Module P2 Classes
 - ✅ `Curl` - Curl command wrapper
 
-**Phase 3 Progress:** 9/29 classes
+**Phase 3 Progress:** 11/29 classes
 
 ---
 
@@ -158,9 +158,9 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 |-------|--------------|-----------|-------------|-------------|------------|
 | Phase 1 (P0) | 8 | 6 | 0 | 2 | 75% |
 | Phase 2 (P1) | 41 | 21 | 0 | 20 | 51% |
-| Phase 3 (P2) | 29 | 9 | 0 | 20 | 31% |
+| Phase 3 (P2) | 29 | 11 | 0 | 18 | 38% |
 | Phase 4 (P3) | 3 | 3 | 0 | 0 | 100% |
-| **Total** | **81** | **39** | **0** | **42** | **48%** |
+| **Total** | **81** | **41** | **0** | **40** | **51%** |
 
 *Note: This excludes the 10 classes that already have tests*
 
