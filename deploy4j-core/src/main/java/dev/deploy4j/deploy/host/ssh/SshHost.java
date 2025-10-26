@@ -18,15 +18,20 @@ public class SshHost {
   private final SSHTemplate sshTemplate;
 
   public SshHost(String hostName, Ssh ssh) {
-    this.hostName = hostName;
-    this.sshTemplate = new SSHTemplate(
+    this(hostName, new SSHTemplate(
       hostName,
       ssh.user(),
       ssh.port(),
       ssh.keyPath(),
       ssh.keyPassphrase(),
       ssh.strictHostKeyChecking()
-    );
+    ));
+  }
+
+  // Package-private constructor for testing
+  SshHost(String hostName, SSHTemplate sshTemplate) {
+    this.hostName = hostName;
+    this.sshTemplate = sshTemplate;
   }
 
   public String hostName() {
