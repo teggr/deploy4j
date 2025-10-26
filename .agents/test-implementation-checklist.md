@@ -44,11 +44,11 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 ### Configuration Classes
 - ⬜ `Role` - Role management (complex)
 - ✅ `HealthCheck` - Health check configuration
-- ⬜ `Registry` (configuration) - Registry configuration
-- ⬜ `Traefik` (configuration) - Traefik configuration
-- ⬜ `Ssh` (configuration) - SSH configuration
-- ⬜ `Boot` (configuration) - Boot configuration
-- ⬜ `Builder` - Builder configuration
+- ✅ `Registry` (configuration) - Registry configuration
+- ✅ `Traefik` (configuration) - Traefik configuration
+- ✅ `Ssh` (configuration) - SSH configuration
+- ✅ `Boot` (configuration) - Boot configuration
+- ✅ `Builder` - Builder configuration
 - ⬜ `Env` (configuration) - Environment configuration
 - ✅ `Logging` - Logging configuration
 - ⬜ `Accessory` (configuration) - Accessory configuration
@@ -56,7 +56,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 ### Environment & Files
 - ✅ `ENVDotenv` - Dotenv file handling
 - ✅ `File` - File utilities
-- ⬜ `ERB` - Template processing
+- ✅ `ERB` - Template processing
 
 ### Host Commands
 - ⬜ `AppHostCommands` - Application-specific commands
@@ -89,7 +89,7 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 - ✅ `Barrier` - Health check barrier
 - ✅ `Poller` - Health check poller
 
-**Phase 2 Progress:** 13/41 classes
+**Phase 2 Progress:** 18/41 classes
 
 ---
 
@@ -157,10 +157,10 @@ This checklist is a quick reference guide derived from the main [unit-test-plan.
 | Phase | Total Classes | Completed | In Progress | Not Started | Progress % |
 |-------|--------------|-----------|-------------|-------------|------------|
 | Phase 1 (P0) | 8 | 5 | 0 | 3 | 63% |
-| Phase 2 (P1) | 41 | 13 | 0 | 28 | 32% |
+| Phase 2 (P1) | 41 | 18 | 0 | 23 | 44% |
 | Phase 3 (P2) | 29 | 4 | 0 | 25 | 14% |
 | Phase 4 (P3) | 3 | 3 | 0 | 0 | 100% |
-| **Total** | **81** | **25** | **0** | **56** | **31%** |
+| **Total** | **81** | **30** | **0** | **51** | **37%** |
 
 *Note: This excludes the 10 classes that already have tests*
 
