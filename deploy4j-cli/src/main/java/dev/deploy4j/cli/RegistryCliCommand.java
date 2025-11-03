@@ -3,6 +3,8 @@ package dev.deploy4j.cli;
 import dev.deploy4j.deploy.DeployApplicationContext;
 import picocli.CommandLine;
 
+import java.util.concurrent.Callable;
+
 @CommandLine.Command(
   name = "registry",
   description = "Login and out of the image registry",
@@ -10,10 +12,16 @@ import picocli.CommandLine;
     RegistryCliCommand.LoginCliCommand.class
   }
 )
-public class RegistryCliCommand {
+public class RegistryCliCommand implements Callable<Integer> {
 
   @CommandLine.Mixin
   private HelpOptions helpOptions = new HelpOptions();
+
+  @Override
+  public Integer call() throws Exception {
+    CommandLine.usage(this, System.out);
+    return 0;
+  }
 
   @CommandLine.Command(
     name = "login",

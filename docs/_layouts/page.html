@@ -1,0 +1,57 @@
+---
+layout: default
+---
+<div class="columns is-8">
+
+    <div class="column is-one-quarter is-hidden-touch">
+
+        <aside class="menu">
+            <ul class="menu-list">
+                <li><a class="is-size-6 has-text-weight-bold {% if page.url=='/installation/' -%}is-active{%- endif -%}" href="/installation/">Installation</a></li>
+                <li>
+                    {% assign confIndexPage = site.configuration | where: 'default', true | first %}
+                    <a class="is-size-6 has-text-weight-bold {% if page.collection=='configuration' -%}is-active{%- endif -%}" href="{{ confIndexPage.url }}">Configuration</a>
+                    {%- if page.collection=='configuration' -%}
+                    {%- assign configurations = site.configuration | sort -%}
+                    <ul>
+                        {%- for config in configurations %}
+                        <li><a class="{%- if page.url==config.url -%}has-text-weight-bold{%- endif -%}" href="{{ config.url }}">{{ config.short_title | default: config.title }}</a></li>
+                        {%- endfor -%}
+                    </ul>
+                    {%- endif -%}
+                </li>
+                <li>
+                    {% assign cmdIndexPage = site.commands | where: 'default', true | first %}
+                    <a class="is-size-6 has-text-weight-bold {% if page.collection=='commands' -%}is-active{%- endif -%}" href="{{ cmdIndexPage.url }}">Commands</a>
+                    {%- if page.collection=='commands' -%}
+                    {%- assign commands = site.commands | sort -%}
+                    <ul>
+                        {%- for command in commands %}
+                        <li><a class="{%- if page.url==command.url -%}has-text-weight-bold{%- endif -%}" href="{{ command.url }}">{{ command.short_title | default: command.title }}</a></li>
+                        {%- endfor -%}
+                    </ul>
+                    {%- endif -%}
+                </li>
+                <li><a class="is-size-6 has-text-weight-bold {% if page.url=='/hooks/overview/' -%}is-active{%- endif -%}" href="/hooks/overview/">Hooks</a></li>
+            </ul>
+        </aside>
+
+    </div>
+
+    <div class="column">
+
+        <article class="article">
+
+            <header class="header">
+                <h1 class="title mb-4">{{ page.title | escape }}</h1>
+            </header>
+
+            <div class="content">
+                {{ content }}
+            </div>
+
+        </article>
+
+    </div>
+
+</div>

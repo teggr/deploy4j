@@ -3,6 +3,8 @@ package dev.deploy4j.cli;
 import dev.deploy4j.deploy.DeployApplicationContext;
 import picocli.CommandLine;
 
+import java.util.concurrent.Callable;
+
 @CommandLine.Command(
   name = "server",
   description = "Boostrap servers with curl and Docker",
@@ -11,10 +13,16 @@ import picocli.CommandLine;
     ServerCliCommand.BootstrapCliCommand.class
   }
 )
-public class ServerCliCommand {
+public class ServerCliCommand implements Callable<Integer> {
 
   @CommandLine.Mixin
   private HelpOptions helpOptions = new HelpOptions();
+
+  @Override
+  public Integer call() throws Exception {
+    CommandLine.usage(this, System.out);
+    return 0;
+  }
 
   @CommandLine.Command(
     name = "exec",
@@ -36,7 +44,7 @@ public class ServerCliCommand {
 
   @CommandLine.Command(
     name = "bootstrap",
-    description = "Set up Docker to run Kamal apps")
+    description = "Set up Docker to run deploy4j apps")
   public static class BootstrapCliCommand extends BaseCliCommand {
 
     @Override

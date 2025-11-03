@@ -53,7 +53,7 @@ public class Server extends Base {
   }
 
   /**
-   * Set up Docker to run Kamal apps
+   * Set up Docker to run deploy4j apps
    */
   public void bootstrap(DeployContext deployContext) {
 

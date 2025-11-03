@@ -21,7 +21,7 @@ class Deploy4JYamlConfigReaderTest {
       registry:
         username: registry-user-name
         password:
-          - KAMAL_REGISTRY_PASSWORD
+          - DEPLOY4J_REGISTRY_PASSWORD
       env:
         secret:
           - RAILS_MASTER_KEY
@@ -35,7 +35,7 @@ class Deploy4JYamlConfigReaderTest {
     assertEquals("37s/hey", config.image());
     assertEquals(2, config.servers().list().size());
     assertEquals("registry-user-name", config.registry().username().value());
-    assertEquals("KAMAL_REGISTRY_PASSWORD", config.registry().password().key());
+    assertEquals("DEPLOY4J_REGISTRY_PASSWORD", config.registry().password().key());
     assertEquals("RAILS_MASTER_KEY", config.env().secrets().get(0));
 
   }
