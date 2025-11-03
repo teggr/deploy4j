@@ -212,7 +212,7 @@ public class App extends Base {
               log.info( "Stopping stale container for role #{role} with version #{version}" );
               host.execute(app.stop(version), false);
             } else {
-              log.info(  "Detected stale container for role #{role} with version #{version} (use `kamal app stale_containers --stop` to stop)" );
+              log.info(  "Detected stale container for role #{role} with version #{version} (use `deploy4j app stale_containers --stop` to stop)" );
             }
           }
 

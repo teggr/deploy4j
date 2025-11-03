@@ -36,7 +36,7 @@ public class ServerCliCommand {
 
   @CommandLine.Command(
     name = "bootstrap",
-    description = "Set up Docker to run Kamal apps")
+    description = "Set up Docker to run deploy4j apps")
   public static class BootstrapCliCommand extends BaseCliCommand {
 
     @Override

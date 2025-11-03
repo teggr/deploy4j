@@ -1,0 +1,29 @@
+---
+layout: page
+title: SSHKit
+aside:
+  group: configuration
+---
+[SSHKit](https://github.com/capistrano/sshkit) is the SSH toolkit used by deploy4j.
+
+The default settings should be sufficient for most use cases, but when connecting to a large number of hosts you may need to adjust some options.
+
+## SSHKit options
+
+The options are specified under the `sshkit` key in the configuration file. Example:
+
+```yaml
+sshkit:
+
+  # Max concurrent starts
+  #
+  # Creating SSH connections concurrently can be an issue when deploying to many servers.
+  # By default deploy4j will limit concurrent connection starts to 30 at a time.
+  max_concurrent_starts: 10
+
+  # Pool idle timeout
+  #
+  # deploy4j sets a long idle timeout of 900 seconds on connections to try to avoid
+  # re-connection storms after an idle period, like building an image or waiting for CI.
+  pool_idle_timeout: 300
+```
