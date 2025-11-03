@@ -22,7 +22,7 @@ title: deploy4j
 # email: robin@tegg.me.uk
 description: >- # this means to ignore newlines until "baseurl:"
   Deploy4j is designed to make it easy to deploy Java web applications to self hosted VMs using Docker. Deploying a simple web application can be a complex process involving multiple steps and configurations. Deploy4j simplifies this process by automating the deployment steps and providing a consistent deployment experience.
-baseurl: "" # the subpath of your site, e.g. /blog
+baseurl: "/deploy4j" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username:
 github_project:  teggr/deploy4j
