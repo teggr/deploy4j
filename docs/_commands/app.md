@@ -6,7 +6,7 @@ Run `deploy4j app` to manage your running apps.
 
 To deploy new versions of the app, see `deploy4j deploy` and `deploy4j rollback`.
 
-You can use `deploy4j app exec` to [run commands on servers](/commands/running-commands-on-servers/).
+You can use `deploy4j app exec` to [run commands on servers](running-commands-on-servers.md).
 
 ```shell
 Usage: app [--help] [COMMAND]
