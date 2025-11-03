@@ -7,7 +7,7 @@ layout: default
 
         <aside class="menu">
             <ul class="menu-list">
-                <li><a class="is-size-6 has-text-weight-bold {% if page.url=='/installation/' -%}is-active{%- endif -%}" href="{{ site.baseurl}}/installation/">Installation</a></li>
+                <li><a class="is-size-6 has-text-weight-bold {% if page.url=='/installation/' -%}is-active{%- endif -%}" href="{{ site.baseurl}}/installation">Installation</a></li>
                 <li>
                     {% assign confIndexPage = site.configuration | where: 'default', true | first %}
                     <a class="is-size-6 has-text-weight-bold {% if page.collection=='configuration' -%}is-active{%- endif -%}" href="{{ site.baseurl}}{{ confIndexPage.url }}">Configuration</a>
@@ -32,7 +32,7 @@ layout: default
                     </ul>
                     {%- endif -%}
                 </li>
-                <li><a class="is-size-6 has-text-weight-bold {% if page.url=='/hooks/overview/' -%}is-active{%- endif -%}" href="{{ site.baseurl}}/hooks/overview/">Hooks</a></li>
+                <li><a class="is-size-6 has-text-weight-bold {% if page.url=='/hooks/overview/' -%}is-active{%- endif -%}" href="{{ site.baseurl}}/hooks/overview">Hooks</a></li>
             </ul>
         </aside>
 
