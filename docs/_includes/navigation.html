@@ -3,7 +3,7 @@
     <div class="container">
 
         <div class="navbar-brand">
-            <a class="navbar-item is-size-2 has-text-weight-bold" href="{{ site.baseurl }}/">
+            <a class="navbar-item is-size-2 has-text-weight-bold" href="{{ '/' | relative_url }}/">
                 deploy4j
             </a>
             <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
@@ -17,31 +17,31 @@
         <div id="navbarBasicExample" class="navbar-menu">
 
             <div class="navbar-end">
-                <a class="navbar-item has-text-weight-bold" href="{{ site.baseurl}}/installation">
+                <a class="navbar-item has-text-weight-bold" href="{{ '/installation' | relative_url }}">
                     Documentation
                 </a>
 
                 <div class="navbar-dropdown is-hidden-desktop">
 
-                    <a class="navbar-item is-size-6 has-text-weight-bold {% if page.url=='/installation/' -%}is-selected{%- endif -%}" href="{{ site.baseurl}}/installation">Installation</a>
+                    <a class="navbar-item is-size-6 has-text-weight-bold {% if page.url=='/installation/' -%}is-selected{%- endif -%}" href="{{ '/installation' | relative_url }}">Installation</a>
 
                     {% assign confIndexPage = site.configuration | where: 'default', true | first %}
-                    <a class="navbar-item is-size-6 has-text-weight-bold {% if page.collection=='configuration' -%}is-selected{%- endif -%}" href="{{ site.baseurl}}{{ confIndexPage.url }}">Configuration</a>
+                    <a class="navbar-item is-size-6 has-text-weight-bold {% if page.collection=='configuration' -%}is-selected{%- endif -%}" href="{{ confIndexPage.url | relative_url }}">Configuration</a>
 
                     {%- assign configurations = site.configuration | sort -%}
                     {%- for config in configurations %}
-                    <a class="navbar-item ml-3 {% if page.url==config.url -%}has-text-weight-bold{%- endif -%}" href="{{ site.baseurl}}{{ config.url }}">{{ config.short_title | default: config.title }}</a>
+                    <a class="navbar-item ml-3 {% if page.url==config.url -%}has-text-weight-bold{%- endif -%}" href="{{ config.url | relative_url }}">{{ config.short_title | default: config.title }}</a>
                     {%- endfor -%}
 
                     {% assign cmdIndexPage = site.commands | where: 'default', true | first %}
-                    <a class="navbar-item is-size-6 has-text-weight-bold {% if page.collection=='commands' -%}is-selected{%- endif -%}" href="{{ site.baseurl}}{{ cmdIndexPage.url }}">Commands</a>
+                    <a class="navbar-item is-size-6 has-text-weight-bold {% if page.collection=='commands' -%}is-selected{%- endif -%}" href="{{ cmdIndexPage.url | relative_url }}">Commands</a>
 
                     {%- assign commands = site.commands | sort -%}
                     {%- for command in commands %}
-                    <a class="navbar-item ml-3 {% if page.url==command.url -%}has-text-weight-bold{%- endif -%}" href="{{ site.baseurl}}{{ command.url }}">{{ command.short_title | default: command.title }}</a>
+                    <a class="navbar-item ml-3 {% if page.url==command.url -%}has-text-weight-bold{%- endif -%}" href="{{ command.url | relative_url }}">{{ command.short_title | default: command.title }}</a>
                     {%- endfor -%}
 
-                    <a class="navbar-item is-size-6 has-text-weight-bold {% if page.url=='/hooks/overview/' -%}is-selected{%- endif -%}" href="{{ site.baseurl}}/hooks/overview">Hooks</a>
+                    <a class="navbar-item is-size-6 has-text-weight-bold {% if page.url=='/hooks/overview/' -%}is-selected{%- endif -%}" href="{{ '/hooks/overview' | relative_url}}">Hooks</a>
 
                 </div>
 
