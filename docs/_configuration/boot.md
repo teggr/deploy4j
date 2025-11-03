@@ -1,8 +1,6 @@
 ---
 layout: page
 title: Booting
-aside:
-  group: configuration
 ---
 When deploying to large numbers of hosts, you might prefer not to restart your services on every host at the same time.
 

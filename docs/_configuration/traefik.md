@@ -1,8 +1,6 @@
 ---
 layout: page
 title: Traefik
-aside:
-  group: configuration
 ---
 Traefik is a reverse proxy used by deploy4j for zero-downtime deployments. We run it in its own container on the hosts.
 

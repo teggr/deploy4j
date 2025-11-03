@@ -1,24 +1,22 @@
 <!DOCTYPE html>
 <html lang="{{ page.lang | default: site.lang | default: "en" }}">
-
-{%- include head.html -%}
-
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page.title }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+</head>
 <body>
 
-{%- include header.html -%}
+{% include navigation.html %}
 
-{%- if page.aside -%}
-{%- include aside.html -%}
-{%- endif -%}
-
-<main class="page-content" aria-label="Content">
-    <div class="wrapper">
+<section class="section">
+    <div class="container">
         {{ content }}
     </div>
-</main>
+</section>
 
-{%- include footer.html -%}
+{% include navigation_scripts.html %}
 
 </body>
-
 </html>

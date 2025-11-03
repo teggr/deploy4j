@@ -1,8 +1,6 @@
 ---
 layout: page
 title: Roles
-aside:
-  group: configuration
 ---
 Roles are used to configure different types of servers in the deployment. The most common use is to run web servers and job servers.
 

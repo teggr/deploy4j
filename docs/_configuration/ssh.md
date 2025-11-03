@@ -1,9 +1,6 @@
 ---
 layout: page
 title: SSH configuration
-aside:
-  group: configuration
-  title: SSH
 ---
 deploy4j uses SSH to connect and run commands on your hosts. By default it will attempt to connect to the `root` user on port 22.
 

@@ -1,8 +1,6 @@
 ---
 layout: page
 title: SSHKit
-aside:
-  group: configuration
 ---
 [SSHKit](https://github.com/capistrano/sshkit) is the SSH toolkit used by deploy4j.
 

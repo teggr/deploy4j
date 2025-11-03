@@ -42,7 +42,7 @@ plugins:
 #
 exclude:
   - README.md
-     - .sass-cache/
+  - .sass-cache/
   - .jekyll-cache/
   - gemfiles/
   - Gemfile
@@ -60,3 +60,9 @@ aside:
     - configuration
     - commands
     - hooks
+
+collections:
+  configuration:
+    output: true
+  commands:
+    output: true

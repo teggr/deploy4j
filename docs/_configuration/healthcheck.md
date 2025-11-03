@@ -1,9 +1,6 @@
 ---
 layout: page
 title: Healthcheck configuration
-aside:
-  group: configuration
-  title: Healthchecks
 ---
 On roles that are running Traefik, deploy4j will supply a default healthcheck to `docker run`. For other roles, by default no healthcheck is supplied.
 

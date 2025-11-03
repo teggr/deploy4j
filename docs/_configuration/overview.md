@@ -1,10 +1,9 @@
 ---
 layout: page
 title: deploy4j Configuration
-aside:
-  group: configuration
-  index: true
-  title: Overview
+default: true
+short_title: Overview
+date: 2025-11-03
 ---
 Configuration is read from the `config/deploy.yml`.
 

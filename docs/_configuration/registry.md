@@ -1,8 +1,6 @@
 ---
 layout: page
 title: Registry
-aside:
-  group: configuration
 ---
 The default registry is Docker Hub, but you can change it using `registry.server` and credentials.
 

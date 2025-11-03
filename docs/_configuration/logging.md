@@ -1,9 +1,6 @@
 ---
 layout: page
 title: Custom logging configuration
-aside:
-  group: configuration
-  title: Logging
 ---
 Set these to control the Docker logging driver and options.
 

@@ -1,8 +1,6 @@
 ---
 layout: page
 title: Builder
-aside:
-  group: configuration
 ---
 The builder configuration controls how the application is built with `docker build` or `docker buildx build`.
 

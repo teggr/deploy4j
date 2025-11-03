@@ -1,8 +1,6 @@
 ---
 layout: page
 title: Environment variables
-aside:
-  group: configuration
 ---
 Environment variables can be set directly in the deploy4j configuration or loaded from a `.env` file for secrets that should not be checked into Git.
 

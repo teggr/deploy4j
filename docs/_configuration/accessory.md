@@ -1,8 +1,6 @@
 ---
 layout: page
 title: Accessories
-aside:
-  group: configuration
 ---
 Accessories can be booted on a single host, a list of hosts, or on specific roles. The hosts do not need to be defined in the deploy4j servers configuration.
 

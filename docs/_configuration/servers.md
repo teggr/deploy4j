@@ -1,8 +1,6 @@
 ---
 layout: page
 title: Servers
-aside:
-  group: configuration
 ---
 Servers are split into different roles, with each role having its own configuration.
 
