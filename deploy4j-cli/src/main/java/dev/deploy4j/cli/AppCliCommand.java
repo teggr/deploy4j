@@ -4,6 +4,7 @@ import dev.deploy4j.deploy.DeployApplicationContext;
 import picocli.CommandLine;
 
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 @CommandLine.Command(
   name = "app",
@@ -25,10 +26,16 @@ import java.util.Map;
     AppCliCommand.VersionCliCommand.class
   }
 )
-public class AppCliCommand {
+public class AppCliCommand implements Callable<Integer> {
 
   @CommandLine.Mixin
   private HelpOptions helpOptions = new HelpOptions();
+
+  @Override
+  public Integer call() throws Exception {
+    CommandLine.usage(this, System.out);
+    return 0;
+  }
 
   @CommandLine.Command(
     name = "boot",

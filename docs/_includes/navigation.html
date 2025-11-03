@@ -23,7 +23,7 @@
 
                 <div class="navbar-dropdown is-hidden-desktop">
 
-                    <a class="navbar-item is-size-6 has-text-weight-bold {% if page.url==config.url -%}is-selected{%- endif -%}" href="/installation">Installation</a>
+                    <a class="navbar-item is-size-6 has-text-weight-bold {% if page.url=='/installation/' -%}is-selected{%- endif -%}" href="/installation/">Installation</a>
 
                     {% assign confIndexPage = site.configuration | where: 'default', true | first %}
                     <a class="navbar-item is-size-6 has-text-weight-bold {% if page.collection=='configuration' -%}is-selected{%- endif -%}" href="{{ confIndexPage.url }}">Configuration</a>
@@ -36,12 +36,12 @@
                     {% assign cmdIndexPage = site.commands | where: 'default', true | first %}
                     <a class="navbar-item is-size-6 has-text-weight-bold {% if page.collection=='commands' -%}is-selected{%- endif -%}" href="{{ cmdIndexPage.url }}">Commands</a>
 
-                    {%- assign commands = site.commands -%}
+                    {%- assign commands = site.commands | sort -%}
                     {%- for command in commands %}
                     <a class="navbar-item ml-3 {% if page.url==command.url -%}has-text-weight-bold{%- endif -%}" href="{{ command.url }}">{{ command.short_title | default: command.title }}</a>
                     {%- endfor -%}
 
-                    <a class="navbar-item is-size-6 has-text-weight-bold">Hooks</a>
+                    <a class="navbar-item is-size-6 has-text-weight-bold {% if page.url=='/hooks/overview/' -%}is-selected{%- endif -%}" href="/hooks/overview/">Hooks</a>
 
                 </div>
 

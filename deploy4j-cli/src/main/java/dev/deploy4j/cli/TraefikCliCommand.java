@@ -3,6 +3,8 @@ package dev.deploy4j.cli;
 import dev.deploy4j.deploy.DeployApplicationContext;
 import picocli.CommandLine;
 
+import java.util.concurrent.Callable;
+
 @CommandLine.Command(
   name = "traefik",
   description = "Manage Traefik load balancer",
@@ -19,10 +21,16 @@ import picocli.CommandLine;
     TraefikCliCommand.RemoveImageCliCommand.class
   }
 )
-public class TraefikCliCommand {
+public class TraefikCliCommand implements Callable<Integer> {
 
   @CommandLine.Mixin
   private HelpOptions helpOptions = new HelpOptions();
+
+  @Override
+  public Integer call() throws Exception {
+    CommandLine.usage(this, System.out);
+    return 0;
+  }
 
   @CommandLine.Command(
     name = "boot",

@@ -3,6 +3,8 @@ package dev.deploy4j.cli;
 import dev.deploy4j.deploy.DeployApplicationContext;
 import picocli.CommandLine;
 
+import java.util.concurrent.Callable;
+
 @CommandLine.Command(
   name = "lock",
   description = "Manage the deploy lock",
@@ -12,10 +14,16 @@ import picocli.CommandLine;
     LockCliCommand.ReleaseCliCommand.class
   }
 )
-public class LockCliCommand {
+public class LockCliCommand implements Callable<Integer> {
 
   @CommandLine.Mixin
   private HelpOptions helpOptions = new HelpOptions();
+
+  @Override
+  public Integer call() throws Exception {
+    CommandLine.usage(this, System.out);
+    return 0;
+  }
 
   @CommandLine.Command(
     name = "status",
