@@ -1,9 +1,9 @@
 ---
 layout: default
 ---
-<h1 class="title">Deploy web apps anywhere.</h1>
-<h2 class="subtitle">From bare metal to cloud VMs.</h2>
+# Deploy web apps anywhere.
+{: .title}
+## From bare metal to cloud VMs.
+{: .subtitle}
 
-<p>
 deploy4j offers zero-downtime deploys, rolling restarts, asset bridging, remote builds, accessory service management, and everything else you need to deploy and manage your web app in production with Docker. Originally built for Rails apps, deploy4j will work with any type of web app that can be containerized.
-</p>
