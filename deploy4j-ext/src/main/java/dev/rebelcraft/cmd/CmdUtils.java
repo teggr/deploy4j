@@ -38,8 +38,8 @@ public class CmdUtils {
       String value = entry.getValue();
 
       if ("true".equalsIgnoreCase(value)) {
-        // treat as flag
-        options.add("--" + key + with + value);
+          // treat as flag
+          options.add("--" + key);
       } else
       if (value != null) {
         if (with != null) {
