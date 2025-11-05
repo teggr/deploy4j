@@ -55,6 +55,7 @@ public class Deploy extends Base {
       env.envify(deployContext, false, null);
       env.push(deployContext);
 
+      log.info("Boot accessories...");
       accessory.boot(deployContext, "all", true);
 
       deploy(deployContext, skipPush);
