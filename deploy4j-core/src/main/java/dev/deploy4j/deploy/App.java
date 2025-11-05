@@ -41,7 +41,7 @@ public class App extends Base {
 
       usingVersion(deployContext, versionOrLatest(deployContext), (version) -> {
 
-        log.debug("Start container with version " + version + " using a " + deployContext.config().readinessDelay() + "s readiness delay (or reboot if already running)..." );
+        log.info("Start container with version " + version + " using a " + deployContext.config().readinessDelay() + "s readiness delay (or reboot if already running)..." );
 
         on(deployContext.hosts(), host -> {
 

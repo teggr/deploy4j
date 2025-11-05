@@ -41,7 +41,7 @@ public class AppHostCommands extends BaseHostCommands {
     cmd = cmd.args("-e", "DEPLOY4J_CONTAINER_NAME=\"" + containerName() + "\"")
       .args("-e", "DEPLOY4J_VERSION=\"" + config().version() + "\"")
       .args(role().envArgs(host()))
-      //.args(role().healthCheckArgs()) TODO: bring this back - acuator and possibly ignore
+      .args(role().healthCheckArgs())
       .args(role().loggingArgs())
       .args(config().volumeArgs())
       .args(role().assetVolumeArgs())

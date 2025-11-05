@@ -69,7 +69,7 @@ public class Server extends Base {
 
         if (!host.execute( docker.installed(), false ) ) {
           if (host.execute( docker.superUser(), false ) ) {
-            log.debug("Missing Docker on {}. Installing...", host.hostName());
+            log.info("Missing Docker on {}. Installing...", host.hostName());
             host.execute( docker.install() );
           } else {
             missing.add(host);

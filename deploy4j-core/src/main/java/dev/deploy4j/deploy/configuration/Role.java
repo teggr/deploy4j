@@ -133,7 +133,9 @@ public class Role {
 
   private List<String> healthCheckArgs(boolean cord) {
 
-    if (runningTraefik() || healthcheck().setPortOrPath()) {
+//    if (runningTraefik() || healthcheck().setPortOrPath()) {
+    // we are going to only run healthchecks if port/path is set. spring boot applications don't use actuator out of the box
+    if(healthcheck().setPortOrPath()) {
       if (cord && usesCord()) {
         List<String> optionize = optionize(Map.of(
           "health-cmd", healthCheckCmdWithCord(),
