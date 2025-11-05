@@ -2,11 +2,11 @@
 layout: page
 title: Healthcheck configuration
 ---
-On roles that are running Traefik, deploy4j will supply a default healthcheck to `docker run`. For other roles, by default no healthcheck is supplied.
+By default, no healthcheck is made when launching an application. We wait for the container to reach a running state and then pause for the readiness delay.
 
-If no healthcheck is supplied and the image does not define one, we wait for the container to reach a running state and then pause for the readiness delay.
+On roles that are running Traefik and supply a healthcheck, deploy4j will supply the healthcheck to the `docker run` command.
 
-The default healthcheck is `curl -f http://localhost:<port>/<path>`, so it assumes that `curl` is available within the container.
+The default healthcheck is `curl -f http://localhost:<port>/<path>`, with a backup of `wget`.
 
 ## Healthcheck options
 
@@ -33,13 +33,13 @@ healthcheck:
 
   # Port
   #
-  # The port to use in the healthcheck, defaults to `3000`
-  port: "80"
+  # The port to use in the healthcheck, defaults to `8080`
+  port: "8080"
 
   # Path
   #
-  # The path to use in the healthcheck, defaults to `/up`
-  path: /health
+  # The path to use in the healthcheck, defaults to `/actuator/health`
+  path: /actuator/health
 
   # Cords for zero-downtime deployments
   #
