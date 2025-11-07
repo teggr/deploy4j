@@ -8,15 +8,15 @@ import picocli.CommandLine;
   description = "Deploy app to servers")
 public class DeployCliCommand extends BaseCliCommand {
 
-  @CommandLine.Option(names = "-P", description = "Skip image build and push", defaultValue = "false")
-  private boolean skipPush;
+  @CommandLine.Option(names = "-P", description = "Skip image pull", defaultValue = "false")
+  private boolean skipPull;
 
   @Override
   protected void execute(DeployApplicationContext deployApplicationContext) {
 
     printRuntime(() -> {
 
-      deployApplicationContext.deploy().deploy(deployApplicationContext.deployContext(), skipPush);
+      deployApplicationContext.deploy().deploy(deployApplicationContext.deployContext(), skipPull);
 
     });
 

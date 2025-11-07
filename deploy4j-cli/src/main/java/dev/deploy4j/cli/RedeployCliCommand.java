@@ -8,15 +8,15 @@ import picocli.CommandLine;
   description = "Deploy app to servers without bootstrapping servers, starting Traefik, pruning, and registry login")
 public class RedeployCliCommand extends BaseCliCommand {
 
-  @CommandLine.Option(names = "-P", description = "Skip image build and push", defaultValue = "false")
-  private boolean skipPush;
+  @CommandLine.Option(names = "-P", description = "Skip image pull", defaultValue = "false")
+  private boolean skipPull;
 
   @Override
   protected void execute(DeployApplicationContext deployApplicationContext) {
 
     printRuntime(() -> {
 
-      deployApplicationContext.deploy().redeploy(deployApplicationContext.deployContext(), skipPush);
+      deployApplicationContext.deploy().redeploy(deployApplicationContext.deployContext(), skipPull);
 
     });
 

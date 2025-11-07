@@ -41,10 +41,8 @@ public class Deploy extends Base {
 
   /**
    * Setup all accessories, push the env, and deploy app to servers
-   *
-   * @param skipPush Skip image build and push
    */
-  public void setup(DeployContext deployContext, boolean skipPush) {
+  public void setup(DeployContext deployContext) {
 
     lockManager.withLock(deployContext, () -> {
 
@@ -58,7 +56,7 @@ public class Deploy extends Base {
       log.info("Boot accessories...");
       accessory.boot(deployContext, "all", true);
 
-      deploy(deployContext, skipPush);
+      deploy(deployContext, false);
 
     });
 
@@ -67,18 +65,19 @@ public class Deploy extends Base {
   /**
    * Deploy the app to servers
    *
-   * @param skipPush Skip image build and push
+   * @param skipPull Skip image pull
    */
-  public void deploy(DeployContext deployContext, boolean skipPush) {
+  public void deploy(DeployContext deployContext, boolean skipPull) {
 
     log.info("Log into image registry...");
     registry.login(deployContext);
 
-    // TODO: we don't build so alwyays pull?
-//    if (!skipPush) {
-    log.info("Pull app image...");
+    if (skipPull) {
+      log.info("Skip pulling app image as requested.");
+    } else {
+      log.info("Pull app image...");
       build.pull(deployContext);
-//    }
+    }
 
     lockManager.withLock(deployContext, () -> {
 
@@ -100,11 +99,13 @@ public class Deploy extends Base {
   /**
    * Deploy app to servers without bootstrapping servers, starting Traefik, pruning, and registry login
    *
-   * @param skipPush Skip image build and push
+   * @param skipPull Skip image pull
    */
-  public void redeploy(DeployContext deployContext, boolean skipPush) {
+  public void redeploy(DeployContext deployContext, boolean skipPull) {
 
-    if (skipPush) {
+    if (skipPull) {
+      log.info("Skip pulling app image as requested.");
+    } else {
       log.info("Pull app image...");
       build.pull(deployContext);
     }
@@ -117,7 +118,6 @@ public class Deploy extends Base {
       app.boot(deployContext);
 
     });
-
 
   }
 
@@ -224,7 +224,7 @@ public class Deploy extends Base {
     on(deployContext.hosts(), host -> {
 
       log.info("Testing connectivity to " + host.hostName() + "...");
-      host.execute( server.test() );
+      host.execute(server.test());
       log.info("Connected to " + host.hostName() + " successfully.");
 
     });

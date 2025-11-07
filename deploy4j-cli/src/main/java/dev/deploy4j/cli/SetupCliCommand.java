@@ -8,9 +8,6 @@ import picocli.CommandLine;
   description = "Setup all accessories, push the env, and deploy app to servers")
 public class SetupCliCommand extends BaseCliCommand {
 
-  @CommandLine.Option(names = "-P", description = "Skip image build and push", defaultValue = "false")
-  private boolean skipPush;
-
   @Override
   protected void execute(DeployApplicationContext deployApplicationContext) {
 
@@ -18,7 +15,7 @@ public class SetupCliCommand extends BaseCliCommand {
 
       deployApplicationContext.lockManager().withLock(deployApplicationContext.deployContext(), () -> {
 
-        deployApplicationContext.deploy().setup(deployApplicationContext.deployContext(), skipPush);
+        deployApplicationContext.deploy().setup(deployApplicationContext.deployContext());
 
       });
 

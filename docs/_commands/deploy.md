@@ -16,6 +16,11 @@ The deployment process is:
 6. Boot the new container and stop the old one
 7. Prune old containers and images
 
+In some cases, you may want to skip the pull step. Use the `-P` flag to skip pulling the image on the servers. Use this option when:
+
+1. You have manually pushed a development version onto the server and don't want to pull from the registry.
+2. You have created a local version and are sharing your local Docker daemon with a local container for testing purposes.
+
 ```shell
 Usage: deploy4j deploy [-HpPqv] [--help] [-c=CONFIG_FILE] [-d=DESTINATION]
                        [--version=VERSION] [-h=HOSTS]... [-r=ROLES]...
@@ -30,7 +35,7 @@ Deploy app to servers
   -H, --skip-hooks        Don't run hooks, Default: false
       --help              Display help about a command
   -p, --[no-]primary      Run commands only on primary host instead of all
-  -P                      Skip image build and push
+  -P                      Skip image pull
   -q, --[no-]quiet        Minimal logging
   -r, --roles=ROLES       Run commands on these roles instead of all (separate
                             by comma, supports wildcards with *)
