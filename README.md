@@ -20,7 +20,7 @@ Some advantages:
 
 ## How?
 
-See [Kamal v1](https://kamal-deploy.org/v1/docs/installation/) for further documentation whilst deploy4j documentation is being put together.
+See [deploy4j](https://teggr.github.io/deploy4j/installation/) for further documentation.
 
 * Connects to server
 * Installs docker
@@ -35,7 +35,7 @@ Requires Java 21.
 
 ## Command Line
 
-[View all commands on Kamal docs for now](https://kamal-deploy.org/v1/docs/commands/view-all-commands/).
+[View all commands](https://teggr.github.io/deploy4j/commands/view-all-commands.html).
 
 Install via JBang:
 
