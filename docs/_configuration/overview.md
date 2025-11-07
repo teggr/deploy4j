@@ -73,7 +73,7 @@ env:
 asset_path: /path/to/assets
 
 # Path to hooks, defaults to `.deploy4j/hooks`
-# See https://kamal-deploy.org/docs/hooks for more information
+# See http://localhost:4000/deploy4j/hooks/overview for more information
 hooks_path: /user_home/deploy4j/hooks
 
 # Require destinations

@@ -10,7 +10,7 @@ If you’ve discovered a bad deploy, you can quickly rollback to a previous imag
 
 ```
 
-From the example above, we can see that e5d9d7c2b898289dfbc5f7f1334140d984eedae4 was the last version, so it’s available as a rollback target. We can perform this rollback by running kamal rollback e5d9d7c2b898289dfbc5f7f1334140d984eedae4.
+From the example above, we can see that e5d9d7c2b898289dfbc5f7f1334140d984eedae4 was the last version, so it’s available as a rollback target. We can perform this rollback by running `deploy4j rollback e5d9d7c2b898289dfbc5f7f1334140d984eedae4`.
 
 That’ll stop 6ef8a6a84c525b123c5245345a8483f86d05a123 and then start a new container running the same image as e5d9d7c2b898289dfbc5f7f1334140d984eedae4. Nothing to download from the registry.
 
