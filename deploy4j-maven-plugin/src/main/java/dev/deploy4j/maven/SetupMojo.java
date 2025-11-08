@@ -40,7 +40,7 @@ public class SetupMojo extends AbstractMojo {
 
       DeployApplicationContext deployApplicationContext = new DeployApplicationContext(environment, sshHosts, deployContext);
 
-      deployApplicationContext.deploy().setup(deployContext, false);
+      deployApplicationContext.deploy().setup(deployContext);
 
     } catch (Exception e) {
 
