@@ -47,24 +47,24 @@ ssh:
   # SSH connection issues.
   log_level: debug
 
-  # Keys Only
+  # SSH Key
   #
-  # Set to true to use only private keys from keys and key_data parameters, 
-  # even if ssh-agent offers more identities. This option is intended for 
-  # situations where ssh-agent offers many different identites or you have 
-  # a need to overwrite all identites and force a single one.
-  keys_only: false
+  # The path to the private key file for authentication.
+  key_path: /path/to/user/.ssh/id_rsa
 
-  # Keys
-  #
-  # An array of file names of private keys to use for publickey
-  # and hostbased authentication
-  keys: [ "~/.ssh/id.pem" ]
+  # SSH Key Passphrase
+  # 
+    # The passphrase for the private key, if applicable.
+  keys_pathphrase: #####
 
-  # Key Data
+  # Strict Host Key Checking
   #
-  # An array of strings, with each element of the array being
-  # a raw private key in PEM format.
-  key_data: [ "-----BEGIN OPENSSH PRIVATE KEY-----" ]
+  # Whether to enable strict host key checking.
+  strict_host_key_checking: true
+
+  # Known Hosts Path
+  #
+  # The path to the known hosts file.
+  known_hosts_path: /path/to/user/.ssh/known_hosts
 
 ```

@@ -1,7 +1,7 @@
 ---
 layout: default
 ---
-<div class="columns is-8">
+<div class="columns">
 
     <div class="column is-one-quarter is-hidden-touch">
 
@@ -33,6 +33,18 @@ layout: default
                     {%- endif -%}
                 </li>
                 <li><a class="is-size-6 has-text-weight-bold {% if page.url=='/hooks/overview/' -%}is-active{%- endif -%}" href="{{ '/hooks/overview' | relative_url}}">Hooks</a></li>
+                <li>
+                    {% assign guideIndexPage = site.guides | where: 'default', true | first %}
+                    <a class="is-size-6 has-text-weight-bold {% if page.collection=='guides' -%}is-active{%- endif -%}" href="{{ guideIndexPage.url | relative_url }}">Guides</a>
+                    {%- if page.collection=='guides' -%}
+                    {%- assign guides = site.guides | sort -%}
+                    <ul>
+                        {%- for guide in guides %}
+                        <li><a class="{%- if page.url==guide.url -%}has-text-weight-bold{%- endif -%}" href="{{ guide.url | relative_url }}">{{ guide.short_title | default: guide.title }}</a></li>
+                        {%- endfor -%}
+                    </ul>
+                    {%- endif -%}
+                </li>
             </ul>
         </aside>
 

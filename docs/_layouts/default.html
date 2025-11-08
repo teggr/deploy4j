@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+<html lang="{{ page.lang | default: site.lang | default: 'en' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,6 +17,36 @@
 </section>
 
 {% include navigation_scripts.html %}
+
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    // Do not start on load — we convert code blocks first, then initialize
+    mermaid.initialize({ startOnLoad: false, securityLevel: 'strict' });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Find code blocks produced by markdown: either <pre><code class="language-mermaid"> or standalone <code class="language-mermaid">
+        const selector = 'pre > code.language-mermaid, code.language-mermaid';
+        const codes = document.querySelectorAll(selector);
+
+        codes.forEach(code => {
+            const pre = code.closest('pre');
+            const mermaidDiv = document.createElement('div');
+            mermaidDiv.className = 'mermaid';
+            // Use textContent so escaped characters are preserved as source
+            mermaidDiv.textContent = code.textContent;
+
+            if (pre && pre.parentNode) {
+                pre.parentNode.replaceChild(mermaidDiv, pre);
+            } else if (code.parentNode) {
+                code.parentNode.replaceChild(mermaidDiv, code);
+            }
+        });
+
+        // Initialize mermaid on the converted elements
+        mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+    });
+</script>
 
 </body>
 </html>

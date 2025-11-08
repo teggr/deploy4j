@@ -5,7 +5,9 @@ import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.configuration.Role;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Optional.ofNullable;
 
@@ -59,17 +61,17 @@ public class Specifics {
   }
 
   public List<String> traefikHosts() {
-    List<String> list = new ArrayList();
+    Set<String> list = new HashSet<>();
     list.addAll(config().traefikHosts());
     list.addAll(specifiedHosts());
-    return list;
+    return list.stream().toList();
   }
 
   public List<String> accessoryHosts() {
-    List<String> accessoryHosts = new ArrayList();
+    Set<String> accessoryHosts = new HashSet<>();
     accessoryHosts.addAll(config().accessories().stream().flatMap(a -> a.hosts().stream()).toList());
     accessoryHosts.addAll(specifiedHosts());
-    return accessoryHosts;
+    return accessoryHosts.stream().toList();
   }
 
   // private

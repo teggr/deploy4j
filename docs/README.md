@@ -13,8 +13,11 @@ Uncommented for gh-pages as described in the `Gemfile` comments.
 
 ```shell
 cd docs
-docker run --rm --volume="%CD%:/srv/jekyll:Z" --volume="%CD%\vendor\bundle:/usr/local/bundle:Z" --publish [::1]:4000:4000 jekyll/jekyll jekyll serve --baseurl '' --force-polling
+docker run --rm --volume="%CD%:/srv/jekyll:Z" --volume="%CD%\vendor\bundle:/usr/local/bundle:Z" --publish [::1]:4000:4000 jekyll/jekyll jekyll serve --force-polling
 ```
+
+Available: http://localhost:4000/deploy4j/
+
 # References
 
 https://github.com/envygeeks/jekyll-docker/blob/master/README.md

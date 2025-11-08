@@ -241,7 +241,7 @@ public class Accessory extends Base {
 
       String type = "Accessory " + name;
 
-      withAccessory(deployContext, type, (accessory, hosts) -> {
+      withAccessory(deployContext, name, (accessory, hosts) -> {
 
         on(hosts, host -> {
 

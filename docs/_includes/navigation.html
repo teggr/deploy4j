@@ -43,6 +43,11 @@
 
                     <a class="navbar-item is-size-6 has-text-weight-bold {% if page.url=='/hooks/overview/' -%}is-selected{%- endif -%}" href="{{ '/hooks/overview' | relative_url}}">Hooks</a>
 
+                    {%- assign guides = site.guides | sort -%}
+                    {%- for guide in guides %}
+                    <a class="navbar-item ml-3 {% if page.url==guide.url -%}has-text-weight-bold{%- endif -%}" href="{{ guide.url | relative_url }}">{{ guide.short_title | default: guide.title }}</a>
+                    {%- endfor -%}
+
                 </div>
 
                 <a class="navbar-item has-text-weight-bold" href="https://github.com/teggr/deploy4j">
