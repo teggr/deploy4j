@@ -110,7 +110,7 @@ accessories:
       "network": "my-network"
 ```
 
-The network can be attached use the pre-deploy hook `.deploy4j/hooks/pre-deploy`:
+The network can be attached use the [docker-setup hook]({{ 'hooks/overview' | relative_url }}) `.deploy4j/hooks/docker-setup`:
 
 ```shell
 #!/usr/bin/env bash
