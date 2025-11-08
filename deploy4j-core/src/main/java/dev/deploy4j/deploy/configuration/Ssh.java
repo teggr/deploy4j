@@ -39,7 +39,8 @@ public class Ssh {
   }
 
   public Boolean strictHostKeyChecking() {
-    return sshConfig().strictHostKeyChecking();
+    return sshConfig().strictHostKeyChecking() != null ?
+      sshConfig().strictHostKeyChecking() : true;
   }
 
   public Map<String, String> options() {
