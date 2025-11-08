@@ -34,7 +34,7 @@ class SshTest {
         assertThat(ssh.proxy()).isNull();
         assertThat(ssh.keyPath()).isNull();
         assertThat(ssh.keyPassphrase()).isNull();
-        assertThat(ssh.strictHostKeyChecking()).isNull();
+        assertThat(ssh.strictHostKeyChecking()).isTrue();
     }
 
     @Test
@@ -44,6 +44,7 @@ class SshTest {
         PlainValueOrSecretKey user = new PlainValueOrSecretKey("deploy");
         PlainValueOrSecretKey keyPath = new PlainValueOrSecretKey("/path/to/key");
         PlainValueOrSecretKey keyPassphrase = new PlainValueOrSecretKey("passphrase");
+        PlainValueOrSecretKey knownHostsPath = new PlainValueOrSecretKey("/path/to/known_hosts");
         SshConfig sshConfig = new SshConfig(
                 user,
                 2222,
@@ -52,7 +53,8 @@ class SshTest {
                 "debug",
                 keyPath,
                 keyPassphrase,
-                true
+                true,
+                knownHostsPath
         );
 
         DeployConfig deployConfig = mock(DeployConfig.class);
@@ -70,6 +72,7 @@ class SshTest {
         assertThat(ssh.keyPath()).isEqualTo("/path/to/key");
         assertThat(ssh.keyPassphrase()).isEqualTo("passphrase");
         assertThat(ssh.strictHostKeyChecking()).isTrue();
+        assertThat(ssh.knownHostsPath()).isEqualTo("/path/to/known_hosts");
     }
 
     @Test
@@ -77,7 +80,7 @@ class SshTest {
     void shouldLookupUserFromEnvironmentWhenKeyIsProvided() {
         // Arrange
         PlainValueOrSecretKey userKey = new PlainValueOrSecretKey(List.of("SSH_USER"));
-        SshConfig sshConfig = new SshConfig(userKey, null, null, null, null, null, null, null);
+        SshConfig sshConfig = new SshConfig(userKey, null, null, null, null, null, null, null, null);
 
         DeployConfig deployConfig = mock(DeployConfig.class);
         when(deployConfig.ssh()).thenReturn(sshConfig);
@@ -101,7 +104,7 @@ class SshTest {
     void shouldLookupKeyPathFromEnvironmentWhenKeyIsProvided() {
         // Arrange
         PlainValueOrSecretKey keyPathKey = new PlainValueOrSecretKey(List.of("SSH_KEY_PATH"));
-        SshConfig sshConfig = new SshConfig(null, null, null, null, null, keyPathKey, null, null);
+        SshConfig sshConfig = new SshConfig(null, null, null, null, null, keyPathKey, null, null, null);
 
         DeployConfig deployConfig = mock(DeployConfig.class);
         when(deployConfig.ssh()).thenReturn(sshConfig);
@@ -120,12 +123,37 @@ class SshTest {
         }
     }
 
+  @Test
+  @DisplayName("should lookup knownHostsPath from environment when key is provided")
+  void shouldLookupKnownHostsPathFromEnvironmentWhenKeyIsProvided() {
+    // Arrange
+    PlainValueOrSecretKey knownHostsPath = new PlainValueOrSecretKey(List.of("SSH_KNOWN_HOSTS_PATH"));
+    SshConfig sshConfig = new SshConfig(null, null, null, null, null, null, null, null, knownHostsPath);
+
+    DeployConfig deployConfig = mock(DeployConfig.class);
+    when(deployConfig.ssh()).thenReturn(sshConfig);
+    Configuration config = mock(Configuration.class);
+    when(config.rawConfig()).thenReturn(deployConfig);
+
+    // Mock ENV.fetch
+    try (MockedStatic<dev.deploy4j.deploy.env.ENV> envMock = mockStatic(dev.deploy4j.deploy.env.ENV.class)) {
+      envMock.when(() -> dev.deploy4j.deploy.env.ENV.fetch("SSH_KNOWN_HOSTS_PATH")).thenReturn("/home/user/.ssh/known_hosts");
+
+      // Act
+      Ssh ssh = new Ssh(config);
+
+      // Assert
+      assertThat(ssh.knownHostsPath()).isEqualTo("/home/user/.ssh/known_hosts");
+    }
+  }
+
     @Test
     @DisplayName("should generate options map with user and port")
     void shouldGenerateOptionsMapWithUserAndPort() {
         // Arrange
         PlainValueOrSecretKey user = new PlainValueOrSecretKey("deploy");
-        SshConfig sshConfig = new SshConfig(user, 2222, null, null, null, null, null, null);
+        PlainValueOrSecretKey knownHostsPath = new PlainValueOrSecretKey("/path/to/known_hosts");
+        SshConfig sshConfig = new SshConfig(user, 2222, null, null, null, null, null, null, knownHostsPath);
 
         DeployConfig deployConfig = mock(DeployConfig.class);
         when(deployConfig.ssh()).thenReturn(sshConfig);
@@ -141,6 +169,7 @@ class SshTest {
         assertThat(options).containsEntry("port", "2222");
         assertThat(options).containsEntry("keepalive", "true");
         assertThat(options).containsEntry("keepalive_interval", "30");
+        assertThat(options).containsEntry("knownHostsPath", "/path/to/known_hosts");
     }
 
     @Test
@@ -149,6 +178,7 @@ class SshTest {
         // Arrange
         PlainValueOrSecretKey user = new PlainValueOrSecretKey("admin");
         PlainValueOrSecretKey keyPath = new PlainValueOrSecretKey("/path/to/key");
+      PlainValueOrSecretKey knownHostsPath = new PlainValueOrSecretKey("/path/to/known_hosts");
         SshConfig sshConfig = new SshConfig(
                 user,
                 3000,
@@ -157,7 +187,8 @@ class SshTest {
                 null,
                 keyPath,
                 null,
-                false
+                false,
+                knownHostsPath
         );
 
         DeployConfig deployConfig = mock(DeployConfig.class);
@@ -177,13 +208,14 @@ class SshTest {
         assertThat(resolved).containsEntry("keyPassphrase", null);
         assertThat(resolved).containsEntry("strictHostKeyChecking", false);
         assertThat(resolved).containsKey("options");
+        assertThat(resolved).containsEntry("knownHostsPath", "/path/to/known_hosts");
     }
 
     @Test
     @DisplayName("should use default root user when user is not provided")
     void shouldUseDefaultRootUserWhenUserIsNotProvided() {
         // Arrange
-        SshConfig sshConfig = new SshConfig(null, null, null, null, null, null, null, null);
+        SshConfig sshConfig = new SshConfig(null, null, null, null, null, null, null, null, null);
 
         DeployConfig deployConfig = mock(DeployConfig.class);
         when(deployConfig.ssh()).thenReturn(sshConfig);
@@ -201,7 +233,7 @@ class SshTest {
     @DisplayName("should use default port 22 when port is not provided")
     void shouldUseDefaultPort22WhenPortIsNotProvided() {
         // Arrange
-        SshConfig sshConfig = new SshConfig(null, null, null, null, null, null, null, null);
+        SshConfig sshConfig = new SshConfig(null, null, null, null, null, null, null, null, null);
 
         DeployConfig deployConfig = mock(DeployConfig.class);
         when(deployConfig.ssh()).thenReturn(sshConfig);

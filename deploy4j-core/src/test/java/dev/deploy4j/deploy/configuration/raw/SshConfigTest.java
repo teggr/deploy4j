@@ -11,6 +11,7 @@ class SshConfigTest {
         PlainValueOrSecretKey user = new PlainValueOrSecretKey("deploy");
         PlainValueOrSecretKey keyPath = new PlainValueOrSecretKey("/home/user/.ssh/id_rsa");
         PlainValueOrSecretKey keyPassphrase = new PlainValueOrSecretKey("secret");
+        PlainValueOrSecretKey knownHostsPath = new PlainValueOrSecretKey("/home/user/.ssh/known_hosts");
         
         SshConfig config = new SshConfig(
             user,
@@ -20,7 +21,8 @@ class SshConfigTest {
             "INFO",
             keyPath,
             keyPassphrase,
-            true
+            true,
+            knownHostsPath
         );
         
         assertThat(config.user()).isEqualTo(user);
@@ -31,6 +33,7 @@ class SshConfigTest {
         assertThat(config.keyPath()).isEqualTo(keyPath);
         assertThat(config.keyPassphrase()).isEqualTo(keyPassphrase);
         assertThat(config.strictHostKeyChecking()).isTrue();
+        assertThat(config.knownHostsPath()).isEqualTo(knownHostsPath);
     }
 
     @Test
@@ -49,7 +52,7 @@ class SshConfigTest {
 
     @Test
     void shouldHandleNullValues() {
-        SshConfig config = new SshConfig(null, null, null, null, null, null, null, null);
+        SshConfig config = new SshConfig(null, null, null, null, null, null, null, null, null);
         
         assertThat(config.user()).isNull();
         assertThat(config.port()).isNull();
@@ -59,18 +62,20 @@ class SshConfigTest {
         assertThat(config.keyPath()).isNull();
         assertThat(config.keyPassphrase()).isNull();
         assertThat(config.strictHostKeyChecking()).isNull();
+        assertThat(config.knownHostsPath()).isNull();
     }
 
     @Test
     void shouldHandlePartialConfiguration() {
         PlainValueOrSecretKey user = new PlainValueOrSecretKey("deploy");
         
-        SshConfig config = new SshConfig(user, 22, null, null, null, null, null, false);
+        SshConfig config = new SshConfig(user, 22, null, null, null, null, null, false, null);
         
         assertThat(config.user()).isEqualTo(user);
         assertThat(config.port()).isEqualTo(22);
         assertThat(config.proxy()).isNull();
         assertThat(config.strictHostKeyChecking()).isFalse();
+        assertThat(config.knownHostsPath()).isNull();
     }
 
     @Test
@@ -78,11 +83,13 @@ class SshConfigTest {
         PlainValueOrSecretKey user = new PlainValueOrSecretKey(java.util.List.of("SSH_USER"));
         PlainValueOrSecretKey keyPath = new PlainValueOrSecretKey(java.util.List.of("SSH_KEY_PATH"));
         PlainValueOrSecretKey keyPassphrase = new PlainValueOrSecretKey(java.util.List.of("SSH_KEY_PASS"));
+      PlainValueOrSecretKey knownHostsPath = new PlainValueOrSecretKey(java.util.List.of("SSH_KNOWN_HOSTS_PATH"));
         
-        SshConfig config = new SshConfig(user, 22, null, null, null, keyPath, keyPassphrase, true);
+        SshConfig config = new SshConfig(user, 22, null, null, null, keyPath, keyPassphrase, true, knownHostsPath);
         
         assertThat(config.user().key()).isEqualTo("SSH_USER");
         assertThat(config.keyPath().key()).isEqualTo("SSH_KEY_PATH");
         assertThat(config.keyPassphrase().key()).isEqualTo("SSH_KEY_PASS");
+        assertThat(config.knownHostsPath().key()).isEqualTo("SSH_KNOWN_HOSTS_PATH");
     }
 }

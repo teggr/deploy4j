@@ -19,16 +19,18 @@ public class SSHTemplate {
   private final String privateKey;
   private final String privateKeyPassphrase;
   private final boolean strictHostChecking;
+  private final String knownHostsFile;
 
   private Session session;
 
-  public SSHTemplate(String host, String username, Integer port, String privateKey, String privateKeyPassphrase, boolean strictHostChecking) {
+  public SSHTemplate(String host, String username, Integer port, String privateKey, String privateKeyPassphrase, boolean strictHostChecking, String knownHostsFile) {
     this.host = host;
     this.username = username;
     this.port = port;
     this.privateKey = privateKey;
     this.privateKeyPassphrase = privateKeyPassphrase;
     this.strictHostChecking = strictHostChecking;
+    this.knownHostsFile = knownHostsFile;
   }
 
   private Session getSession() throws JSchException {
@@ -39,6 +41,10 @@ public class SSHTemplate {
       // setup ssh environment for host
       JSch jsch = new JSch();
       jsch.addIdentity(privateKey, privateKeyPassphrase);
+
+      if(knownHostsFile != null && !knownHostsFile.isEmpty()) {
+        jsch.setKnownHosts(knownHostsFile);
+      }
 
       // create a session
       session = jsch.getSession(username, host, port);

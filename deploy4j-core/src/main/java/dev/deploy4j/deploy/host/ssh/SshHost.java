@@ -24,7 +24,8 @@ public class SshHost {
       ssh.port(),
       ssh.keyPath(),
       ssh.keyPassphrase(),
-      ssh.strictHostKeyChecking()
+      ssh.strictHostKeyChecking(),
+      ssh.knownHostsPath()
     ));
   }
 

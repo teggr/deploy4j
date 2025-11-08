@@ -43,6 +43,10 @@ public class Ssh {
       sshConfig().strictHostKeyChecking() : true;
   }
 
+  public String knownHostsPath() {
+    return lookup( sshConfig().knownHostsPath() );
+  }
+
   public Map<String, String> options() {
     Map<String, String> options = new HashMap<String, String>();
     if (user() != null) {
@@ -54,15 +58,9 @@ public class Ssh {
     // TODO: proxy
     options.put("keepalive", "true");
     options.put("keepalive_interval", "30");
-//    if (keysOnly() != null) {
-//      options.put("keys_only", keysOnly().toString());
-//    }
-//    if (keys() != null) {
-//      options.put("keys", keys().toString());
-//    }
-//    if (keyData() != null) {
-//      options.put("key_data", keyData().toString());
-//    }
+    if(knownHostsPath() != null) {
+      options.put("knownHostsPath", knownHostsPath());
+    }
     return options;
   }
 
@@ -102,6 +100,7 @@ public class Ssh {
     map.put("keyPath", keyPath());
     map.put("keyPassphrase", keyPassphrase());
     map.put("strictHostKeyChecking", strictHostKeyChecking());
+    map.put("knownHostsPath", knownHostsPath());
     map.put("options", options());
     return map;
   }

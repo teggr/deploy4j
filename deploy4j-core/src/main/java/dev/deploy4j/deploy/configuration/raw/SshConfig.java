@@ -15,6 +15,7 @@ public class SshConfig {
   private final PlainValueOrSecretKey keyPath;
   private final PlainValueOrSecretKey keyPassphrase;
   private final Boolean strictHostKeyChecking;
+  private final PlainValueOrSecretKey knownHostsPath;
 
   @JsonCreator
   public SshConfig(
@@ -25,7 +26,8 @@ public class SshConfig {
     @JsonProperty("log_level") String logLevel,
     @JsonProperty("key_path") PlainValueOrSecretKey keyPath,
     @JsonProperty("key_passphrase") PlainValueOrSecretKey keyPassphrase,
-    @JsonProperty("strict_host_key_checking") Boolean strictHostKeyChecking
+    @JsonProperty("strict_host_key_checking") Boolean strictHostKeyChecking,
+    @JsonProperty("known_hosts_path") PlainValueOrSecretKey knownHostsPath
   ) {
     this.user = user;
     this.port = port;
@@ -35,6 +37,7 @@ public class SshConfig {
     this.keyPath = keyPath;
     this.keyPassphrase = keyPassphrase;
     this.strictHostKeyChecking = strictHostKeyChecking;
+    this.knownHostsPath = knownHostsPath;
   }
 
   public SshConfig() {
@@ -46,6 +49,7 @@ public class SshConfig {
     this.keyPath = null;
     this.keyPassphrase = null;
     this.strictHostKeyChecking = null;
+    this.knownHostsPath = null;
   }
 
   public PlainValueOrSecretKey user() {
@@ -78,6 +82,10 @@ public class SshConfig {
 
   public Boolean strictHostKeyChecking() {
     return strictHostKeyChecking;
+  }
+
+  public PlainValueOrSecretKey knownHostsPath() {
+    return knownHostsPath;
   }
 
 }
