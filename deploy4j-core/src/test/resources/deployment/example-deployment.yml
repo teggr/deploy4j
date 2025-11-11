@@ -15,6 +15,7 @@ env:
   DATABASE_HOST: "mysql-db"
 traefik:
   args:
-    api.insecure: "true"
+    api.dashboard: true
+    api.insecure: true
   options:
     publish: "8080:8080"

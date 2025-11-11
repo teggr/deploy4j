@@ -114,6 +114,7 @@ accessories:
 traefik:
   publish: true
   args:
+    api.dashboard: true
     api.insecure: true
   options:
     publish: "8080:8080"
