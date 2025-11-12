@@ -1,8 +1,8 @@
 package dev.deploy4j.deploy.configuration;
 
+import dev.deploy4j.deploy.configuration.raw.AccessoryConfig;
 import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
 import dev.deploy4j.deploy.utils.file.File;
-import dev.deploy4j.deploy.configuration.raw.AccessoryConfig;
 
 import java.nio.file.Paths;
 import java.util.*;
@@ -23,13 +23,22 @@ public class Accessory {
     this.config = config;
     this.accessoryConfig = config.rawConfig().accessories().get(name);
 
-    // TODO: validate
+    validate();
 
     this.env = new Env(
       accessoryConfig.env() != null ? accessoryConfig.env() : new EnvironmentConfig(),
       File.join(config.hostEnvDirectory(), "accessories", serviceName() + ".env"),
       "accessories/%s/env".formatted(name)
     );
+  }
+
+  private void validate() {
+    if ((this.accessoryConfig.hosts() == null || this.accessoryConfig.hosts().isEmpty())
+        && this.accessoryConfig.host() == null
+        && (this.accessoryConfig.roles() == null || this.accessoryConfig.roles().isEmpty())
+    ) {
+      throw new IllegalArgumentException("Accessory '%s' must specify at least one of 'host', 'hosts' or 'roles'".formatted(name()));
+    }
   }
 
   public String serviceName() {
@@ -54,7 +63,7 @@ public class Accessory {
 
   public String port() {
     String port = accessoryConfig().port() != null ? accessoryConfig().port() : null;
-    if( port != null ) {
+    if (port != null) {
       if (port.contains(":")) {
         return port;
       } else {
@@ -65,7 +74,7 @@ public class Accessory {
   }
 
   public String[] publishArgs() {
-    if(port() != null) {
+    if (port() != null) {
       return argumentize("--publish", port());
     } else {
       return new String[]{};

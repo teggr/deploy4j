@@ -36,7 +36,6 @@ public class Env {
       this.secretsFile = secretsFile;
       this.context = context;
     }
-    // TODO: context to be used with validation/error messages
   }
 
   public List<String> args() {

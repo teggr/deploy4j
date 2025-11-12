@@ -33,8 +33,6 @@ public class Role {
     this.name = name;
     this.config = config;
 
-    // TODO: validate
-
     this.specializedEnv = new Env(
       specializations().env() != null ? specializations().env() : new EnvironmentConfig(),
       File.join(config().hostEnvDirectory(), "roles", containerPrefix() + ".env"),

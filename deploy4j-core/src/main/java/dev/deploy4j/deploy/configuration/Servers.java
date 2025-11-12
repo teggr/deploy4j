@@ -13,7 +13,6 @@ public class Servers {
   public Servers(Configuration config) {
     this.config = config;
     this.serversConfig = config.rawConfig().servers();
-    // TODO validate servers
 
     this.roles = roleNames().stream()
       .map( roleName -> new Role(roleName, config) )

@@ -69,8 +69,6 @@ public class Configuration {
     this.destination = destination;
     this.declaredVersion = version;
 
-    // TODO: validate config
-
     this.servers = new Servers(this);
     this.registry = new Registry(this);
 

@@ -12,7 +12,6 @@ public class Registry {
     this.registryConfig = config.rawConfig().registry() != null
       ? config.rawConfig().registry()
       : new RegistryConfig();
-    // TODO: validate
   }
 
   public String server() {

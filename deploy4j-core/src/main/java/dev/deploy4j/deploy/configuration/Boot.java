@@ -12,7 +12,6 @@ public class Boot {
       ? config.rawConfig().boot()
       : new BootConfig();
     this.hostCount = config.allHosts().size();
-    // TODO: validate
   }
 
   public Integer limit() {
