@@ -203,5 +203,45 @@ public class DeployConfigBuilder {
         public HealthCheckConfig build() { return new HealthCheckConfig(cmd, interval, maxAttempts, port, path, cord, logLines); }
     }
 
-}
+    // --- Accessory builder for tests ---
+    public static AccessoryConfigBuilder accessory() { return new AccessoryConfigBuilder(); }
 
+    public static class AccessoryConfigBuilder {
+        private String service;
+        private String image;
+        private String host;
+        private List<String> hosts;
+        private List<String> roles;
+        private String cmd;
+        private String port;
+        private Map<String, String> labels;
+        private Map<String, String> options;
+        private EnvironmentConfig env;
+        private List<String> files;
+        private List<String> directories;
+        private List<String> volumes;
+
+        public AccessoryConfigBuilder service(String s) { this.service = s; return this; }
+        public AccessoryConfigBuilder image(String i) { this.image = i; return this; }
+        public AccessoryConfigBuilder host(String h) { this.host = h; return this; }
+        public AccessoryConfigBuilder hosts(List<String> hs) { this.hosts = hs; return this; }
+        public AccessoryConfigBuilder addHost(String h) { if (this.hosts == null) this.hosts = new ArrayList<>(); this.hosts.add(h); return this; }
+        public AccessoryConfigBuilder roles(List<String> r) { this.roles = r; return this; }
+        public AccessoryConfigBuilder cmd(String c) { this.cmd = c; return this; }
+        public AccessoryConfigBuilder port(String p) { this.port = p; return this; }
+        public AccessoryConfigBuilder labels(Map<String, String> l) { this.labels = l; return this; }
+        public AccessoryConfigBuilder options(Map<String, String> o) { this.options = o; return this; }
+        public AccessoryConfigBuilder env(EnvironmentConfig e) { this.env = e; return this; }
+        public AccessoryConfigBuilder files(List<String> f) { this.files = f; return this; }
+        public AccessoryConfigBuilder addFile(String f) { if (this.files == null) this.files = new ArrayList<>(); this.files.add(f); return this; }
+        public AccessoryConfigBuilder directories(List<String> d) { this.directories = d; return this; }
+        public AccessoryConfigBuilder addDirectory(String d) { if (this.directories == null) this.directories = new ArrayList<>(); this.directories.add(d); return this; }
+        public AccessoryConfigBuilder volumes(List<String> v) { this.volumes = v; return this; }
+        public AccessoryConfigBuilder addVolume(String v) { if (this.volumes == null) this.volumes = new ArrayList<>(); this.volumes.add(v); return this; }
+
+        public AccessoryConfig build() {
+            return new AccessoryConfig(service, image, host, hosts, roles, cmd, port, labels, options, env, files, directories, volumes);
+        }
+    }
+
+}

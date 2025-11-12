@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
 @DisplayName("Accessory Configuration")
 class AccessoryTest {
@@ -23,8 +22,13 @@ class AccessoryTest {
         @DisplayName("should use configured service name when provided")
         void shouldUseConfiguredServiceNameWhenProvided() {
             // Arrange
-            Configuration config = createConfigWithAccessory("redis", 
-                Map.of("service", "my-redis", "image", "redis:latest"));
+            Configuration config = createConfigWithAccessory("redis",
+                DeployConfigBuilder.accessory()
+                    .service("my-redis")
+                    .image("redis:latest")
+                    .host("redis-host")
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("redis", config);
@@ -37,8 +41,12 @@ class AccessoryTest {
         @DisplayName("should generate service name from config service and accessory name")
         void shouldGenerateServiceNameFromConfigServiceAndAccessoryName() {
             // Arrange
-            Configuration config = createConfigWithAccessory("mysql", 
-                Map.of("image", "mysql:8.0"));
+            Configuration config = createConfigWithAccessory("mysql",
+                DeployConfigBuilder.accessory()
+                    .image("mysql:8.0")
+                    .host("mysql-host")
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("mysql", config);
@@ -56,8 +64,12 @@ class AccessoryTest {
         @DisplayName("should return configured image")
         void shouldReturnConfiguredImage() {
             // Arrange
-            Configuration config = createConfigWithAccessory("postgres", 
-                Map.of("image", "postgres:14"));
+            Configuration config = createConfigWithAccessory("postgres",
+                DeployConfigBuilder.accessory()
+                    .image("postgres:14")
+                    .host("postgres-host")
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("postgres", config);
@@ -75,8 +87,13 @@ class AccessoryTest {
         @DisplayName("should format port as host:container when only port number provided")
         void shouldFormatPortAsHostContainerWhenOnlyPortNumberProvided() {
             // Arrange
-            Configuration config = createConfigWithAccessory("redis", 
-                Map.of("image", "redis:latest", "port", "6379"));
+            Configuration config = createConfigWithAccessory("redis",
+                DeployConfigBuilder.accessory()
+                    .image("redis:latest")
+                    .host("redis-host")
+                    .port("6379")
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("redis", config);
@@ -89,8 +106,13 @@ class AccessoryTest {
         @DisplayName("should keep port format when already specified as host:container")
         void shouldKeepPortFormatWhenAlreadySpecified() {
             // Arrange
-            Configuration config = createConfigWithAccessory("redis", 
-                Map.of("image", "redis:latest", "port", "6380:6379"));
+            Configuration config = createConfigWithAccessory("redis",
+                DeployConfigBuilder.accessory()
+                    .image("redis:latest")
+                    .host("redis-host")
+                    .port("6380:6379")
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("redis", config);
@@ -103,8 +125,12 @@ class AccessoryTest {
         @DisplayName("should return null when port not configured")
         void shouldReturnNullWhenPortNotConfigured() {
             // Arrange
-            Configuration config = createConfigWithAccessory("redis", 
-                Map.of("image", "redis:latest"));
+            Configuration config = createConfigWithAccessory("redis",
+                DeployConfigBuilder.accessory()
+                    .image("redis:latest")
+                    .host("redis-host")
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("redis", config);
@@ -117,8 +143,13 @@ class AccessoryTest {
         @DisplayName("should generate publish args when port configured")
         void shouldGeneratePublishArgsWhenPortConfigured() {
             // Arrange
-            Configuration config = createConfigWithAccessory("redis", 
-                Map.of("image", "redis:latest", "port", "6379"));
+            Configuration config = createConfigWithAccessory("redis",
+                DeployConfigBuilder.accessory()
+                    .image("redis:latest")
+                    .host("redis-host")
+                    .port("6379")
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("redis", config);
@@ -132,8 +163,12 @@ class AccessoryTest {
         @DisplayName("should return empty array when no port configured")
         void shouldReturnEmptyArrayWhenNoPortConfigured() {
             // Arrange
-            Configuration config = createConfigWithAccessory("redis", 
-                Map.of("image", "redis:latest"));
+            Configuration config = createConfigWithAccessory("redis",
+                DeployConfigBuilder.accessory()
+                    .image("redis:latest")
+                    .host("redis-host")
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("redis", config);
@@ -151,8 +186,13 @@ class AccessoryTest {
         @DisplayName("should include default service label")
         void shouldIncludeDefaultServiceLabel() {
             // Arrange
-            Configuration config = createConfigWithAccessory("redis", 
-                Map.of("image", "redis:latest", "service", "my-redis"));
+            Configuration config = createConfigWithAccessory("redis",
+                DeployConfigBuilder.accessory()
+                    .service("my-redis")
+                    .image("redis:latest")
+                    .host("redis-host")
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("redis", config);
@@ -166,9 +206,13 @@ class AccessoryTest {
         @DisplayName("should merge custom labels with default labels")
         void shouldMergeCustomLabelsWithDefaultLabels() {
             // Arrange
-            Configuration config = createConfigWithAccessory("redis", 
-                Map.of("image", "redis:latest", 
-                       "labels", Map.of("env", "production", "version", "1.0")));
+            Configuration config = createConfigWithAccessory("redis",
+                DeployConfigBuilder.accessory()
+                    .image("redis:latest")
+                    .host("redis-host")
+                    .labels(Map.of("env", "production", "version", "1.0"))
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("redis", config);
@@ -184,9 +228,13 @@ class AccessoryTest {
         @DisplayName("should generate label args")
         void shouldGenerateLabelArgs() {
             // Arrange
-            Configuration config = createConfigWithAccessory("redis", 
-                Map.of("image", "redis:latest", 
-                       "labels", Map.of("env", "prod")));
+            Configuration config = createConfigWithAccessory("redis",
+                DeployConfigBuilder.accessory()
+                    .image("redis:latest")
+                    .host("redis-host")
+                    .labels(Map.of("env", "prod"))
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("redis", config);
@@ -205,9 +253,13 @@ class AccessoryTest {
         @DisplayName("should return specific volumes when configured")
         void shouldReturnSpecificVolumesWhenConfigured() {
             // Arrange
-            Configuration config = createConfigWithAccessory("mysql", 
-                Map.of("image", "mysql:8.0", 
-                       "volumes", List.of("mysql-data:/var/lib/mysql")));
+            Configuration config = createConfigWithAccessory("mysql",
+                DeployConfigBuilder.accessory()
+                    .image("mysql:8.0")
+                    .host("redis-host")
+                    .volumes(List.of("mysql-data:/var/lib/mysql"))
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("mysql", config);
@@ -221,9 +273,13 @@ class AccessoryTest {
         @DisplayName("should generate volume args")
         void shouldGenerateVolumeArgs() {
             // Arrange
-            Configuration config = createConfigWithAccessory("mysql", 
-                Map.of("image", "mysql:8.0", 
-                       "volumes", List.of("mysql-data:/var/lib/mysql")));
+            Configuration config = createConfigWithAccessory("mysql",
+                DeployConfigBuilder.accessory()
+                    .image("mysql:8.0")
+                    .host("redis-host")
+                    .volumes(List.of("mysql-data:/var/lib/mysql"))
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("mysql", config);
@@ -237,8 +293,12 @@ class AccessoryTest {
         @DisplayName("should return empty volume args when no volumes configured")
         void shouldReturnEmptyVolumeArgsWhenNoVolumesConfigured() {
             // Arrange
-            Configuration config = createConfigWithAccessory("redis", 
-                Map.of("image", "redis:latest"));
+            Configuration config = createConfigWithAccessory("redis",
+                DeployConfigBuilder.accessory()
+                    .image("redis:latest")
+                    .host("redis-host")
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("redis", config);
@@ -256,9 +316,13 @@ class AccessoryTest {
         @DisplayName("should return option args when configured")
         void shouldReturnOptionArgsWhenConfigured() {
             // Arrange
-            Configuration config = createConfigWithAccessory("redis", 
-                Map.of("image", "redis:latest", 
-                       "options", Map.of("memory", "1g", "cpus", "2")));
+            Configuration config = createConfigWithAccessory("redis",
+                DeployConfigBuilder.accessory()
+                    .image("redis:latest")
+                    .host("redis-host")
+                    .options(Map.of("memory", "1g", "cpus", "2"))
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("redis", config);
@@ -272,8 +336,12 @@ class AccessoryTest {
         @DisplayName("should return empty list when no options configured")
         void shouldReturnEmptyListWhenNoOptionsConfigured() {
             // Arrange
-            Configuration config = createConfigWithAccessory("redis", 
-                Map.of("image", "redis:latest"));
+            Configuration config = createConfigWithAccessory("redis",
+                DeployConfigBuilder.accessory()
+                    .image("redis:latest")
+                    .host("redis-host")
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("redis", config);
@@ -291,8 +359,13 @@ class AccessoryTest {
         @DisplayName("should return configured command")
         void shouldReturnConfiguredCommand() {
             // Arrange
-            Configuration config = createConfigWithAccessory("redis", 
-                Map.of("image", "redis:latest", "cmd", "redis-server --appendonly yes"));
+            Configuration config = createConfigWithAccessory("redis",
+                DeployConfigBuilder.accessory()
+                    .image("redis:latest")
+                    .host("redis-host")
+                    .cmd("redis-server --appendonly yes")
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("redis", config);
@@ -305,8 +378,12 @@ class AccessoryTest {
         @DisplayName("should return null when no command configured")
         void shouldReturnNullWhenNoCommandConfigured() {
             // Arrange
-            Configuration config = createConfigWithAccessory("redis", 
-                Map.of("image", "redis:latest"));
+            Configuration config = createConfigWithAccessory("redis",
+                DeployConfigBuilder.accessory()
+                    .image("redis:latest")
+                    .host("redis-host")
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("redis", config);
@@ -324,8 +401,12 @@ class AccessoryTest {
         @DisplayName("should provide environment args")
         void shouldProvideEnvironmentArgs() {
             // Arrange
-            Configuration config = createConfigWithAccessory("redis", 
-                Map.of("image", "redis:latest"));
+            Configuration config = createConfigWithAccessory("redis",
+                DeployConfigBuilder.accessory()
+                    .image("redis:latest")
+                    .host("redis-host")
+                    .build()
+            );
 
             // Act
             Accessory accessory = new Accessory("redis", config);
@@ -336,49 +417,13 @@ class AccessoryTest {
     }
 
     // Helper method to create test configuration
-    private Configuration createConfigWithAccessory(String accessoryName, Map<String, Object> accessoryProperties) {
-        // Build a real AccessoryConfig from provided properties (null-safe casting)
-        String service = (String) accessoryProperties.get("service");
-        String image = (String) accessoryProperties.get("image");
-        String host = (String) accessoryProperties.get("host");
-        List<String> hosts = (List<String>) accessoryProperties.get("hosts");
-        List<String> roles = accessoryProperties.containsKey("roles") ? (List<String>) accessoryProperties.get("roles") : null;
-        String cmd = (String) accessoryProperties.get("cmd");
-        String port = (String) accessoryProperties.get("port");
-        Map<String, String> labels = (Map<String, String>) accessoryProperties.get("labels");
-        Map<String, String> options = (Map<String, String>) accessoryProperties.get("options");
-        dev.deploy4j.deploy.configuration.raw.EnvironmentConfig env = (dev.deploy4j.deploy.configuration.raw.EnvironmentConfig) accessoryProperties.get("env");
-        List<String> files = (List<String>) accessoryProperties.get("files");
-        List<String> directories = (List<String>) accessoryProperties.get("directories");
-        List<String> volumes = (List<String>) accessoryProperties.get("volumes");
-
-        AccessoryConfig accessoryConfig = new AccessoryConfig(
-            service,
-            image,
-            host,
-            hosts,
-            roles,
-            cmd,
-            port,
-            labels,
-            options,
-            env,
-            files,
-            directories,
-            volumes
-        );
-
+    private Configuration createConfigWithAccessory(String accessoryName, AccessoryConfig accessoryConfig) {
         // Build DeployConfig using the test builder and attach the accessory map
         DeployConfig deployConfig = DeployConfigBuilder.minimal()
             .service("test-app")
             .accessories(Map.of(accessoryName, accessoryConfig))
             .build();
 
-        Configuration config = mock(Configuration.class);
-        when(config.service()).thenReturn("test-app");
-        when(config.rawConfig()).thenReturn(deployConfig);
-        when(config.hostEnvDirectory()).thenReturn("/tmp/env");
-
-        return config;
+        return new Configuration(deployConfig, null, null);
     }
 }
