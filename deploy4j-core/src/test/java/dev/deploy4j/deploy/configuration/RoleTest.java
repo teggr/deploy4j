@@ -12,6 +12,7 @@ class RoleTest {
 
   @Test
   void basicNamesAndLabelsAndContainer() {
+
     // build a simple deploy config with a service and servers map (role "web")
     ServersConfig servers = new ServersConfig(Map.of(
       "web", new RoleConfig(List.of("host1", "host2"))
@@ -19,31 +20,13 @@ class RoleTest {
 
     EnvironmentConfig env = new EnvironmentConfig(Map.of("K", "V"), null, null, null);
 
-    DeployConfig raw = new DeployConfig(
-      "svc", // service
-      null, // image
-      Map.of("custom", "val"), // labels
-      null, // volumes
-      null, // registry
-      servers,
-      env,
-      null, // assetPath
-      null, // hooksPath
-      null, // requireDestination
-      null, // primaryRole
-      null, // allowEmptyRoles
-      null, // stopWaitTime
-      null, // retainContainers
-      null, // minimumVersion
-      null, // readinessDelay
-      null, // runDirectory
-      null, // ssh
-      null, // accessories
-      null, // traefik
-      null, // boot
-      null, // healthCheck
-      null  // logging
-    );
+    DeployConfig raw = DeployConfigBuilder.minimal()
+      .service("svc")
+      .labels(Map.of("custom", "val"))
+      .servers(servers)
+      .env(env)
+      .registry(new RegistryConfig(null, null, null))
+      .build();
 
     Configuration config = new Configuration(raw, "dest", "v1");
     Role role = config.role("web");
@@ -80,31 +63,11 @@ class RoleTest {
 
     EnvironmentConfig env = new EnvironmentConfig(Map.of("FOO", "BAR"), null, null, null);
 
-    DeployConfig raw = new DeployConfig(
-      "svc",
-      null,
-      null,
-      null,
-      null,
-      servers,
-      env,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    );
+    DeployConfig raw = DeployConfigBuilder.minimal()
+      .service("svc")
+      .servers(servers)
+      .env(env)
+      .build();
 
     Configuration config = new Configuration(raw, "dest", "ver");
     Role role = config.role("web");
@@ -152,31 +115,10 @@ class RoleTest {
     RoleConfig roleConfig = new RoleConfig(custom);
     ServersConfig servers = new ServersConfig(Map.of("web", roleConfig));
 
-    DeployConfig raw = new DeployConfig(
-      "svc",
-      null,
-      null,
-      null,
-      null,
-      servers,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    );
+    DeployConfig raw = DeployConfigBuilder.minimal()
+      .service("svc")
+      .servers(servers)
+      .build();
 
     Configuration config = new Configuration(raw, "dst", "rv");
     Role role = config.role("web");
@@ -208,31 +150,11 @@ class RoleTest {
       "web", new RoleConfig(List.of("host1"))
     ));
 
-    DeployConfig raw = new DeployConfig(
-      "svc",
-      null,
-      null,
-      null,
-      null,
-      servers,
-      null,
-      "/var/www", // assetPath
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    );
+    DeployConfig raw = DeployConfigBuilder.minimal()
+      .service("svc")
+      .servers(servers)
+      .assetPath("/var/www")
+      .build();
 
     Configuration config = new Configuration(raw, "dest", "1.2.3");
     Role role = config.role("web");
@@ -256,31 +178,10 @@ class RoleTest {
     ServersConfig servers = new ServersConfig(Map.of(
       "web", new RoleConfig(List.of("a"))
     ));
-    DeployConfig raw = new DeployConfig(
-      "svc",
-      null,
-      null,
-      null,
-      null,
-      servers,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    );
+    DeployConfig raw = DeployConfigBuilder.minimal()
+      .service("svc")
+      .servers(servers)
+      .build();
 
     Configuration config = new Configuration(raw, null, null);
     Role role = config.role("web");

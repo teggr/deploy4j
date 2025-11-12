@@ -1,5 +1,6 @@
 package dev.deploy4j.deploy.configuration;
 
+import dev.deploy4j.deploy.Version;
 import dev.deploy4j.deploy.configuration.env.Tag;
 import dev.deploy4j.deploy.configuration.raw.DeployConfig;
 import dev.deploy4j.deploy.configuration.raw.DeployConfigYamlReader;
@@ -86,12 +87,11 @@ public class Configuration {
     this.traefik = new Traefik(this);
     this.ssh = new Ssh(this);
 
-    // TODO: more validations
-//    ensure_destination_if_required
-//      ensure_required_keys_present
-//    ensure_valid_kamal_version
-//      ensure_retain_containers_valid
-//    ensure_valid_service_name
+    ensureDestinationIfRequired();
+    ensureRequiredKeysPresent();
+    ensureValidKamalVersion();
+    ensureRetainContainersValid();
+    ensureValidServiceName();
 
   }
 
@@ -168,7 +168,8 @@ public class Configuration {
   }
 
   public Boolean allowEmptyRoles() {
-    return rawConfig().allowEmptyRoles();
+    return rawConfig().allowEmptyRoles() != null ?
+      rawConfig().allowEmptyRoles() : false;
   }
 
   private List<Role> traefikRoles() {
@@ -215,7 +216,8 @@ public class Configuration {
   }
 
   public Boolean requireDestination() {
-    return rawConfig().requireDestination();
+    return rawConfig().requireDestination() != null ?
+      rawConfig().requireDestination() : false;
   }
 
   public int retainContainer() {
@@ -317,11 +319,65 @@ public class Configuration {
 
   // private
 
-  // TODO: ensure_destination_if_required
-  // TODO: ensure_required_keys_present
-  // TODO: ensure_valid_service_name
-  // TODO: ensure_valid_kamal_version
-  // TODO: ensure_retain_containers_valid
+  private void ensureDestinationIfRequired() {
+    if (requireDestination() && destination() == null) {
+      throw new IllegalArgumentException("You must specify a destination");
+    }
+  }
+
+  public void ensureRequiredKeysPresent() {
+    Map<String, Object> requiredKeys = new HashMap<>();
+    requiredKeys.put("service", rawConfig().service());
+    requiredKeys.put("image", rawConfig().image());
+    requiredKeys.put("registry", rawConfig().registry());
+    requiredKeys.put("servers", rawConfig().servers());
+
+        // stream requiredkeys and build list of keys with null values
+    List<String> missingKeys = requiredKeys.entrySet().stream()
+      .filter(entry -> entry.getValue() == null)
+      .map(entry -> entry.getKey())
+      .collect(Collectors.toList());
+    if (!missingKeys.isEmpty()) {
+      throw new IllegalArgumentException("Missing required configuration for " + String.join(", ", missingKeys));
+    }
+
+    if (primaryRoleName() == null) {
+      throw new IllegalArgumentException("The primary_role " + primaryRoleName() + " isn't defined");
+    }
+
+    if (primaryRole().hosts().isEmpty()) {
+      throw new IllegalArgumentException("No servers specified for the " + primaryRole().name() + " primary_role");
+    }
+
+    if (!allowEmptyRoles()) {
+      for (Role role : roles()) {
+        if (role.hosts().isEmpty()) {
+          throw new IllegalArgumentException("No servers specified for the " + role.name() + " role. You can ignore this with allow_empty_roles: true");
+        }
+      }
+    }
+  }
+
+  private void ensureValidServiceName() {
+    String serviceName = rawConfig().service();
+    if (!serviceName.matches("^[a-zA-Z0-9_-]+$")) {
+      throw new IllegalArgumentException("Service name can only include alphanumeric characters, hyphens, and underscores");
+    }
+  }
+
+  private void ensureValidKamalVersion() {
+    String minimumVersion = minumimVersion();
+    String currentVersion = Version.VERSION;
+    if (minimumVersion != null && Version.compareVersions(minimumVersion, currentVersion) > 0) {
+      throw new IllegalArgumentException("Current version is " + currentVersion + ", minimum required is " + minimumVersion);
+    }
+  }
+
+  private void ensureRetainContainersValid() {
+    if (retainContainer() < 1) {
+      throw new IllegalArgumentException("Must retain at least 1 container");
+    }
+  }
 
   public List<String> roleNames() {
     if (rawConfig().servers().isAList()) {

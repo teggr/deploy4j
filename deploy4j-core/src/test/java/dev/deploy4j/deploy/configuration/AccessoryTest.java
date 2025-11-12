@@ -337,36 +337,48 @@ class AccessoryTest {
 
     // Helper method to create test configuration
     private Configuration createConfigWithAccessory(String accessoryName, Map<String, Object> accessoryProperties) {
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.service()).thenReturn("test-app");
-        
-        AccessoryConfig accessoryConfig = mock(AccessoryConfig.class);
-        
-        // Setup accessory config based on provided properties
-        lenient().when(accessoryConfig.service()).thenReturn((String) accessoryProperties.get("service"));
-        lenient().when(accessoryConfig.image()).thenReturn((String) accessoryProperties.get("image"));
-        lenient().when(accessoryConfig.port()).thenReturn((String) accessoryProperties.get("port"));
-        lenient().when(accessoryConfig.cmd()).thenReturn((String) accessoryProperties.get("cmd"));
-        lenient().when(accessoryConfig.host()).thenReturn((String) accessoryProperties.get("host"));
-        lenient().when(accessoryConfig.hosts()).thenReturn((List<String>) accessoryProperties.get("hosts"));
-        lenient().when(accessoryConfig.roles()).thenReturn(
-            accessoryProperties.containsKey("roles") ? 
-                (List<String>) accessoryProperties.get("roles") : 
-                List.of()
+        // Build a real AccessoryConfig from provided properties (null-safe casting)
+        String service = (String) accessoryProperties.get("service");
+        String image = (String) accessoryProperties.get("image");
+        String host = (String) accessoryProperties.get("host");
+        List<String> hosts = (List<String>) accessoryProperties.get("hosts");
+        List<String> roles = accessoryProperties.containsKey("roles") ? (List<String>) accessoryProperties.get("roles") : null;
+        String cmd = (String) accessoryProperties.get("cmd");
+        String port = (String) accessoryProperties.get("port");
+        Map<String, String> labels = (Map<String, String>) accessoryProperties.get("labels");
+        Map<String, String> options = (Map<String, String>) accessoryProperties.get("options");
+        dev.deploy4j.deploy.configuration.raw.EnvironmentConfig env = (dev.deploy4j.deploy.configuration.raw.EnvironmentConfig) accessoryProperties.get("env");
+        List<String> files = (List<String>) accessoryProperties.get("files");
+        List<String> directories = (List<String>) accessoryProperties.get("directories");
+        List<String> volumes = (List<String>) accessoryProperties.get("volumes");
+
+        AccessoryConfig accessoryConfig = new AccessoryConfig(
+            service,
+            image,
+            host,
+            hosts,
+            roles,
+            cmd,
+            port,
+            labels,
+            options,
+            env,
+            files,
+            directories,
+            volumes
         );
-        lenient().when(accessoryConfig.volumes()).thenReturn((List<String>) accessoryProperties.get("volumes"));
-        lenient().when(accessoryConfig.files()).thenReturn((List<String>) accessoryProperties.get("files"));
-        lenient().when(accessoryConfig.directories()).thenReturn((List<String>) accessoryProperties.get("directories"));
-        lenient().when(accessoryConfig.labels()).thenReturn((Map<String, String>) accessoryProperties.get("labels"));
-        lenient().when(accessoryConfig.options()).thenReturn((Map<String, String>) accessoryProperties.get("options"));
-        
-        when(deployConfig.accessories()).thenReturn(Map.of(accessoryName, accessoryConfig));
-        
+
+        // Build DeployConfig using the test builder and attach the accessory map
+        DeployConfig deployConfig = DeployConfigBuilder.minimal()
+            .service("test-app")
+            .accessories(Map.of(accessoryName, accessoryConfig))
+            .build();
+
         Configuration config = mock(Configuration.class);
         when(config.service()).thenReturn("test-app");
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.hostEnvDirectory()).thenReturn("/tmp/env");
-        
+
         return config;
     }
 }

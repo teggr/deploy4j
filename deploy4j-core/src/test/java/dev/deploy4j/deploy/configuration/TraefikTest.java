@@ -18,8 +18,7 @@ class TraefikTest {
     @DisplayName("should use default values when config is null")
     void shouldUseDefaultValuesWhenConfigIsNull() {
         // Arrange
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.traefik()).thenReturn(null);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.hostEnvDirectory()).thenReturn("/app/env");
@@ -51,8 +50,7 @@ class TraefikTest {
                 null
         );
 
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.traefik()).thenReturn(traefikConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().traefik(traefikConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.hostEnvDirectory()).thenReturn("/app/env");
@@ -73,8 +71,7 @@ class TraefikTest {
         // Arrange
         TraefikConfig traefikConfig = new TraefikConfig(null, null, null, null, null, null, null);
 
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.traefik()).thenReturn(traefikConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().traefik(traefikConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.hostEnvDirectory()).thenReturn("/app/env");
@@ -90,8 +87,7 @@ class TraefikTest {
     @DisplayName("should include default labels in labels map")
     void shouldIncludeDefaultLabelsInLabelsMap() {
         // Arrange
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.traefik()).thenReturn(null);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.hostEnvDirectory()).thenReturn("/app/env");
@@ -116,8 +112,7 @@ class TraefikTest {
         Map<String, String> customLabels = Map.of("custom.label", "value", "another.label", "another-value");
         TraefikConfig traefikConfig = new TraefikConfig(null, null, null, customLabels, null, null, null);
 
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.traefik()).thenReturn(traefikConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().traefik(traefikConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.hostEnvDirectory()).thenReturn("/app/env");
@@ -137,8 +132,7 @@ class TraefikTest {
     @DisplayName("should include default args in args map")
     void shouldIncludeDefaultArgsInArgsMap() {
         // Arrange
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.traefik()).thenReturn(null);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.hostEnvDirectory()).thenReturn("/app/env");
@@ -158,8 +152,7 @@ class TraefikTest {
         Map<String, String> customArgs = Map.of("api.dashboard", "true", "entrypoints.web.address", ":80");
         TraefikConfig traefikConfig = new TraefikConfig(null, null, null, null, customArgs, null, null);
 
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.traefik()).thenReturn(traefikConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().traefik(traefikConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.hostEnvDirectory()).thenReturn("/app/env");
@@ -181,8 +174,7 @@ class TraefikTest {
         // Arrange
         TraefikConfig traefikConfig = new TraefikConfig(null, 8080, null, null, null, null, null);
 
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.traefik()).thenReturn(traefikConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().traefik(traefikConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.hostEnvDirectory()).thenReturn("/app/env");
@@ -198,8 +190,7 @@ class TraefikTest {
     @DisplayName("should format default port correctly")
     void shouldFormatDefaultPortCorrectly() {
         // Arrange
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.traefik()).thenReturn(null);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.hostEnvDirectory()).thenReturn("/app/env");
@@ -215,8 +206,7 @@ class TraefikTest {
     @DisplayName("should create Env with correct parameters")
     void shouldCreateEnvWithCorrectParameters() {
         // Arrange
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.traefik()).thenReturn(null);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.hostEnvDirectory()).thenReturn("/app/env");

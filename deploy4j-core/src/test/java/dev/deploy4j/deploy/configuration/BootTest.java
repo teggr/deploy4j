@@ -18,8 +18,7 @@ class BootTest {
     @DisplayName("should use default boot config when null")
     void shouldUseDefaultBootConfigWhenNull() {
         // Arrange
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.boot()).thenReturn(null);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().boot(null).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.allHosts()).thenReturn(List.of("host1", "host2", "host3"));
@@ -37,8 +36,7 @@ class BootTest {
     void shouldUseProvidedBootConfig() {
         // Arrange
         BootConfig bootConfig = new BootConfig("50%", "10");
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.boot()).thenReturn(bootConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().boot(bootConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.allHosts()).thenReturn(List.of("host1", "host2", "host3", "host4"));
@@ -56,8 +54,7 @@ class BootTest {
     void shouldCalculateLimitAsPercentageOfHosts() {
         // Arrange
         BootConfig bootConfig = new BootConfig("50%", null);
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.boot()).thenReturn(bootConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().boot(bootConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.allHosts()).thenReturn(List.of("host1", "host2", "host3", "host4"));
@@ -74,8 +71,7 @@ class BootTest {
     void shouldCalculateLimitAsAbsoluteNumber() {
         // Arrange
         BootConfig bootConfig = new BootConfig("3", null);
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.boot()).thenReturn(bootConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().boot(bootConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.allHosts()).thenReturn(List.of("host1", "host2", "host3", "host4", "host5"));
@@ -92,8 +88,7 @@ class BootTest {
     void shouldEnsureMinimumLimitOf1ForPercentageCalculations() {
         // Arrange
         BootConfig bootConfig = new BootConfig("10%", null);
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.boot()).thenReturn(bootConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().boot(bootConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.allHosts()).thenReturn(List.of("host1", "host2")); // 10% of 2 = 0.2
@@ -110,8 +105,7 @@ class BootTest {
     void shouldReturnWaiterValueFromConfig() {
         // Arrange
         BootConfig bootConfig = new BootConfig("2", "30");
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.boot()).thenReturn(bootConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().boot(bootConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.allHosts()).thenReturn(List.of("host1"));
@@ -128,8 +122,7 @@ class BootTest {
     void shouldHandle100PercentLimit() {
         // Arrange
         BootConfig bootConfig = new BootConfig("100%", null);
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.boot()).thenReturn(bootConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().boot(bootConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.allHosts()).thenReturn(List.of("host1", "host2", "host3"));
@@ -146,8 +139,7 @@ class BootTest {
     void shouldHandle25PercentLimit() {
         // Arrange
         BootConfig bootConfig = new BootConfig("25%", null);
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.boot()).thenReturn(bootConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().boot(bootConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.allHosts()).thenReturn(List.of("host1", "host2", "host3", "host4", "host5", "host6", "host7", "host8"));

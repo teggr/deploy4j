@@ -19,8 +19,7 @@ class RegistryTest {
     @DisplayName("should use default values when config is null")
     void shouldUseDefaultValuesWhenConfigIsNull() {
         // Arrange
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.registry()).thenReturn(null);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().registry(null).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
 
@@ -41,8 +40,7 @@ class RegistryTest {
         PlainValueOrSecretKey password = new PlainValueOrSecretKey("secret123");
         RegistryConfig registryConfig = new RegistryConfig("docker.io", username, password);
 
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.registry()).thenReturn(registryConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().registry(registryConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
 
@@ -63,8 +61,7 @@ class RegistryTest {
         PlainValueOrSecretKey password = new PlainValueOrSecretKey("password");
         RegistryConfig registryConfig = new RegistryConfig("docker.io", usernameKey, password);
 
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.registry()).thenReturn(registryConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().registry(registryConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
 
@@ -89,8 +86,7 @@ class RegistryTest {
         PlainValueOrSecretKey passwordKey = new PlainValueOrSecretKey(List.of("REGISTRY_PASSWORD"));
         RegistryConfig registryConfig = new RegistryConfig("ghcr.io", username, passwordKey);
 
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.registry()).thenReturn(registryConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().registry(registryConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
 
@@ -113,8 +109,7 @@ class RegistryTest {
         // Arrange
         RegistryConfig registryConfig = new RegistryConfig("registry.example.com", null, null);
 
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.registry()).thenReturn(registryConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().registry(registryConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
 

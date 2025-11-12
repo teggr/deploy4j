@@ -20,8 +20,7 @@ class SshTest {
     @DisplayName("should use default values when config is null")
     void shouldUseDefaultValuesWhenConfigIsNull() {
         // Arrange
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.ssh()).thenReturn(null);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
 
@@ -57,8 +56,7 @@ class SshTest {
                 knownHostsPath
         );
 
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.ssh()).thenReturn(sshConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().ssh(sshConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
 
@@ -82,8 +80,7 @@ class SshTest {
         PlainValueOrSecretKey userKey = new PlainValueOrSecretKey(List.of("SSH_USER"));
         SshConfig sshConfig = new SshConfig(userKey, null, null, null, null, null, null, null, null);
 
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.ssh()).thenReturn(sshConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().ssh(sshConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
 
@@ -106,8 +103,7 @@ class SshTest {
         PlainValueOrSecretKey keyPathKey = new PlainValueOrSecretKey(List.of("SSH_KEY_PATH"));
         SshConfig sshConfig = new SshConfig(null, null, null, null, null, keyPathKey, null, null, null);
 
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.ssh()).thenReturn(sshConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().ssh(sshConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
 
@@ -130,8 +126,7 @@ class SshTest {
     PlainValueOrSecretKey knownHostsPath = new PlainValueOrSecretKey(List.of("SSH_KNOWN_HOSTS_PATH"));
     SshConfig sshConfig = new SshConfig(null, null, null, null, null, null, null, null, knownHostsPath);
 
-    DeployConfig deployConfig = mock(DeployConfig.class);
-    when(deployConfig.ssh()).thenReturn(sshConfig);
+    DeployConfig deployConfig = DeployConfigBuilder.minimal().ssh(sshConfig).build();
     Configuration config = mock(Configuration.class);
     when(config.rawConfig()).thenReturn(deployConfig);
 
@@ -155,8 +150,7 @@ class SshTest {
         PlainValueOrSecretKey knownHostsPath = new PlainValueOrSecretKey("/path/to/known_hosts");
         SshConfig sshConfig = new SshConfig(user, 2222, null, null, null, null, null, null, knownHostsPath);
 
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.ssh()).thenReturn(sshConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().ssh(sshConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
 
@@ -191,8 +185,7 @@ class SshTest {
                 knownHostsPath
         );
 
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.ssh()).thenReturn(sshConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().ssh(sshConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
 
@@ -216,9 +209,7 @@ class SshTest {
     void shouldUseDefaultRootUserWhenUserIsNotProvided() {
         // Arrange
         SshConfig sshConfig = new SshConfig(null, null, null, null, null, null, null, null, null);
-
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.ssh()).thenReturn(sshConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().ssh(sshConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
 
@@ -234,9 +225,7 @@ class SshTest {
     void shouldUseDefaultPort22WhenPortIsNotProvided() {
         // Arrange
         SshConfig sshConfig = new SshConfig(null, null, null, null, null, null, null, null, null);
-
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.ssh()).thenReturn(sshConfig);
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().ssh(sshConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
 

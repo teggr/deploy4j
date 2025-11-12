@@ -1,8 +1,6 @@
 package dev.deploy4j.deploy.configuration;
 
-import dev.deploy4j.deploy.configuration.raw.DeployConfig;
-import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
-import dev.deploy4j.deploy.configuration.raw.ServersConfig;
+import dev.deploy4j.deploy.configuration.raw.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,8 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("Configuration")
 class ConfigurationTest {
@@ -25,7 +22,7 @@ class ConfigurationTest {
         @DisplayName("should return declared version when provided")
         void shouldReturnDeclaredVersion() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1.2.3");
 
             // Act & Assert
@@ -36,7 +33,7 @@ class ConfigurationTest {
         @DisplayName("should abbreviate version to 7 characters when not underscore-separated")
         void shouldAbbreviateVersion() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1234567890abc");
 
             // Act & Assert
@@ -47,7 +44,7 @@ class ConfigurationTest {
         @DisplayName("should not abbreviate underscore-separated version")
         void shouldNotAbbreviateUnderscoreVersion() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "v1_2_3");
 
             // Act & Assert
@@ -58,7 +55,7 @@ class ConfigurationTest {
         @DisplayName("should handle version with exactly 7 characters")
         void shouldHandleExactly7CharacterVersion() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1234567");
 
             // Act & Assert
@@ -69,7 +66,7 @@ class ConfigurationTest {
         @DisplayName("should allow updating version after construction")
         void shouldAllowUpdatingVersion() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1.0.0");
 
             // Act
@@ -88,7 +85,7 @@ class ConfigurationTest {
         @DisplayName("should return all hosts from configuration")
         void shouldReturnAllHostsFromConfiguration() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1.0.0");
 
             // Act
@@ -102,7 +99,7 @@ class ConfigurationTest {
         @DisplayName("should return traefik hosts")
         void shouldReturnTraefikHosts() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1.0.0");
 
             // Act
@@ -121,7 +118,7 @@ class ConfigurationTest {
         @DisplayName("should construct absolute image with version")
         void shouldConstructAbsoluteImageWithVersion() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1.2.3");
 
             // Act
@@ -135,7 +132,7 @@ class ConfigurationTest {
         @DisplayName("should construct latest image with latest tag")
         void shouldConstructLatestImageWithLatestTag() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1.2.3");
 
             // Act
@@ -149,7 +146,7 @@ class ConfigurationTest {
         @DisplayName("should construct latest tag with destination")
         void shouldConstructLatestTagWithDestination() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "staging", "1.0.0");
 
             // Act
@@ -163,7 +160,7 @@ class ConfigurationTest {
         @DisplayName("should construct repository from registry server and image")
         void shouldConstructRepositoryFromRegistryServerAndImage() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1.0.0");
 
             // Act
@@ -182,7 +179,7 @@ class ConfigurationTest {
         @DisplayName("should return service name from raw config")
         void shouldReturnServiceNameFromRawConfig() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1.0.0");
 
             // Act
@@ -196,7 +193,7 @@ class ConfigurationTest {
         @DisplayName("should return image name from raw config")
         void shouldReturnImageNameFromRawConfig() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1.0.0");
 
             // Act
@@ -210,7 +207,7 @@ class ConfigurationTest {
         @DisplayName("should return destination")
         void shouldReturnDestination() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "production", "1.0.0");
 
             // Act
@@ -224,8 +221,9 @@ class ConfigurationTest {
         @DisplayName("should return default retain containers when not specified")
         void shouldReturnDefaultRetainContainersWhenNotSpecified() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
-            when(deployConfig.retainContainers()).thenReturn(null); // Explicitly return null for default
+            DeployConfig deployConfig = DeployConfigBuilder.minimal()
+              .retainContainers(null)
+              .build();
 
             Configuration configuration = new Configuration(deployConfig, "prod", "1.0.0");
 
@@ -240,12 +238,7 @@ class ConfigurationTest {
         @DisplayName("should return custom retain containers when specified")
         void shouldReturnCustomRetainContainersWhenSpecified() {
             // Arrange
-            DeployConfig deployConfig = mock(DeployConfig.class);
-            when(deployConfig.service()).thenReturn("test-service");
-            when(deployConfig.image()).thenReturn("test-image");
-            when(deployConfig.servers()).thenReturn(new ServersConfig(List.of("host1")));
-            when(deployConfig.retainContainers()).thenReturn(10);
-
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().retainContainers(10).build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1.0.0");
 
             // Act
@@ -264,7 +257,7 @@ class ConfigurationTest {
         @DisplayName("should return all roles")
         void shouldReturnAllRoles() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1.0.0");
 
             // Act
@@ -278,7 +271,7 @@ class ConfigurationTest {
         @DisplayName("should return null for non-existent role")
         void shouldReturnNullForNonExistentRole() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1.0.0");
 
             // Act
@@ -297,7 +290,7 @@ class ConfigurationTest {
         @DisplayName("should generate run ID")
         void shouldGenerateRunId() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1.0.0");
 
             // Act
@@ -314,7 +307,7 @@ class ConfigurationTest {
         @DisplayName("should return same run ID on multiple calls")
         void shouldReturnSameRunIdOnMultipleCalls() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1.0.0");
 
             // Act
@@ -334,7 +327,7 @@ class ConfigurationTest {
         @DisplayName("should construct healthcheck service name")
         void shouldConstructHealthcheckServiceName() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1.0.0");
 
             // Act
@@ -348,7 +341,7 @@ class ConfigurationTest {
         @DisplayName("should construct healthcheck service name without destination")
         void shouldConstructHealthcheckServiceNameWithoutDestination() {
             // Arrange
-            DeployConfig deployConfig = createMinimalConfig();
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, null, "1.0.0");
 
             // Act
@@ -359,13 +352,73 @@ class ConfigurationTest {
         }
     }
 
-    // Helper methods to create test data
+    @Nested
+    @DisplayName("validation")
+    class Validation {
 
-    private DeployConfig createMinimalConfig() {
-        DeployConfig deployConfig = mock(DeployConfig.class);
-        when(deployConfig.service()).thenReturn("test-service");
-        when(deployConfig.image()).thenReturn("test-image");
-        when(deployConfig.servers()).thenReturn(new ServersConfig(List.of("host1")));
-        return deployConfig;
+        @Test
+        @DisplayName("should require destination when requireDestination is true")
+        void shouldRequireDestinationWhenRequired() {
+            DeployConfig deployConfig = DeployConfigBuilder.minimal()
+                .service("svc")
+                .image("img")
+                .registry(new RegistryConfig("reg", null, null))
+                .requireDestination(true)
+                .build();
+
+            assertThatThrownBy(() -> new Configuration(deployConfig, null, "1.0.0"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("You must specify a destination");
+        }
+
+        @Test
+        @DisplayName("should complain when required keys are missing")
+        void shouldComplainWhenRequiredKeysMissing() {
+            DeployConfig deployConfig = DeployConfigBuilder.minimal()
+                .service("svc")
+                .image(null) // missing image
+                .build();
+
+            assertThatThrownBy(() -> new Configuration(deployConfig, "prod", "1.0.0"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Missing required configuration for")
+                .hasMessageContaining("image");
+        }
+
+        @Test
+        @DisplayName("should validate minimum required version against current version")
+        void shouldValidateMinimumVersion() {
+            DeployConfig deployConfig = DeployConfigBuilder.minimal()
+                .minimumVersion("9999.0.0")
+                .build();
+
+            assertThatThrownBy(() -> new Configuration(deployConfig, "prod", "1.0.0"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Current version is");
+        }
+
+        @Test
+        @DisplayName("should require retainContainers to be at least 1")
+        void shouldValidateRetainContainers() {
+            DeployConfig deployConfig = DeployConfigBuilder.minimal()
+                .retainContainers(0)
+                .build();
+
+            assertThatThrownBy(() -> new Configuration(deployConfig, "prod", "1.0.0"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Must retain at least 1 container");
+        }
+
+        @Test
+        @DisplayName("should validate service name characters")
+        void shouldValidateServiceName() {
+            DeployConfig deployConfig = DeployConfigBuilder.minimal()
+                .service("invalid service!") // invalid characters
+                .build();
+
+            assertThatThrownBy(() -> new Configuration(deployConfig, "prod", "1.0.0"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Service name can only include alphanumeric characters, hyphens, and underscores");
+        }
     }
 }
