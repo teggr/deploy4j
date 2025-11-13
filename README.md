@@ -24,9 +24,9 @@ See [deploy4j](https://teggr.github.io/deploy4j/installation/) for further docum
 
 * Connects to server
 * Installs docker
-* Pushes jar + docker file to server
-* Builds image
+* Pulls service image onto server
 * Starts traefik proxy
+* Starts accessory services
 * Starts the service
 
 ## Pre-reqs
@@ -42,7 +42,7 @@ Install via JBang:
 `deploy4j` is currently available via JitPack.
 
 ```shell
-jbang app install --name deploy4j --repos jitpack=https://jitpack.io com.github.teggr.deploy4j:deploy4j-cli:-SNAPSHOT
+jbang app install --name deploy4j --repos jitpack=https://jitpack.io --force --fresh com.github.teggr.deploy4j:deploy4j-cli:-SNAPSHOT
 ```
 
 ```shell
@@ -78,7 +78,7 @@ Commands:
 ### Typical Usage
 
 ```shell
-# initialise the project for the first time
+# initialise your project with deploy4j files
 deploy4j init
 
 # edit config/deploy.yml and .env
