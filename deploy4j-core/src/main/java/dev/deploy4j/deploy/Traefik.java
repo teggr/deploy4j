@@ -16,8 +16,8 @@ public class Traefik extends Base {
   private final TraefikHostCommands traefik;
   private final AuditorHostCommands audit;
 
-  public Traefik(SshHosts sshHosts, LockManager lockManager, RegistryHostCommands registry, TraefikHostCommands traefik, AuditorHostCommands audit) {
-    super(sshHosts);
+  public Traefik(SshHosts sshHosts, Hooks hooks, LockManager lockManager, RegistryHostCommands registry, TraefikHostCommands traefik, AuditorHostCommands audit) {
+    super(sshHosts, hooks);
     this.lockManager = lockManager;
     this.registry = registry;
     this.traefik = traefik;
@@ -53,7 +53,10 @@ public class Traefik extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
+      runHook("pre-traefik-reboot");
+
       on(deployContext.traefikHosts(), host -> {
+
 
         host.execute(audit.record("Rebooted traefik"));
         host.execute(registry.login());
@@ -62,6 +65,8 @@ public class Traefik extends Base {
         host.execute(traefik.run());
 
       });
+
+      runHook("post-traefik-reboot");
 
     });
 

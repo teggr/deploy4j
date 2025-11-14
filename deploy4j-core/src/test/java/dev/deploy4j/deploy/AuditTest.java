@@ -31,11 +31,14 @@ class AuditTest {
     @Mock
     private DeployContext deployContext;
 
+    @Mock
+    private Hooks hooks;
+
     private Audit audit;
 
     @BeforeEach
     void setUp() {
-        audit = new Audit(sshHosts, auditorHostCommands);
+        audit = new Audit(sshHosts, hooks, auditorHostCommands);
     }
 
     @Test

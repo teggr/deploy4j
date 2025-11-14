@@ -22,8 +22,8 @@ public class Env extends Base {
   private final AppHostCommandsFactory apps;
   private final AccessoryHostCommandsFactory accessories;
 
-  public Env(SshHosts sshHosts, LockManager lockManager, TraefikHostCommands traefik, Environment environment, AuditorHostCommands audit, AppHostCommandsFactory apps, AccessoryHostCommandsFactory accessories) {
-    super(sshHosts);
+  public Env(SshHosts sshHosts, Hooks hooks, LockManager lockManager, TraefikHostCommands traefik, Environment environment, AuditorHostCommands audit, AppHostCommandsFactory apps, AccessoryHostCommandsFactory accessories) {
+    super(sshHosts, hooks);
     this.lockManager = lockManager;
     this.traefik = traefik;
     this.environment = environment;

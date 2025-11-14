@@ -25,8 +25,8 @@ public class Deploy extends Base {
   private final Traefik traefik;
   private final AppHostCommandsFactory apps;
 
-  public Deploy(SshHosts sshHosts, LockManager lockManager, App app, Server server, Env env, Accessory accessory, Registry registry, Build build, Prune prune, Traefik traefik, AppHostCommandsFactory apps) {
-    super(sshHosts);
+  public Deploy(SshHosts sshHosts, Hooks hooks, LockManager lockManager, App app, Server server, Env env, Accessory accessory, Registry registry, Build build, Prune prune, Traefik traefik, AppHostCommandsFactory apps) {
+    super(sshHosts, hooks);
     this.lockManager = lockManager;
     this.app = app;
     this.server = server;
@@ -81,6 +81,8 @@ public class Deploy extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
+      runHook("pre-deploy");
+
       log.info("Ensure Traefik is running...");
       traefik.boot(deployContext);
 
@@ -93,6 +95,8 @@ public class Deploy extends Base {
       prune.all(deployContext);
 
     });
+
+    runHook("post-deploy");
 
   }
 
@@ -112,12 +116,16 @@ public class Deploy extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
+      runHook("pre-deploy");
+
       log.info("Detect stale containers...");
       app.staleContainers(deployContext);
 
       app.boot(deployContext);
 
     });
+
+    runHook("post-deploy");
 
   }
 
@@ -135,6 +143,8 @@ public class Deploy extends Base {
 
       if (containerAvailable(deployContext, version)) {
 
+        runHook("pre-deploy");
+
         app.boot(deployContext);
         rolledBack = true;
       } else {
@@ -142,6 +152,8 @@ public class Deploy extends Base {
       }
 
     });
+
+    runHook("post-deploy");
 
   }
 

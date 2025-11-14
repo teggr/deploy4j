@@ -7,8 +7,8 @@ public class Registry extends Base {
 
   private final RegistryHostCommands registry;
 
-  public Registry(SshHosts sshHosts, RegistryHostCommands registry) {
-    super(sshHosts);
+  public Registry(SshHosts sshHosts, Hooks hooks, RegistryHostCommands registry) {
+    super(sshHosts, hooks);
     this.registry = registry;
   }
 

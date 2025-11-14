@@ -21,8 +21,8 @@ public class Server extends Base {
   private final ServerHostCommands server;
   private final AuditorHostCommands audit;
 
-  public Server(SshHosts sshHosts, LockManager lockManager, DockerHostCommands docker, ServerHostCommands server, AuditorHostCommands audit) {
-    super(sshHosts);
+  public Server(SshHosts sshHosts, Hooks hooks, LockManager lockManager, DockerHostCommands docker, ServerHostCommands server, AuditorHostCommands audit) {
+    super(sshHosts, hooks);
     this.lockManager = lockManager;
     this.docker = docker;
     this.server = server;
@@ -85,6 +85,8 @@ public class Server extends Base {
           .map(SshHost::hostName)
           .collect(Collectors.joining(", "))));
       }
+
+      runHook("docker-setup");
 
     });
 

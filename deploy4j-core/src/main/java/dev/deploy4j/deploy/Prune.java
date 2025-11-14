@@ -10,8 +10,8 @@ public class Prune extends Base {
   private final PruneHostCommands prune;
   private final AuditorHostCommands audit;
 
-  public Prune(SshHosts sshHosts, LockManager lockManager, PruneHostCommands prune, AuditorHostCommands audit) {
-    super(sshHosts);
+  public Prune(SshHosts sshHosts, Hooks hooks, LockManager lockManager, PruneHostCommands prune, AuditorHostCommands audit) {
+    super(sshHosts, hooks);
     this.lockManager = lockManager;
     this.prune = prune;
     this.audit = audit;

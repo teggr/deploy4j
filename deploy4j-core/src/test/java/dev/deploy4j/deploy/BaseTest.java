@@ -26,11 +26,14 @@ class BaseTest {
     @Mock
     private SshHosts sshHosts;
 
+    @Mock
+    private Hooks hooks;
+
     private Base base;
 
     @BeforeEach
     void setUp() {
-        base = new Base(sshHosts);
+        base = new Base(sshHosts, hooks);
     }
 
     @Test

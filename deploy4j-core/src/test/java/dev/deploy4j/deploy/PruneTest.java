@@ -39,11 +39,14 @@ class PruneTest {
     @Mock
     private Configuration configuration;
 
+    @Mock
+    private Hooks hooks;
+
     private Prune prune;
 
     @BeforeEach
     void setUp() {
-        prune = new Prune(sshHosts, lockManager, pruneHostCommands, auditorHostCommands);
+        prune = new Prune(sshHosts, hooks, lockManager, pruneHostCommands, auditorHostCommands);
     }
 
     @Test

@@ -31,11 +31,14 @@ class RegistryTest {
     @Mock
     private DeployContext deployContext;
 
+    @Mock
+    private Hooks hooks;
+
     private Registry registry;
 
     @BeforeEach
     void setUp() {
-        registry = new Registry(sshHosts, registryHostCommands);
+        registry = new Registry(sshHosts, hooks, registryHostCommands);
     }
 
     @Test

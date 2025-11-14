@@ -9,8 +9,8 @@ public class Audit extends Base {
 
   private final AuditorHostCommands audit;
 
-  public Audit(SshHosts sshHosts, AuditorHostCommands audit) {
-    super(sshHosts);
+  public Audit(SshHosts sshHosts, Hooks hooks, AuditorHostCommands audit) {
+    super(sshHosts, hooks);
     this.audit = audit;
   }
 

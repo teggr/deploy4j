@@ -23,8 +23,8 @@ public class App extends Base {
   private final AuditorHostCommands audit;
   private final AppHostCommandsFactory apps;
 
-  public App(SshHosts sshHosts, LockManager lockManager, AuditorHostCommands audit, AppHostCommandsFactory apps) {
-    super(sshHosts);
+  public App(SshHosts sshHosts, Hooks hooks, LockManager lockManager, AuditorHostCommands audit, AppHostCommandsFactory apps) {
+    super(sshHosts, hooks);
     this.lockManager = lockManager;
     this.audit = audit;
     this.apps = apps;

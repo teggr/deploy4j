@@ -14,8 +14,8 @@ public class Lock extends Base {
   private final ServerHostCommands server;
   private final LockHostCommands lock;
 
-  public Lock(SshHosts sshHosts, LockManager lockManager, ServerHostCommands server, LockHostCommands lock) {
-    super(sshHosts);
+  public Lock(SshHosts sshHosts, Hooks hooks, LockManager lockManager, ServerHostCommands server, LockHostCommands lock) {
+    super(sshHosts, hooks);
     this.lockManager = lockManager;
     this.server = server;
     this.lock = lock;

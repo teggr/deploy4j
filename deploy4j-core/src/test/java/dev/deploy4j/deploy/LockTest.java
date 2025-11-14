@@ -34,11 +34,14 @@ class LockTest {
     @Mock
     private DeployContext deployContext;
 
+    @Mock
+    private Hooks hooks;
+
     private Lock lock;
 
     @BeforeEach
     void setUp() {
-        lock = new Lock(sshHosts, lockManager, serverHostCommands, lockHostCommands);
+        lock = new Lock(sshHosts, hooks, lockManager, serverHostCommands, lockHostCommands);
     }
 
     @Test

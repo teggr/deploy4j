@@ -11,8 +11,8 @@ public class Build extends Base {
   private final BuilderHostCommands builder;
   private final AuditorHostCommands audit;
 
-  public Build(SshHosts sshHosts, BuilderHostCommands builder, AuditorHostCommands audit) {
-    super(sshHosts);
+  public Build(SshHosts sshHosts, Hooks hooks, BuilderHostCommands builder, AuditorHostCommands audit) {
+    super(sshHosts, hooks);
     this.builder = builder;
     this.audit = audit;
   }

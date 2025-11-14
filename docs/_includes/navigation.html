@@ -41,7 +41,10 @@
                     <a class="navbar-item ml-3 {% if page.url==command.url -%}has-text-weight-bold{%- endif -%}" href="{{ command.url | relative_url }}">{{ command.short_title | default: command.title }}</a>
                     {%- endfor -%}
 
-                    <a class="navbar-item is-size-6 has-text-weight-bold {% if page.url=='/hooks/overview/' -%}is-selected{%- endif -%}" href="{{ '/hooks/overview' | relative_url}}">Hooks</a>
+                    {%- assign hooks = site.hooks | sort -%}
+                    {%- for hook in hooks %}
+                    <a class="navbar-item ml-3 {% if page.url==hook.url -%}has-text-weight-bold{%- endif -%}" href="{{ hook.url | relative_url }}">{{ hook.short_title | default: hook.title }}</a>
+                    {%- endfor -%}
 
                     {%- assign guides = site.guides | sort -%}
                     {%- for guide in guides %}

@@ -67,6 +67,9 @@ class DeployTest {
   @Mock
   AppHostCommands appHostCommands;
 
+  @Mock
+  Hooks hooks;
+
   Deploy deploy;
 
   @BeforeEach
@@ -94,7 +97,7 @@ class DeployTest {
     // server.test() returns a simple Cmd to avoid null invocation in tests
     when(server.test()).thenReturn(Cmd.cmd("pwd"));
 
-    deploy = new Deploy(sshHosts, lockManager, app, server, env, accessory, registry, build, prune, traefik, apps);
+    deploy = new Deploy(sshHosts, hooks, lockManager, app, server, env, accessory, registry, build, prune, traefik, apps);
   }
 
   @Test

@@ -23,8 +23,8 @@ public class Accessory extends Base {
   private final AuditorHostCommands audit;
   private final AccessoryHostCommandsFactory accessories;
 
-  public Accessory(SshHosts sshHosts, LockManager lockManager, RegistryHostCommands registry, AuditorHostCommands audit, AccessoryHostCommandsFactory accessories) {
-    super(sshHosts);
+  public Accessory(SshHosts sshHosts, Hooks hooks, LockManager lockManager, RegistryHostCommands registry, AuditorHostCommands audit, AccessoryHostCommandsFactory accessories) {
+    super(sshHosts, hooks);
     this.lockManager = lockManager;
     this.registry = registry;
     this.audit = audit;

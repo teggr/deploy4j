@@ -9,15 +9,22 @@ import java.util.function.Consumer;
 public class Base {
 
   private final SshHosts sshHosts;
+  private final Hooks hooks;
 
-  public Base(SshHosts sshHosts) {
+  public Base(SshHosts sshHosts, Hooks hooks) {
     this.sshHosts = sshHosts;
+    this.hooks = hooks;
   }
 
   // private
 
   public void on(List<String> hosts, Consumer<SshHost> block) {
+    runHook("pre-connect");
     sshHosts.on(hosts, block);
+  }
+
+  public void runHook(String hookName) {
+    hooks.runHook(hookName);
   }
 
 }
