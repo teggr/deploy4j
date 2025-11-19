@@ -3,6 +3,7 @@ package dev.deploy4j.deploy;
 import dev.deploy4j.deploy.host.commands.LockHostCommands;
 import dev.deploy4j.deploy.host.commands.ServerHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,11 +38,14 @@ class LockTest {
     @Mock
     private Hooks hooks;
 
+  @Mock
+  private LocalHost localHost;
+
     private Lock lock;
 
     @BeforeEach
     void setUp() {
-        lock = new Lock(sshHosts, hooks, lockManager, serverHostCommands, lockHostCommands);
+        lock = new Lock(sshHosts, hooks, localHost, lockManager, serverHostCommands, lockHostCommands);
     }
 
     @Test

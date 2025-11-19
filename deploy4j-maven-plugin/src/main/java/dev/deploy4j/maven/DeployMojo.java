@@ -6,6 +6,7 @@ import dev.deploy4j.deploy.Environment;
 import dev.deploy4j.deploy.Hooks;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -30,6 +31,8 @@ public class DeployMojo extends AbstractMojo {
     String version = project.getVersion();
     String destination = null;
     String configFile = new File( project.getBasedir(), "config/deploy.yml" ).getAbsolutePath();
+    boolean skipHooks = false;
+      boolean skipPull = false;
 
     Environment environment = new Environment(destination);
 
@@ -37,13 +40,15 @@ public class DeployMojo extends AbstractMojo {
 
     DeployContext deployContext = new DeployContext(configuration, null, null, null); // specific hosts, roles, primary not yet supported
 
-    Hooks hooks = new Hooks();
+    LocalHost localHost = new LocalHost();
+
+    Hooks hooks = new Hooks(localHost, deployContext.config(), skipHooks);
 
     try (SshHosts sshHosts = new SshHosts(deployContext.config())) {
 
-      DeployApplicationContext deployApplicationContext = new DeployApplicationContext(environment, sshHosts, hooks, deployContext);
+      DeployApplicationContext deployApplicationContext = new DeployApplicationContext(environment, sshHosts, hooks, localHost, deployContext);
 
-      deployApplicationContext.deploy().deploy(deployContext, false);
+      deployApplicationContext.deploy().deploy(deployContext, skipPull);
 
     } catch (Exception e) {
 

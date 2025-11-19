@@ -4,6 +4,7 @@ import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.host.commands.RegistryHostCommands;
 import dev.deploy4j.deploy.host.commands.TraefikHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,8 +17,8 @@ public class Traefik extends Base {
   private final TraefikHostCommands traefik;
   private final AuditorHostCommands audit;
 
-  public Traefik(SshHosts sshHosts, Hooks hooks, LockManager lockManager, RegistryHostCommands registry, TraefikHostCommands traefik, AuditorHostCommands audit) {
-    super(sshHosts, hooks);
+  public Traefik(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, RegistryHostCommands registry, TraefikHostCommands traefik, AuditorHostCommands audit) {
+    super(sshHosts, hooks, localHost);
     this.lockManager = lockManager;
     this.registry = registry;
     this.traefik = traefik;
@@ -31,7 +32,7 @@ public class Traefik extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext.traefikHosts(), host -> {
+      on(deployContext, deployContext.traefikHosts(), host -> {
 
         host.execute(registry.login());
         host.execute(traefik.startOrRun());
@@ -53,9 +54,9 @@ public class Traefik extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      runHook("pre-traefik-reboot");
+      runHook(deployContext, "pre-traefik-reboot");
 
-      on(deployContext.traefikHosts(), host -> {
+      on(deployContext, deployContext.traefikHosts(), host -> {
 
 
         host.execute(audit.record("Rebooted traefik"));
@@ -66,7 +67,7 @@ public class Traefik extends Base {
 
       });
 
-      runHook("post-traefik-reboot");
+      runHook(deployContext, "post-traefik-reboot");
 
     });
 
@@ -79,7 +80,7 @@ public class Traefik extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext.traefikHosts(), host -> {
+      on(deployContext, deployContext.traefikHosts(), host -> {
 
         host.execute(audit.record("Started traefik"));
         host.execute(traefik.start());
@@ -98,7 +99,7 @@ public class Traefik extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext.traefikHosts(), host -> {
+      on(deployContext, deployContext.traefikHosts(), host -> {
 
         host.execute(audit.record("Stopped traefik"));
         host.execute(traefik.stop(), false);
@@ -129,7 +130,7 @@ public class Traefik extends Base {
    */
   public void details(DeployContext deployContext) {
 
-    on(deployContext.traefikHosts(), host -> {
+    on(deployContext, deployContext.traefikHosts(), host -> {
 
       log.info(host.capture(traefik.info()));
 
@@ -162,7 +163,7 @@ public class Traefik extends Base {
 //      lines = 100;
 //    }
 
-    on(deployContext.traefikHosts(), host -> {
+    on(deployContext, deployContext.traefikHosts(), host -> {
 
       log.info(host.capture(traefik.logs(since, lines != null ? lines.toString() : null, grep, grepOptions)));
 
@@ -193,7 +194,7 @@ public class Traefik extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext.traefikHosts(), host -> {
+      on(deployContext, deployContext.traefikHosts(), host -> {
 
         host.execute(audit.record("Removed traefik container"));
         host.execute(traefik.removeContainer());
@@ -211,7 +212,7 @@ public class Traefik extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext.traefikHosts(), host -> {
+      on(deployContext, deployContext.traefikHosts(), host -> {
 
         host.execute(audit.record("Removed traefik image"));
         host.execute(traefik.removeImage());

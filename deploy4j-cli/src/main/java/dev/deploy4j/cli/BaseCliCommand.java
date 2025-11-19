@@ -8,6 +8,7 @@ import dev.deploy4j.deploy.Environment;
 import dev.deploy4j.deploy.Hooks;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
@@ -34,7 +35,7 @@ public abstract class BaseCliCommand implements Callable<Integer> {
   String configFile;
   @CommandLine.Option(names = {"-d", "--destination"}, paramLabel = "DESTINATION", description = "Specify destination to be used for config file (staging -> deploy.staging.yml)")
   String destination;
-  @CommandLine.Option(names = {"-H", "--skip-hooks"}, description = "Don't run hooks, Default: false")
+  @CommandLine.Option(names = {"-H", "--skip-hooks"}, description = "Don't run hooks, Default: false", defaultValue = "false")
   Boolean skipHooks;
 
   @Override
@@ -56,11 +57,13 @@ public abstract class BaseCliCommand implements Callable<Integer> {
 
     DeployContext deployContext = new DeployContext(configuration, hosts, roles, primary);
 
-    Hooks hooks = new Hooks();
+    LocalHost localhost = new LocalHost();
+
+    Hooks hooks = new Hooks(localhost, deployContext.config(), skipHooks);
 
     try (SshHosts sshHosts = new SshHosts(deployContext.config())) {
 
-      DeployApplicationContext deployApplicationContext = new DeployApplicationContext(environment, sshHosts, hooks, deployContext);
+      DeployApplicationContext deployApplicationContext = new DeployApplicationContext(environment, sshHosts, hooks, localhost, deployContext);
 
       execute(deployApplicationContext);
 

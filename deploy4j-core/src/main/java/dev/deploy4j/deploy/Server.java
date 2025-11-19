@@ -5,6 +5,7 @@ import dev.deploy4j.deploy.host.commands.DockerHostCommands;
 import dev.deploy4j.deploy.host.commands.ServerHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHost;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 import dev.rebelcraft.cmd.Cmd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +22,8 @@ public class Server extends Base {
   private final ServerHostCommands server;
   private final AuditorHostCommands audit;
 
-  public Server(SshHosts sshHosts, Hooks hooks, LockManager lockManager, DockerHostCommands docker, ServerHostCommands server, AuditorHostCommands audit) {
-    super(sshHosts, hooks);
+  public Server(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, DockerHostCommands docker, ServerHostCommands server, AuditorHostCommands audit) {
+    super(sshHosts, hooks, localHost);
     this.lockManager = lockManager;
     this.docker = docker;
     this.server = server;
@@ -43,7 +44,7 @@ public class Server extends Base {
     // TODO: interactive mode
     log.info( "Running '"+cmd+"' on " + String.join(",", hosts) +  "..." );
 
-    on(hosts, host -> {
+    on(deployContext, hosts, host -> {
 
       host.execute( audit.record( "Executed cmd '" + cmd + "' on " + host.hostName() ) );
       log.info( host.capture( cmd ) );
@@ -65,7 +66,7 @@ public class Server extends Base {
       hosts.addAll(deployContext.hosts());
       hosts.addAll(deployContext.accessoryHosts());
 
-      on(hosts, host -> {
+      on(deployContext, hosts, host -> {
 
         if (!host.execute( docker.installed(), false ) ) {
           if (host.execute( docker.superUser(), false ) ) {
@@ -86,7 +87,7 @@ public class Server extends Base {
           .collect(Collectors.joining(", "))));
       }
 
-      runHook("docker-setup");
+      runHook(deployContext, "docker-setup");
 
     });
 

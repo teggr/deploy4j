@@ -8,6 +8,7 @@ import dev.deploy4j.deploy.host.commands.AppHostCommands;
 import dev.deploy4j.deploy.host.commands.AppHostCommandsFactory;
 import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +24,8 @@ public class App extends Base {
   private final AuditorHostCommands audit;
   private final AppHostCommandsFactory apps;
 
-  public App(SshHosts sshHosts, Hooks hooks, LockManager lockManager, AuditorHostCommands audit, AppHostCommandsFactory apps) {
-    super(sshHosts, hooks);
+  public App(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, AuditorHostCommands audit, AppHostCommandsFactory apps) {
+    super(sshHosts, hooks, localHost);
     this.lockManager = lockManager;
     this.audit = audit;
     this.apps = apps;
@@ -43,7 +44,7 @@ public class App extends Base {
 
         log.info("Start container with version " + version + " using a " + deployContext.config().readinessDelay() + "s readiness delay (or reboot if already running)..." );
 
-        on(deployContext.hosts(), host -> {
+        on(deployContext, deployContext.hosts(), host -> {
 
           for( Role role : deployContext.rolesOn(host.hostName()) ) {
 
@@ -55,7 +56,7 @@ public class App extends Base {
 
         Barrier barrier = new Barrier();
 
-        on(deployContext.hosts(), host -> {
+        on(deployContext, deployContext.hosts(), host -> {
 
           for( Role role : deployContext.rolesOn(host.hostName()) ) {
 
@@ -66,7 +67,7 @@ public class App extends Base {
 
         });
 
-        on(deployContext.hosts(), host -> {
+        on(deployContext, deployContext.hosts(), host -> {
 
           host.execute(audit.record("Tagging " + deployContext.config().absoluteImage() + " as the latest image"));
           host.execute(apps.app(null, null)
@@ -87,7 +88,7 @@ public class App extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext.hosts(), host -> {
+      on(deployContext, deployContext.hosts(), host -> {
 
         for (Role role : deployContext.rolesOn(host.hostName())) {
 
@@ -109,7 +110,7 @@ public class App extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext.hosts(), host -> {
+      on(deployContext, deployContext.hosts(), host -> {
 
         for (Role role : deployContext.rolesOn(host.hostName())) {
 
@@ -129,7 +130,7 @@ public class App extends Base {
    */
   public void details(DeployContext deployContext) {
 
-    on(deployContext.hosts(), host -> {
+    on(deployContext, deployContext.hosts(), host -> {
 
       for (Role role : deployContext.rolesOn(host.hostName())) {
 
@@ -158,7 +159,7 @@ public class App extends Base {
 
       log.info("Launching command with version " + version + " from existing container...");
 
-      on(deployContext.hosts(), host -> {
+      on(deployContext, deployContext.hosts(), host -> {
 
         for (Role role : deployContext.rolesOn(host.hostName())) {
 
@@ -178,7 +179,7 @@ public class App extends Base {
    */
   public void containers(DeployContext deployContext) {
 
-    on(deployContext.hosts(), host -> {
+    on(deployContext, deployContext.hosts(), host -> {
 
       log.info(host.capture(apps.app(null, host.hostName()).listContainers()));
 
@@ -197,7 +198,7 @@ public class App extends Base {
 
     withLockIfStopping(deployContext, stop, () -> {
 
-      on(deployContext.hosts(), host -> {
+      on(deployContext, deployContext.hosts(), host -> {
 
         List<Role> roles = deployContext.rolesOn(host.hostName());
 
@@ -229,7 +230,7 @@ public class App extends Base {
    */
   public void images(DeployContext deployContext) {
 
-    on(deployContext.hosts(), host -> {
+    on(deployContext, deployContext.hosts(), host -> {
 
       log.info(host.capture(apps.app(null, host.hostName()).listImages()));
 
@@ -262,7 +263,7 @@ public class App extends Base {
 //      lines = 100;
 //    }
 
-    on(deployContext.hosts(), host -> {
+    on(deployContext, deployContext.hosts(), host -> {
 
       for (Role role : deployContext.rolesOn(host.hostName())) {
 
@@ -292,7 +293,7 @@ public class App extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext.hosts(), host -> {
+      on(deployContext, deployContext.hosts(), host -> {
 
         for (Role role : deployContext.rolesOn(host.hostName())) {
 
@@ -314,7 +315,7 @@ public class App extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext.hosts(), host -> {
+      on(deployContext, deployContext.hosts(), host -> {
 
         for (Role role : deployContext.rolesOn(host.hostName())) {
 
@@ -336,7 +337,7 @@ public class App extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext.hosts(), host -> {
+      on(deployContext, deployContext.hosts(), host -> {
 
         for (Role role : deployContext.rolesOn(host.hostName())) {
 
@@ -356,7 +357,7 @@ public class App extends Base {
    */
   public void version(DeployContext deployContext) {
 
-    on(deployContext.hosts(), host -> {
+    on(deployContext, deployContext.hosts(), host -> {
 
       Role role = deployContext.rolesOn(host.hostName()).getFirst();
 

@@ -4,6 +4,7 @@ import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.host.commands.PruneHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,11 +43,14 @@ class PruneTest {
     @Mock
     private Hooks hooks;
 
+  @Mock
+  private LocalHost localHost;
+
     private Prune prune;
 
     @BeforeEach
     void setUp() {
-        prune = new Prune(sshHosts, hooks, lockManager, pruneHostCommands, auditorHostCommands);
+        prune = new Prune(sshHosts, hooks, localHost, lockManager, pruneHostCommands, auditorHostCommands);
     }
 
     @Test

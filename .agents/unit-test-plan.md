@@ -545,7 +545,7 @@ dev.deploy4j.deploy.host.commands.BaseHostCommands
 dev.deploy4j.deploy.host.commands.BuilderHostCommands
 dev.deploy4j.deploy.host.commands.DockerHostCommands
 dev.deploy4j.deploy.host.commands.HealthcheckHostCommands
-dev.deploy4j.deploy.host.commands.HookHostCommands
+dev.deploy4j.deploy.local.commands.LocalHookCommands
 dev.deploy4j.deploy.host.commands.LockHostCommands
 dev.deploy4j.deploy.host.commands.PruneHostCommands
 dev.deploy4j.deploy.host.commands.RegistryHostCommands

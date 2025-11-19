@@ -2,6 +2,7 @@ package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.host.ssh.SshHost;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import java.util.function.Consumer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,11 +31,14 @@ class BaseTest {
     @Mock
     private Hooks hooks;
 
+    @Mock
+    private LocalHost localHost;
+
     private Base base;
 
     @BeforeEach
     void setUp() {
-        base = new Base(sshHosts, hooks);
+        base = new Base(sshHosts, hooks, localHost);
     }
 
     @Test
@@ -42,9 +47,10 @@ class BaseTest {
         // Arrange
         List<String> hosts = Arrays.asList("host1", "host2");
         Consumer<SshHost> block = host -> {};
+        DeployContext deployContext = mock(DeployContext.class);
 
         // Act
-        base.on(hosts, block);
+        base.on(deployContext, hosts, block);
 
         // Assert
         verify(sshHosts).on(eq(hosts), any());
@@ -55,13 +61,14 @@ class BaseTest {
     void shouldPassCorrectHostsList() {
         // Arrange
         List<String> hosts = Arrays.asList("server1.example.com", "server2.example.com");
+      DeployContext deployContext = mock(DeployContext.class);
         
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<String>> hostsCaptor = ArgumentCaptor.forClass(List.class);
         Consumer<SshHost> block = host -> {};
 
         // Act
-        base.on(hosts, block);
+        base.on(deployContext, hosts, block);
 
         // Assert
         verify(sshHosts).on(hostsCaptor.capture(), any());
