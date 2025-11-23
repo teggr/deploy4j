@@ -1,7 +1,6 @@
 package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.app.Boot;
-import dev.deploy4j.deploy.app.PrepareAssets;
 import dev.deploy4j.deploy.configuration.Role;
 import dev.deploy4j.deploy.healthcheck.Barrier;
 import dev.deploy4j.deploy.host.commands.AppHostCommands;
@@ -43,16 +42,6 @@ public class App extends Base {
       usingVersion(deployContext, versionOrLatest(deployContext), (version) -> {
 
         log.info("Start container with version " + version + " using a " + deployContext.config().readinessDelay() + "s readiness delay (or reboot if already running)..." );
-
-        on(deployContext, deployContext.hosts(), host -> {
-
-          for( Role role : deployContext.rolesOn(host.hostName()) ) {
-
-            new PrepareAssets(host.hostName(), role, host, apps).run();
-
-          }
-
-        });
 
         Barrier barrier = new Barrier();
 

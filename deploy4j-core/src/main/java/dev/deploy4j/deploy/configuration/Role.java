@@ -121,10 +121,6 @@ public class Role {
     return env(host).args();
   }
 
-  public String[] assetVolumeArgs() {
-    return assetVolume(null) != null ? assetVolume(null).dockerArgs() : new String[]{};
-  }
-
   public List<String> healthCheckArgs() {
     return healthCheckArgs(true);
   }
@@ -233,35 +229,6 @@ public class Role {
         config().destination()
       ).filter(Objects::nonNull)
       .collect(Collectors.joining("-"));
-  }
-
-  public String assetPath() {
-    return specializations().assetPath() != null ?
-      specializations().assetPath() :
-      config().assetPath() != null ?
-        config().assetPath() : null;
-  }
-
-  public boolean assets() {
-    return assetPath() != null && runningTraefik();
-  }
-
-  public Volume assetVolume(String version) {
-    if (assets()) {
-      return new Volume(
-        assetVolumePath(version),
-        assetPath()
-      );
-    }
-    return null;
-  }
-
-  public String assetExtractedPath(String version) {
-    return File.join(config().runDirectory(), "assets", "extracted", containerName(version));
-  }
-
-  public String assetVolumePath(String version) {
-    return File.join(config().runDirectory(), "assets", "volumes", containerName(version));
   }
 
   // private

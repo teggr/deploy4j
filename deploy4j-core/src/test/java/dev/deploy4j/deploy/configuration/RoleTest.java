@@ -144,36 +144,6 @@ class RoleTest {
   }
 
   @Test
-  void assetsAndAssetVolumePaths() {
-    // role should report assets when an assetPath is provided and traefik is running (primary)
-    ServersConfig servers = new ServersConfig(Map.of(
-      "web", new RoleConfig(List.of("host1"))
-    ));
-
-    DeployConfig raw = DeployConfigBuilder.minimal()
-      .service("svc")
-      .servers(servers)
-      .assetPath("/var/www")
-      .build();
-
-    Configuration config = new Configuration(raw, "dest", "1.2.3");
-    Role role = config.role("web");
-
-    assertEquals("/var/www", role.assetPath());
-    assertTrue(role.assets());
-
-    Volume vol = role.assetVolume("1.2.3");
-    assertNotNull(vol);
-    assertEquals(role.assetPath(), vol.containerPath());
-    assertEquals(role.assetVolumePath("1.2.3"), vol.hostPath());
-
-    // extracted path
-    String extracted = role.assetExtractedPath("1.2.3");
-    assertTrue(extracted.contains("assets"));
-    assertTrue(extracted.contains(role.containerName("1.2.3")));
-  }
-
-  @Test
   void attributeAccessors() {
     ServersConfig servers = new ServersConfig(Map.of(
       "web", new RoleConfig(List.of("a"))

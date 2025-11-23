@@ -269,10 +269,6 @@ public class Configuration {
       rawConfig().hooksPath() : ".deploy4j/hooks";
   }
 
-  public String assetPath() {
-    return rawConfig().assetPath();
-  }
-
   public String hostEnvDirectory() {
     return File.join(runDirectory(), "env");
   }

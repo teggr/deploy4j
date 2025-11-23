@@ -17,7 +17,6 @@ public class CustomRoleConfig {
   private final LoggingConfig logging;
   private final HealthCheckConfig healthcheck;
   private final Map<String, String> options;
-  private final String assetPath;
   private final Map<String, String> labels;
 
   @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
@@ -29,7 +28,6 @@ public class CustomRoleConfig {
     @JsonProperty("logging") LoggingConfig logging,
     @JsonProperty("healthcheck") HealthCheckConfig healthcheck,
     @JsonProperty("options") Map<String, String> options,
-    @JsonProperty("asset_path") String assetPath,
     @JsonProperty("labels") Map<String, String> labels
     ) {
     this.hosts = hosts.stream().map( o -> {;
@@ -47,7 +45,6 @@ public class CustomRoleConfig {
     this.logging = logging;
     this.healthcheck = healthcheck;
     this.options = options;
-    this.assetPath = assetPath;
     this.labels = labels;
   }
 
@@ -59,7 +56,6 @@ public class CustomRoleConfig {
     this.logging = null;
     this.healthcheck = null;
     this.options = null;
-    this.assetPath = null;
     this.labels = null;
   }
 
@@ -89,10 +85,6 @@ public class CustomRoleConfig {
 
   public Map<String, String> options() {
     return options;
-  }
-
-  public String assetPath() {
-    return assetPath;
   }
 
   public Map<String, String> labels() {

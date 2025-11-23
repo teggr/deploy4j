@@ -20,7 +20,6 @@ class CustomRoleConfigTest {
         assertThat(config.logging()).isNull();
         assertThat(config.healthcheck()).isNull();
         assertThat(config.options()).isNull();
-        assertThat(config.assetPath()).isNull();
         assertThat(config.labels()).isNull();
     }
 
@@ -40,7 +39,6 @@ class CustomRoleConfigTest {
             logging,
             healthcheck,
             options,
-            "/opt/assets",
             labels
         );
         
@@ -52,7 +50,6 @@ class CustomRoleConfigTest {
         assertThat(config.logging()).isEqualTo(logging);
         assertThat(config.healthcheck()).isEqualTo(healthcheck);
         assertThat(config.options()).isEqualTo(options);
-        assertThat(config.assetPath()).isEqualTo("/opt/assets");
         assertThat(config.labels()).isEqualTo(labels);
     }
 
@@ -65,7 +62,6 @@ class CustomRoleConfigTest {
         
         CustomRoleConfig config = new CustomRoleConfig(
             hosts,
-            null,
             null,
             null,
             null,
@@ -92,7 +88,6 @@ class CustomRoleConfigTest {
             null,
             null,
             null,
-            null,
             null
         );
         
@@ -103,7 +98,6 @@ class CustomRoleConfigTest {
         assertThat(config.logging()).isNull();
         assertThat(config.healthcheck()).isNull();
         assertThat(config.options()).isNull();
-        assertThat(config.assetPath()).isNull();
         assertThat(config.labels()).isNull();
     }
 
@@ -112,7 +106,6 @@ class CustomRoleConfigTest {
         CustomRoleConfig config = new CustomRoleConfig(
             List.of("192.168.1.10"),
             false,
-            null,
             null,
             null,
             null,

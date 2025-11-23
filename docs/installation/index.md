@@ -26,7 +26,7 @@ registry:
     - DEPLOY4J_REGISTRY_PASSWORD
 env:
   secret:
-    - RAILS_MASTER_KEY
+    - DB_PASSWORD
 ```
 
 Then edit your `.env` file to add your registry password as `DEPLOY4J_REGISTRY_PASSWORD`.

@@ -126,10 +126,6 @@ public class Boot {
 
     sshHost().execute(app().stop(version), false);
 
-    if(assets()) {
-      sshHost().execute(app().cleanUpAssets());
-    }
-
   }
 
   private void releaseBarrier() {
@@ -211,10 +207,6 @@ public class Boot {
 
   public boolean usesCord() {
     return role().usesCord();
-  }
-
-  public boolean assets() {
-    return role().assets();
   }
 
   public boolean runningTraefik() {

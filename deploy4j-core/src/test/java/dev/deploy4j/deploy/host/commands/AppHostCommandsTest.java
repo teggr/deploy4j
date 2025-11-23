@@ -39,7 +39,6 @@ class AppHostCommandsTest {
         lenient().when(role.name()).thenReturn("web");
         lenient().when(role.envArgs(testHost)).thenReturn(java.util.List.of()); // Returns List<String>
         lenient().when(role.loggingArgs()).thenReturn(new String[]{}); // Returns String[]
-        lenient().when(role.assetVolumeArgs()).thenReturn(new String[]{}); // Returns String[]
         lenient().when(role.labelArgs()).thenReturn(new String[]{}); // Returns String[]
         lenient().when(role.optionArgs()).thenReturn(java.util.List.of()); // Returns List<String>
         lenient().when(role.cmd()).thenReturn(null);

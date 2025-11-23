@@ -44,7 +44,6 @@ public class AppHostCommands extends BaseHostCommands {
       .args(role().healthCheckArgs())
       .args(role().loggingArgs())
       .args(config().volumeArgs())
-      .args(role().assetVolumeArgs())
       .args(role().labelArgs())
       .args(role().optionArgs())
       .args(config().absoluteImage())
@@ -202,51 +201,6 @@ public class AppHostCommands extends BaseHostCommands {
   }
 
   // includes
-
-  // assets
-
-  public Cmd extractAssets() {
-
-    String assetContainer = role().containerPrefix() + "-assets";
-
-    return combine(
-      "&&", new Cmd[]{
-        makeDirectory(role().assetExtractedPath(null)),
-        any(docker().stop().args("-t 1", assetContainer, "2> /dev/null"), Cmd.cmd("true")),
-        docker().run().args("--name", assetContainer, "--detach", "--rm", config().absoluteImage(), "sleep 1000000"),
-        docker().cp().args("-L", assetContainer + ":" + role().assetPath() + "/.", role().assetExtractedPath(null)),
-        docker().stop().args("-t 1", assetContainer)
-      }
-
-    );
-  }
-
-  public Cmd syncAssetVolumes(String oldVersion) {
-
-    List<Cmd> cmds = new ArrayList<>();
-
-    String newExtractedPath = role().assetExtractedPath(config().version());
-    String newVolumePath = role().assetVolume(null).hostPath();
-    cmds.add(makeDirectory(newVolumePath));
-    cmds.add(copyContents(newExtractedPath, newVolumePath, false));
-
-    if (oldVersion != null) {
-      String oldExtractedPath = role().assetExtractedPath(oldVersion);
-      String oldVolumePath = role().assetVolume(oldVersion).hostPath();
-      cmds.add(copyContents(newExtractedPath, oldVolumePath, true));
-      cmds.add(copyContents(oldExtractedPath, newVolumePath, true));
-    }
-
-    return chain(cmds.toArray(new Cmd[0]));
-
-  }
-
-  public Cmd cleanUpAssets() {
-    return chain(
-      findAndRemoveOlderSiblings(role().assetExtractedPath(null)),
-      findAndRemoveOlderSiblings(role().assetVolumePath(null))
-    );
-  }
 
   // private
 

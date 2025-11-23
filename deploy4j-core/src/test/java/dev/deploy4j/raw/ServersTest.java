@@ -119,7 +119,6 @@ class ServersTest {
              cpus: 4
            labels:
              my-label: workers
-           asset_path: /public
        """;
 
     // when
