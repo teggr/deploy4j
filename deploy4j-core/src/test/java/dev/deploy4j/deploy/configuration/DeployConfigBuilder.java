@@ -23,7 +23,6 @@ public class DeployConfigBuilder {
     private RegistryConfig registry;
     private ServersConfig servers;
     private EnvironmentConfig env;
-    private String assetPath;
     private String hooksPath;
     private Boolean requireDestination;
     private String primaryRole;
@@ -61,7 +60,6 @@ public class DeployConfigBuilder {
     public DeployConfigBuilder registry(RegistryConfig registry) { this.registry = registry; return this; }
     public DeployConfigBuilder servers(ServersConfig servers) { this.servers = servers; return this; }
     public DeployConfigBuilder env(EnvironmentConfig env) { this.env = env; return this; }
-    public DeployConfigBuilder assetPath(String assetPath) { this.assetPath = assetPath; return this; }
     public DeployConfigBuilder hooksPath(String hooksPath) { this.hooksPath = hooksPath; return this; }
     public DeployConfigBuilder requireDestination(Boolean requireDestination) { this.requireDestination = requireDestination; return this; }
     public DeployConfigBuilder primaryRole(String primaryRole) { this.primaryRole = primaryRole; return this; }
@@ -87,7 +85,6 @@ public class DeployConfigBuilder {
             registry,
             servers,
             env,
-            assetPath,
             hooksPath,
             requireDestination,
             primaryRole,
@@ -169,7 +166,6 @@ public class DeployConfigBuilder {
         private LoggingConfig logging;
         private HealthCheckConfig healthcheck;
         private Map<String, String> options;
-        private String assetPath;
         private Map<String, String> labels;
 
         public CustomRoleBuilder addHost(String host) { hosts.add(host); return this; }
@@ -179,9 +175,8 @@ public class DeployConfigBuilder {
         public CustomRoleBuilder logging(LoggingConfig l) { this.logging = l; return this; }
         public CustomRoleBuilder healthcheck(HealthCheckConfig h) { this.healthcheck = h; return this; }
         public CustomRoleBuilder options(Map<String, String> o) { this.options = o; return this; }
-        public CustomRoleBuilder assetPath(String p) { this.assetPath = p; return this; }
         public CustomRoleBuilder labels(Map<String, String> l) { this.labels = l; return this; }
-        public CustomRoleConfig build() { return new CustomRoleConfig(new ArrayList<>(hosts), traefik, cmd, env, logging, healthcheck, options, assetPath, labels); }
+        public CustomRoleConfig build() { return new CustomRoleConfig(new ArrayList<>(hosts), traefik, cmd, env, logging, healthcheck, options, labels); }
     }
 
     public static class HealthCheckBuilder {

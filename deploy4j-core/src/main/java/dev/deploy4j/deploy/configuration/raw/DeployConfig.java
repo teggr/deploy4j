@@ -17,7 +17,6 @@ public class DeployConfig {
   private final RegistryConfig registry;
   private final ServersConfig servers;
   private final EnvironmentConfig env;
-  private final String assetPath;
   private final String hooksPath;
   private final Boolean requireDestination;
   private final String primaryRole;
@@ -43,7 +42,6 @@ public class DeployConfig {
     @JsonProperty("registry") RegistryConfig registry,
     @JsonProperty("servers") ServersConfig servers,
     @JsonProperty("env") EnvironmentConfig env,
-    @JsonProperty("asset_path") String assetPath,
     @JsonProperty("hooks_path") String hooksPath,
     @JsonProperty("require_destination") Boolean requireDestination,
     @JsonProperty("primary_role") String primaryRole,
@@ -67,7 +65,6 @@ public class DeployConfig {
     this.registry = registry;
     this.servers = servers;
     this.env = env;
-    this.assetPath = assetPath;
     this.hooksPath = hooksPath;
     this.requireDestination = requireDestination;
     this.primaryRole = primaryRole;
@@ -111,10 +108,6 @@ public class DeployConfig {
 
   public EnvironmentConfig env() {
     return env;
-  }
-
-  public String assetPath() {
-    return assetPath;
   }
 
   public String hooksPath() {

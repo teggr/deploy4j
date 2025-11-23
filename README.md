@@ -185,3 +185,7 @@ docker exec -it deploy4j-droplet /bin/bash
 The current port is based on Kamal v1. Once the v2 changes have been assessed then a decision can be made on whether to port those changes over.
 
 It's likely that v1 will remain the baseline for future enhancements as we start to look at introducing more Java focussed enhancements.
+
+Some features didn't make the cut initially but may be added in future:
+
+* Asset bridging - https://github.com/teggr/deploy4j/discussions/57

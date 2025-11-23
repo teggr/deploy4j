@@ -50,5 +50,4 @@ servers:
       my-label: workers
     env:
       ...
-    asset_path: /public
 ```
