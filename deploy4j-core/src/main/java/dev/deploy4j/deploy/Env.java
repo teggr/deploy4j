@@ -4,6 +4,7 @@ import dev.deploy4j.deploy.configuration.Accessory;
 import dev.deploy4j.deploy.configuration.Role;
 import dev.deploy4j.deploy.host.commands.*;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 import dev.deploy4j.deploy.utils.erb.ERB;
 import org.apache.commons.io.FileUtils;
 
@@ -22,8 +23,8 @@ public class Env extends Base {
   private final AppHostCommandsFactory apps;
   private final AccessoryHostCommandsFactory accessories;
 
-  public Env(SshHosts sshHosts, LockManager lockManager, TraefikHostCommands traefik, Environment environment, AuditorHostCommands audit, AppHostCommandsFactory apps, AccessoryHostCommandsFactory accessories) {
-    super(sshHosts);
+  public Env(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, TraefikHostCommands traefik, Environment environment, AuditorHostCommands audit, AppHostCommandsFactory apps, AccessoryHostCommandsFactory accessories) {
+    super(sshHosts, hooks, localHost);
     this.lockManager = lockManager;
     this.traefik = traefik;
     this.environment = environment;
@@ -39,7 +40,7 @@ public class Env extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext.hosts(), host -> {
+      on(deployContext, deployContext.hosts(), host -> {
 
         host.execute(audit.record("Pushed env files"));
 
@@ -52,14 +53,14 @@ public class Env extends Base {
 
       });
 
-      on(deployContext.traefikHosts(), host -> {
+      on(deployContext, deployContext.traefikHosts(), host -> {
 
         host.execute(traefik.makeEnvDirectory());
         host.upload(traefik.env().secretsIO(), traefik.env().secretsFile(), 400);
 
       });
 
-      on(deployContext.accessoryHosts(), host -> {
+      on(deployContext, deployContext.accessoryHosts(), host -> {
 
         for (String accessory : deployContext.accessoriesOn(host.hostName())) {
 
@@ -82,7 +83,7 @@ public class Env extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext.hosts(), host -> {
+      on(deployContext, deployContext.hosts(), host -> {
 
         host.execute(audit.record("Deleted env files"));
 
@@ -94,13 +95,13 @@ public class Env extends Base {
 
       });
 
-      on(deployContext.traefikHosts(), host -> {
+      on(deployContext, deployContext.traefikHosts(), host -> {
 
         host.execute(traefik.removeEnvFile());
 
       });
 
-      on(deployContext.accessoryHosts(), host -> {
+      on(deployContext, deployContext.accessoryHosts(), host -> {
 
         for (String accessory : deployContext.accessoriesOn(host.hostName())) {
 

@@ -1,6 +1,9 @@
 ---
 layout: page
-title: Hooks overview
+title: deploy4j Configuration
+default: true
+short_title: Hooks Overview
+date: 2025-11-03
 ---
 You can run custom scripts at specific points with hooks.
 
@@ -25,13 +28,12 @@ If the script returns a non-zero exit code the command will be aborted.
 
 The available hooks are:
 
-docker-setup
-pre-connect
-pre-build
-pre-deploy
-post-deploy
-pre-traefik-reboot
-post-traefik-reboot
+* [docker-setup]({{ 'hooks/docker-setup' | relative_url }})
+* [pre-connect]({{ 'hooks/pre-connect' | relative_url }})
+* [pre-deploy]({{ 'hooks/pre-deploy' | relative_url }})
+* [post-deploy]({{ 'hooks/post-deploy' | relative_url }})
+* [pre-traefik-reboot]({{ 'hooks/pre-traefik-reboot' | relative_url }})
+* [post-traefik-reboot]({{ 'hooks/post-traefik-reboot' | relative_url }})
 
 You can pass --skip_hooks to avoid running the hooks.
 

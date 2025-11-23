@@ -5,6 +5,7 @@ import dev.deploy4j.deploy.host.commands.AccessoryHostCommandsFactory;
 import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.host.commands.RegistryHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 import dev.rebelcraft.cmd.Cmd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +24,8 @@ public class Accessory extends Base {
   private final AuditorHostCommands audit;
   private final AccessoryHostCommandsFactory accessories;
 
-  public Accessory(SshHosts sshHosts, LockManager lockManager, RegistryHostCommands registry, AuditorHostCommands audit, AccessoryHostCommandsFactory accessories) {
-    super(sshHosts);
+  public Accessory(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, RegistryHostCommands registry, AuditorHostCommands audit, AccessoryHostCommandsFactory accessories) {
+    super(sshHosts, hooks, localHost);
     this.lockManager = lockManager;
     this.registry = registry;
     this.audit = audit;
@@ -62,7 +63,7 @@ public class Accessory extends Base {
           directories(deployContext, name);
           upload(deployContext, name);
 
-          on(hosts, host -> {
+          on(deployContext, hosts, host -> {
 
             if (login) {
               host.execute(registry.login());
@@ -89,7 +90,7 @@ public class Accessory extends Base {
 
       withAccessory(deployContext, name, (accessory, hosts) -> {
 
-        on(hosts, host -> {
+        on(deployContext, hosts, host -> {
 
           accessory.files().forEach((local, remote) -> {
             accessory.ensureLocalFilePresent(local);
@@ -117,7 +118,7 @@ public class Accessory extends Base {
 
       withAccessory(deployContext, name, (accessory, hosts) -> {
 
-        on(hosts, host -> {
+        on(deployContext, hosts, host -> {
 
           for (String hostPath : accessory.directories().keySet()) {
             host.execute(accessory.makeDirectory(hostPath));
@@ -147,7 +148,7 @@ public class Accessory extends Base {
 
         withAccessory(deployContext, name, (accessory, hosts) -> {
 
-          on(hosts, host -> {
+          on(deployContext, hosts, host -> {
 
             host.execute(registry.login());
 
@@ -174,7 +175,7 @@ public class Accessory extends Base {
 
       withAccessory(deployContext, name, (accessory, hosts) -> {
 
-        on(hosts, host -> {
+        on(deployContext, hosts, host -> {
 
           host.execute(audit.record("Started " + name + " accessory"));
           host.execute(accessory.start());
@@ -196,7 +197,7 @@ public class Accessory extends Base {
 
       withAccessory(deployContext, name, (accessory, hosts) -> {
 
-        on(hosts, host -> {
+        on(deployContext, hosts, host -> {
 
           host.execute(audit.record("Stopped " + name + " accessory"));
           host.execute(accessory.stop(), false);
@@ -243,7 +244,7 @@ public class Accessory extends Base {
 
       withAccessory(deployContext, name, (accessory, hosts) -> {
 
-        on(hosts, host -> {
+        on(deployContext, hosts, host -> {
 
           log.info(host.capture(accessory.info()));
 
@@ -270,7 +271,7 @@ public class Accessory extends Base {
     withAccessory(deployContext, name, (accessory, hosts) -> {
 
       log.info("Launching command from existing container...");
-      on(hosts, host -> {
+      on(deployContext, hosts, host -> {
 
         host.execute(audit.record("Executed cmd '" + cmd + "' on " + name + " accessory"));
         host.capture(accessory.executeInExistingContainer(cmd));
@@ -310,7 +311,7 @@ public class Accessory extends Base {
 //      }
 //
 //      Integer finalLines = lines;
-      on(hosts, host -> {
+      on(deployContext, hosts, host -> {
 
         log.info(host.capture(accessory.logs(since, lines != null ? lines.toString() : null, grep, grepOptions)));
 
@@ -352,7 +353,7 @@ public class Accessory extends Base {
 
       withAccessory(deployContext, name, (accessory, hosts) -> {
 
-        on(hosts, host -> {
+        on(deployContext, hosts, host -> {
 
           host.execute(audit.record("Remove " + name + " accessory container"));
           host.execute(accessory.removeContainer());
@@ -375,7 +376,7 @@ public class Accessory extends Base {
 
       withAccessory(deployContext, name, (accessory, hosts) -> {
 
-        on(hosts, host -> {
+        on(deployContext, hosts, host -> {
 
           host.execute(audit.record("Removed " + name + " accessory image"));
           host.execute(accessory.removeImage());
@@ -397,7 +398,7 @@ public class Accessory extends Base {
 
       withAccessory(deployContext, name, (accessory, hosts) -> {
 
-        on(hosts, host -> {
+        on(deployContext, hosts, host -> {
 
           host.execute(accessory.removeServiceDirectory());
 

@@ -2,6 +2,7 @@ package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.host.commands.*;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class DeployApplicationContext {
   private final LockManager lockManager;
   private final Audit audit;
 
-  public DeployApplicationContext(Environment environment, SshHosts sshHosts, DeployContext deployContext) {
+  public DeployApplicationContext(Environment environment, SshHosts sshHosts, Hooks hooks, LocalHost localHost, DeployContext deployContext) {
 
     this.environment = environment;
     this.deployContext = deployContext;
@@ -32,8 +33,6 @@ public class DeployApplicationContext {
     DockerHostCommands docker = new DockerHostCommands(deployContext.config());
 
     HealthcheckHostCommands healthcheck = new HealthcheckHostCommands(deployContext.config());
-
-    HookHostCommands hook = new HookHostCommands(deployContext.config());
 
     LockHostCommands lock = new LockHostCommands(deployContext.config());
 
@@ -52,18 +51,18 @@ public class DeployApplicationContext {
 
     this.lockManager = new LockManager(sshHosts, lock, server, deployContext.config().version());
 
-    this.app = new App(sshHosts, lockManager, audit, apps);
-    this.server = new Server(sshHosts, lockManager, docker, server, audit);
-    this.env = new Env(sshHosts, lockManager, traefik, this.environment, audit, apps, accessories);
-    this.accessory = new Accessory(sshHosts, lockManager, registry, audit, accessories);
-    this.registry = new Registry(sshHosts, registry);
-    this.build = new Build(sshHosts, builder, audit);
-    this.prune = new Prune(sshHosts, lockManager, prune, audit);
-    this.traefik = new Traefik(sshHosts, lockManager, registry, traefik, audit);
-    this.lock = new Lock(sshHosts, lockManager, server, lock);
+    this.app = new App(sshHosts, hooks, localHost, lockManager, audit, apps);
+    this.server = new Server(sshHosts, hooks, localHost, lockManager, docker, server, audit);
+    this.env = new Env(sshHosts, hooks, localHost, lockManager, traefik, this.environment, audit, apps, accessories);
+    this.accessory = new Accessory(sshHosts, hooks, localHost, lockManager, registry, audit, accessories);
+    this.registry = new Registry(sshHosts, hooks, localHost, registry);
+    this.build = new Build(sshHosts, hooks, localHost, builder, audit);
+    this.prune = new Prune(sshHosts, hooks, localHost, lockManager, prune, audit);
+    this.traefik = new Traefik(sshHosts, hooks, localHost, lockManager, registry, traefik, audit);
+    this.lock = new Lock(sshHosts, hooks, localHost, lockManager, server, lock);
 
-    this.audit = new Audit(sshHosts, audit);
-    this.deploy = new Deploy(sshHosts, lockManager, this.app, this.server, this.env, this.accessory, this.registry, build, this.prune, this.traefik, apps);
+    this.audit = new Audit(sshHosts, hooks, localHost, audit);
+    this.deploy = new Deploy(sshHosts, hooks, localHost, lockManager, this.app, this.server, this.env, this.accessory, this.registry, build, this.prune, this.traefik, apps);
 
   }
 

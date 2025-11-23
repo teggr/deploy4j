@@ -3,6 +3,7 @@ package dev.deploy4j.deploy;
 import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.host.commands.PruneHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 
 public class Prune extends Base {
 
@@ -10,8 +11,8 @@ public class Prune extends Base {
   private final PruneHostCommands prune;
   private final AuditorHostCommands audit;
 
-  public Prune(SshHosts sshHosts, LockManager lockManager, PruneHostCommands prune, AuditorHostCommands audit) {
-    super(sshHosts);
+  public Prune(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, PruneHostCommands prune, AuditorHostCommands audit) {
+    super(sshHosts, hooks, localHost);
     this.lockManager = lockManager;
     this.prune = prune;
     this.audit = audit;
@@ -38,7 +39,7 @@ public class Prune extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext.hosts(), host -> {
+      on(deployContext, deployContext.hosts(), host -> {
 
         host.execute(audit.record("Pruned images"));
         host.execute(prune.danglingImages());
@@ -73,7 +74,7 @@ public class Prune extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext.hosts(), host -> {
+      on(deployContext, deployContext.hosts(), host -> {
 
         host.execute(audit.record("Pruned containers"));
         host.execute(prune.appContainers(finalRetain));

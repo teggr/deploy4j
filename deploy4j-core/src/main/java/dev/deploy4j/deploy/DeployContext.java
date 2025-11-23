@@ -96,6 +96,10 @@ public class DeployContext implements LockContext {
     return connected;
   }
 
+  public void connected(boolean connected) {
+    this.connected = connected;
+  }
+
   // private
 
   // TODO: configure ssh kit with

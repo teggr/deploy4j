@@ -4,6 +4,7 @@ import dev.deploy4j.deploy.configuration.ConfigurationPrinter;
 import dev.deploy4j.deploy.configuration.Role;
 import dev.deploy4j.deploy.host.commands.AppHostCommandsFactory;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +26,8 @@ public class Deploy extends Base {
   private final Traefik traefik;
   private final AppHostCommandsFactory apps;
 
-  public Deploy(SshHosts sshHosts, LockManager lockManager, App app, Server server, Env env, Accessory accessory, Registry registry, Build build, Prune prune, Traefik traefik, AppHostCommandsFactory apps) {
-    super(sshHosts);
+  public Deploy(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, App app, Server server, Env env, Accessory accessory, Registry registry, Build build, Prune prune, Traefik traefik, AppHostCommandsFactory apps) {
+    super(sshHosts, hooks, localHost);
     this.lockManager = lockManager;
     this.app = app;
     this.server = server;
@@ -81,6 +82,8 @@ public class Deploy extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
+      runHook(deployContext, "pre-deploy");
+
       log.info("Ensure Traefik is running...");
       traefik.boot(deployContext);
 
@@ -93,6 +96,8 @@ public class Deploy extends Base {
       prune.all(deployContext);
 
     });
+
+    runHook(deployContext, "post-deploy");
 
   }
 
@@ -112,12 +117,16 @@ public class Deploy extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
+      runHook(deployContext, "pre-deploy");
+
       log.info("Detect stale containers...");
       app.staleContainers(deployContext);
 
       app.boot(deployContext);
 
     });
+
+    runHook(deployContext, "post-deploy");
 
   }
 
@@ -135,6 +144,8 @@ public class Deploy extends Base {
 
       if (containerAvailable(deployContext, version)) {
 
+        runHook(deployContext, "pre-deploy");
+
         app.boot(deployContext);
         rolledBack = true;
       } else {
@@ -142,6 +153,8 @@ public class Deploy extends Base {
       }
 
     });
+
+    runHook(deployContext, "post-deploy");
 
   }
 
@@ -186,7 +199,7 @@ public class Deploy extends Base {
 
     try {
 
-      on(deployContext.hosts(), host -> {
+      on(deployContext, deployContext.hosts(), host -> {
 
         for (Role role : deployContext.rolesOn(host.hostName())) {
 
@@ -221,7 +234,7 @@ public class Deploy extends Base {
 
   public void test(DeployContext deployContext) {
 
-    on(deployContext.hosts(), host -> {
+    on(deployContext, deployContext.hosts(), host -> {
 
       log.info("Testing connectivity to " + host.hostName() + "...");
       host.execute(server.test());

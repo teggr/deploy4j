@@ -6,6 +6,7 @@ import dev.deploy4j.deploy.host.commands.AppHostCommands;
 import dev.deploy4j.deploy.host.commands.AppHostCommandsFactory;
 import dev.deploy4j.deploy.host.ssh.SshHost;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 import dev.rebelcraft.cmd.Cmd;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,6 +68,12 @@ class DeployTest {
   @Mock
   AppHostCommands appHostCommands;
 
+  @Mock
+  Hooks hooks;
+
+  @Mock
+  private LocalHost localHost;
+
   Deploy deploy;
 
   @BeforeEach
@@ -94,7 +101,7 @@ class DeployTest {
     // server.test() returns a simple Cmd to avoid null invocation in tests
     when(server.test()).thenReturn(Cmd.cmd("pwd"));
 
-    deploy = new Deploy(sshHosts, lockManager, app, server, env, accessory, registry, build, prune, traefik, apps);
+    deploy = new Deploy(sshHosts, hooks, localHost, lockManager, app, server, env, accessory, registry, build, prune, traefik, apps);
   }
 
   @Test

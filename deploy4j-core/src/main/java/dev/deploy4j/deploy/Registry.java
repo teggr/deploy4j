@@ -2,13 +2,14 @@ package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.host.commands.RegistryHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 
 public class Registry extends Base {
 
   private final RegistryHostCommands registry;
 
-  public Registry(SshHosts sshHosts, RegistryHostCommands registry) {
-    super(sshHosts);
+  public Registry(SshHosts sshHosts, Hooks hooks, LocalHost localHost, RegistryHostCommands registry) {
+    super(sshHosts, hooks, localHost);
     this.registry = registry;
   }
 
@@ -19,7 +20,7 @@ public class Registry extends Base {
 
     // TODO: locally?
 
-    on(deployContext.hosts(), host -> {
+    on(deployContext, deployContext.hosts(), host -> {
 
       host.execute(registry.login());
 
@@ -34,7 +35,7 @@ public class Registry extends Base {
 
     // TODO: locally?
 
-    on(deployContext.hosts(), host -> {
+    on(deployContext, deployContext.hosts(), host -> {
 
       host.execute(registry.logout());
 

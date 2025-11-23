@@ -2,6 +2,7 @@ package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 
 public class Audit extends Base {
 
@@ -9,8 +10,8 @@ public class Audit extends Base {
 
   private final AuditorHostCommands audit;
 
-  public Audit(SshHosts sshHosts, AuditorHostCommands audit) {
-    super(sshHosts);
+  public Audit(SshHosts sshHosts, Hooks hooks, LocalHost localHost, AuditorHostCommands audit) {
+    super(sshHosts, hooks, localHost);
     this.audit = audit;
   }
 
@@ -18,7 +19,7 @@ public class Audit extends Base {
    * Show audit log from servers
    */
   public void audit(DeployContext deployContext) {
-    on(deployContext.hosts(), host -> {
+    on(deployContext, deployContext.hosts(), host -> {
       log.info(host.capture(audit.reveal()));
     });
   }

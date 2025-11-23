@@ -68,3 +68,5 @@ collections:
     output: true
   guides:
     output: true
+  hooks:
+    output: true

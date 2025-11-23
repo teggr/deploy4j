@@ -2,6 +2,7 @@ package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.host.commands.RegistryHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,11 +32,17 @@ class RegistryTest {
     @Mock
     private DeployContext deployContext;
 
+    @Mock
+    private Hooks hooks;
+
+  @Mock
+  private LocalHost localHost;
+
     private Registry registry;
 
     @BeforeEach
     void setUp() {
-        registry = new Registry(sshHosts, registryHostCommands);
+        registry = new Registry(sshHosts, hooks, localHost, registryHostCommands);
     }
 
     @Test

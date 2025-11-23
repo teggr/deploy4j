@@ -3,6 +3,7 @@ package dev.deploy4j.deploy;
 import dev.deploy4j.deploy.host.commands.LockHostCommands;
 import dev.deploy4j.deploy.host.commands.ServerHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
+import dev.deploy4j.deploy.local.LocalHost;
 
 import java.util.List;
 
@@ -14,8 +15,8 @@ public class Lock extends Base {
   private final ServerHostCommands server;
   private final LockHostCommands lock;
 
-  public Lock(SshHosts sshHosts, LockManager lockManager, ServerHostCommands server, LockHostCommands lock) {
-    super(sshHosts);
+  public Lock(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, ServerHostCommands server, LockHostCommands lock) {
+    super(sshHosts, hooks, localHost);
     this.lockManager = lockManager;
     this.server = server;
     this.lock = lock;
@@ -28,7 +29,7 @@ public class Lock extends Base {
 
     handleMissingLock(() -> {
 
-      on(List.of(deployContext.primaryHost()), host -> {;
+      on(deployContext, List.of(deployContext.primaryHost()), host -> {;
 
         host.execute(server.ensureRunDirectory());
         log.info( host.capture( lock.status() ) );
@@ -48,7 +49,7 @@ public class Lock extends Base {
 
     lockManager.raiseIfLocked(deployContext, () -> {
 
-      on(List.of(deployContext.primaryHost()), host -> {
+      on(deployContext, List.of(deployContext.primaryHost()), host -> {
 
         host.execute(server.ensureRunDirectory());
         host.execute(lock.acquire(message, deployContext.config().version()));
@@ -68,7 +69,7 @@ public class Lock extends Base {
 
     handleMissingLock(() -> {
 
-      on(List.of(deployContext.primaryHost()), host -> {
+      on(deployContext, List.of(deployContext.primaryHost()), host -> {
 
         host.execute(server.ensureRunDirectory());
         host.execute(lock.release());
