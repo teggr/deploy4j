@@ -1,11 +1,9 @@
 package dev.deploy4j.deploy.configuration;
 
+import dev.deploy4j.deploy.Secrets;
 import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
-import dev.deploy4j.deploy.env.ENV;
 import dev.deploy4j.deploy.env.EnvFile;
-import dev.deploy4j.deploy.utils.file.File;
 
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -13,55 +11,37 @@ import static dev.rebelcraft.cmd.CmdUtils.argumentize;
 
 public class Env {
 
-  private List<String> secretsKeys;
-  private Map<String, String> clear;
-  private String secretsFile;
-  private String context;
+  private final List<String> secretsKeys;
+  private final Map<String, String> clear;
+  private final Secrets secrets;
+  private final String context;
 
-  private Map<String, String> secrets;
-
-  public Env(EnvironmentConfig config) {
-    this(config, null, "env");
+  public Env(EnvironmentConfig config, Secrets secrets) {
+    this(config, secrets, "env");
   }
 
-  public Env(EnvironmentConfig config, String secretsFile, String context) {
+  public Env(EnvironmentConfig config, Secrets secrets, String context) {
     if (config == null) {
       this.clear = Map.of();
       this.secretsKeys = List.of();
-      this.secretsFile = secretsFile;
+      this.secrets = secrets;
       this.context = context;
     } else {
       this.clear = config.isAMap() ? config.map() : config.isClearAndSecrets() ? config.clear() : Map.of();
       this.secretsKeys = config.secrets() != null ? config.secrets() : List.of();
-      this.secretsFile = secretsFile;
+      this.secrets = secrets;
       this.context = context;
     }
   }
 
-  public List<String> args() {
+  public List<String> clearArgs() {
     List<String> args = new ArrayList<>();
-    args.add("--env-file");
-    args.add(secretsFile());
     args.addAll(Stream.of(argumentize("--env", clear())).toList());
     return args;
   }
 
   public String secretsIO() {
-    return new EnvFile(secrets()).encode();
-  }
-
-  private Map<String, String> secrets() {
-    if (secrets == null) {
-      secrets = secretsKeys.stream()
-        .collect(HashMap::new, (map, key) -> {
-          map.put(key, ENV.fetch(key));
-        }, HashMap::putAll);
-    }
-    return secrets;
-  }
-
-  public String secretsDirectory() {
-    return File.dirname(secretsFile());
+    return new EnvFile(aliasedSecrets()).encode();
   }
 
   public Env merge(Env other) {
@@ -81,10 +61,30 @@ public class Env {
 
     return new Env(
       config,
-      secretsFile() != null ? this.secretsFile() : other.secretsFile(),
+      secrets,
       "env"
     );
 
+  }
+
+  // private
+
+  private Map<String, String> aliasedSecrets() {
+    return secretsKeys().stream()
+      .map(this::extractAlias)
+      .collect(
+        HashMap::new,
+        (map, pair) -> map.put(pair[0], secrets.get(pair[1])),
+        HashMap::putAll
+      );
+  }
+
+  private String[] extractAlias(String key) {
+    String[] split = key.split(":");
+    if (split.length == 2) {
+      return split;
+    }
+    return new String[]{key, key};
   }
 
   // attributes
@@ -95,10 +95,6 @@ public class Env {
 
   public Map<String, String> clear() {
     return clear;
-  }
-
-  public String secretsFile() {
-    return secretsFile;
   }
 
   public String context() {

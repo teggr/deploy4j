@@ -96,12 +96,8 @@ public class AccessoryHostCommands extends BaseHostCommands {
     return docker().image().args("rm", "--force", image());
   }
 
-  public Cmd makeEnvDirectory() {
-    return makeDirectory(accessoryConfig().env().secretsDirectory());
-  }
-
-  public Cmd removeEnvFile() {
-    return Cmd.cmd("rm", "-f", accessoryConfig().env().secretsDirectory());
+  public Cmd ensureEnvDirectory() {
+    return makeDirectory(accessoryConfig().envDirectory());
   }
 
   // private
@@ -161,6 +157,14 @@ public class AccessoryHostCommands extends BaseHostCommands {
 
   public List<String> optionArgs() {
     return accessoryConfig().optionArgs();
+  }
+
+  public String secretsPath() {
+    return accessoryConfig().secretsPath();
+  }
+
+  public String secretsIO() {
+    return accessoryConfig().secretsIO();
   }
 
   // attributes

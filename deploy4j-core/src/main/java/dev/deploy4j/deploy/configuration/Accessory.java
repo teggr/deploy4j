@@ -27,7 +27,7 @@ public class Accessory {
 
     this.env = new Env(
       accessoryConfig.env() != null ? accessoryConfig.env() : new EnvironmentConfig(),
-      File.join(config.hostEnvDirectory(), "accessories", serviceName() + ".env"),
+      config().secrets(),
       "accessories/%s/env".formatted(name)
     );
   }
@@ -93,7 +93,22 @@ public class Accessory {
   }
 
   public List<String> envArgs() {
-    return env().args();
+    List<String> list = new ArrayList<>();
+    list.addAll(env().clearArgs());
+    list.addAll(Arrays.asList(argumentize("--env-file", secretsPath())));
+    return list;
+  }
+
+  public String envDirectory() {
+    return File.join( config().envDirectory(), "accessories" );
+  }
+
+  public String secretsIO() {
+    return env().secretsIO();
+  }
+
+  public String secretsPath() {
+    return File.join( config().envDirectory(), "accessories", name() + ".env" );
   }
 
   public Map<String, String> files() {

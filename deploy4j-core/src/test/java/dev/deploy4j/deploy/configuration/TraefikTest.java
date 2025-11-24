@@ -217,7 +217,6 @@ class TraefikTest {
 
         // Assert
         assertThat(env).isNotNull();
-        assertThat(env.secretsFile()).isEqualTo("/app/env/traefik/traefik.env");
         assertThat(env.context()).isEqualTo("traefik/env");
     }
 }

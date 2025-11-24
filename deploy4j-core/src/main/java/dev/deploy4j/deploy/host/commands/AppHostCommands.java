@@ -115,12 +115,8 @@ public class AppHostCommands extends BaseHostCommands {
     ).description("list versions");
   }
 
-  public Cmd makeEnvDirectory() {
-    return makeDirectory(role.env(host).secretsDirectory());
-  }
-
-  public Cmd removeEnvFile() {
-    return Cmd.cmd("rm", "-f", role().env(host()).secretsFile());
+  public Cmd ensureEnvDirectory() {
+    return makeDirectory(role().envDirectory());
   }
 
   // private

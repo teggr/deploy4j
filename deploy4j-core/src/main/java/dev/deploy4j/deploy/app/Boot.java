@@ -104,6 +104,9 @@ public class Boot {
 
     String hostName = prefix + "-" + suffix;
 
+    sshHost().execute(app().ensureEnvDirectory());
+    sshHost().upload(role().secretsIO(host), role.secretsPath(), 600);
+
     sshHost().execute(app().run(hostName));
 
     new Poller(deployContext).waitForHealthy(true, () -> sshHost().capture( app().status(version()) ) );

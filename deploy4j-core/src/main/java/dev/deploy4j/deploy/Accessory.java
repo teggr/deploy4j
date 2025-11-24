@@ -69,6 +69,8 @@ public class Accessory extends Base {
               host.execute(registry.login());
             }
             host.execute(audit.record("Booted " + name + " accessory"));
+            host.execute(accessory.ensureEnvDirectory());
+            host.upload( accessory.secretsIO(), accessory.secretsPath(), 600 );
             host.execute(accessory.run());
 
           });

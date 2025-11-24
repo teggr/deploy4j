@@ -1,6 +1,5 @@
 package dev.deploy4j.deploy.configuration;
 
-import dev.deploy4j.deploy.utils.file.File;
 import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
 import dev.deploy4j.deploy.configuration.raw.TraefikConfig;
 
@@ -47,7 +46,7 @@ public class Traefik {
   public Env env() {
     return new Env(
       traefikConfig().env() != null ? traefikConfig().env() : new EnvironmentConfig(),
-      File.join(config().hostEnvDirectory(), "traefik", "traefik.env"),
+      config().secrets(),
       "traefik/env"
     );
   }

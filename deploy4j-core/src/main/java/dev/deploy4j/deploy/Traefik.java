@@ -35,6 +35,8 @@ public class Traefik extends Base {
       on(deployContext, deployContext.traefikHosts(), host -> {
 
         host.execute(registry.login());
+        host.execute(traefik.ensureEnvDirectory());
+        host.upload( traefik.secretsIO(), traefik.secretsPath(), 600 );
         host.execute(traefik.startOrRun());
 
       });
@@ -63,6 +65,8 @@ public class Traefik extends Base {
         host.execute(registry.login());
         host.execute(traefik.stop(), false);
         host.execute(traefik.removeContainer());
+        host.execute(traefik.ensureEnvDirectory());
+        host.upload( traefik.secretsIO(), traefik.secretsPath(), 600 );
         host.execute(traefik.run());
 
       });

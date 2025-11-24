@@ -1,5 +1,6 @@
 package dev.deploy4j.deploy.configuration;
 
+import dev.deploy4j.deploy.Secrets;
 import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.*;
 
 @DisplayName("Env")
 class EnvTest {
@@ -18,12 +19,11 @@ class EnvTest {
     @DisplayName("should create Env with null config")
     void shouldCreateEnvWithNullConfig() {
         // Act
-        Env env = new Env(null, "/path/to/secrets.env", "test/env");
+        Env env = new Env(null, mock(Secrets.class), "test/env");
 
         // Assert
         assertThat(env.clear()).isEmpty();
         assertThat(env.secretsKeys()).isEmpty();
-        assertThat(env.secretsFile()).isEqualTo("/path/to/secrets.env");
         assertThat(env.context()).isEqualTo("test/env");
     }
 
@@ -35,7 +35,7 @@ class EnvTest {
         EnvironmentConfig config = new EnvironmentConfig(null, null, null, envMap);
 
         // Act
-        Env env = new Env(config, "/path/to/secrets.env", "test/env");
+        Env env = new Env(config, mock(Secrets.class), "test/env");
 
         // Assert
         assertThat(env.clear()).containsExactlyInAnyOrderEntriesOf(envMap);
@@ -51,7 +51,7 @@ class EnvTest {
         EnvironmentConfig config = new EnvironmentConfig(clearMap, secrets, null, null);
 
         // Act
-        Env env = new Env(config, "/path/to/secrets.env", "test/env");
+        Env env = new Env(config, mock(Secrets.class), "test/env");
 
         // Assert
         assertThat(env.clear()).containsExactlyInAnyOrderEntriesOf(clearMap);
@@ -66,29 +66,11 @@ class EnvTest {
         EnvironmentConfig config = new EnvironmentConfig(clearMap, null, null, null);
 
         // Act
-        Env env = new Env(config, "/path/to/secrets.env", "test/env");
-        List<String> args = env.args();
+        Env env = new Env(config, mock(Secrets.class), "test/env");
+        List<String> args = env.clearArgs();
 
         // Assert
-        assertThat(args).contains("--env-file", "/path/to/secrets.env");
         assertThat(args).contains("--env");
-    }
-
-    @Test
-    @DisplayName("should retrieve secrets directory from secrets file path")
-    void shouldRetrieveSecretsDirectoryFromSecretsFilePath() {
-        // Arrange
-        Env env = new Env(null, "/app/env/service/secrets.env", "test/env");
-
-        // Act
-        String secretsDir = env.secretsDirectory();
-
-        // Assert
-        // File.dirname() uses Apache Commons getFullPathNoEndSeparator
-        assertThat(secretsDir).isNotNull();
-        assertThat(secretsDir).doesNotEndWith("/");
-        // Verify it returns the parent directory
-        assertThat("/app/env/service/secrets.env").startsWith(secretsDir);
     }
 
     @Test
@@ -97,12 +79,11 @@ class EnvTest {
         // Arrange
         List<String> secrets = List.of("SECRET_KEY");
         EnvironmentConfig config = new EnvironmentConfig(null, secrets, null, null);
+      Secrets secretsa = mock(Secrets.class);
 
-        // Mock ENV.fetch
-        try (MockedStatic<dev.deploy4j.deploy.env.ENV> envMock = mockStatic(dev.deploy4j.deploy.env.ENV.class)) {
-            envMock.when(() -> dev.deploy4j.deploy.env.ENV.fetch("SECRET_KEY")).thenReturn("secret_value");
+      when(secretsa.get("SECRET_KEY")).thenReturn("secret_value");
 
-            Env env = new Env(config, "/path/to/secrets.env", "test/env");
+            Env env = new Env(config, secretsa, "test/env");
 
             // Act
             String secretsIO = env.secretsIO();
@@ -110,7 +91,6 @@ class EnvTest {
             // Assert
             assertThat(secretsIO).isNotEmpty();
             assertThat(secretsIO).contains("SECRET_KEY");
-        }
     }
 
     @Test
@@ -125,8 +105,10 @@ class EnvTest {
         EnvironmentConfig config1 = new EnvironmentConfig(clear1, secrets1, null, null);
         EnvironmentConfig config2 = new EnvironmentConfig(clear2, secrets2, null, null);
 
-        Env env1 = new Env(config1, "/path1/secrets.env", "env1");
-        Env env2 = new Env(config2, "/path2/secrets.env", "env2");
+      Secrets secretsa = mock(Secrets.class);
+
+        Env env1 = new Env(config1, secretsa, "env1");
+        Env env2 = new Env(config2, secretsa, "env2");
 
         // Act
         Env merged = env1.merge(env2);
@@ -135,7 +117,7 @@ class EnvTest {
         // NOTE: This test documents current incomplete behavior due to TODO in source
         // The merge implementation passes null for config, so merged env has empty clear/secrets
         // This test will need to be updated when merge is properly implemented
-        assertThat(merged.secretsFile()).isEqualTo("/path1/secrets.env");
+       // assertThat(merged.secretsFile()).isEqualTo("/path1/secrets.env");
     }
 
     @Test
@@ -145,11 +127,10 @@ class EnvTest {
         EnvironmentConfig config = new EnvironmentConfig(null, null, null, null);
 
         // Act
-        Env env = new Env(config);
+        Env env = new Env(config,mock(Secrets.class));
 
         // Assert
         assertThat(env.context()).isEqualTo("env");
-        assertThat(env.secretsFile()).isNull();
     }
 
     @Test
@@ -157,9 +138,10 @@ class EnvTest {
     void shouldHandleEmptyClearAndSecretsConfig() {
         // Arrange
         EnvironmentConfig config = new EnvironmentConfig(Map.of(), List.of(), null, null);
+      Secrets secretsa = mock(Secrets.class);
 
         // Act
-        Env env = new Env(config, "/path/to/secrets.env", "test/env");
+        Env env = new Env(config, secretsa, "test/env");
 
         // Assert
         assertThat(env.clear()).isEmpty();

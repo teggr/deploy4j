@@ -1,6 +1,5 @@
 package dev.deploy4j.deploy.configuration;
 
-import dev.deploy4j.deploy.env.ENV;
 import dev.deploy4j.deploy.configuration.raw.PlainValueOrSecretKey;
 import dev.deploy4j.deploy.configuration.raw.SshConfig;
 
@@ -80,7 +79,7 @@ public class Ssh {
       return null;
     }
     if (key.isKey()) {
-      return ENV.fetch(key.key());
+      return System.getenv().get(key.key());
     } else {
       return key.value();
     }
