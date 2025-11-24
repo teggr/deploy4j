@@ -18,7 +18,6 @@ public class Deploy extends Base {
   private final LockManager lockManager;
   private final App app;
   private final Server server;
-  private final Env env;
   private final Accessory accessory;
   private final Registry registry;
   private final Build build;
@@ -26,12 +25,11 @@ public class Deploy extends Base {
   private final Traefik traefik;
   private final AppHostCommandsFactory apps;
 
-  public Deploy(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, App app, Server server, Env env, Accessory accessory, Registry registry, Build build, Prune prune, Traefik traefik, AppHostCommandsFactory apps) {
+  public Deploy(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, App app, Server server, Accessory accessory, Registry registry, Build build, Prune prune, Traefik traefik, AppHostCommandsFactory apps) {
     super(sshHosts, hooks, localHost);
     this.lockManager = lockManager;
     this.app = app;
     this.server = server;
-    this.env = env;
     this.accessory = accessory;
     this.registry = registry;
     this.build = build;
@@ -49,10 +47,6 @@ public class Deploy extends Base {
 
       log.info("Ensure Docker is installed...");
       server.bootstrap(deployContext);
-
-      log.info("Evaluate and push env files...");
-      env.envify(deployContext, false, null);
-      env.push(deployContext);
 
       log.info("Boot accessories...");
       accessory.boot(deployContext, "all", true);

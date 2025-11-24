@@ -18,7 +18,6 @@ public class DeployApplicationContext {
   private final Prune prune;
   private final Accessory accessory;
   private final Lock lock;
-  private final Env env;
   private final DeployContext deployContext;
   private final LockManager lockManager;
   private final Audit audit;
@@ -53,7 +52,6 @@ public class DeployApplicationContext {
 
     this.app = new App(sshHosts, hooks, localHost, lockManager, audit, apps);
     this.server = new Server(sshHosts, hooks, localHost, lockManager, docker, server, audit);
-    this.env = new Env(sshHosts, hooks, localHost, lockManager, traefik, this.environment, audit, apps, accessories);
     this.accessory = new Accessory(sshHosts, hooks, localHost, lockManager, registry, audit, accessories);
     this.registry = new Registry(sshHosts, hooks, localHost, registry);
     this.build = new Build(sshHosts, hooks, localHost, builder, audit);
@@ -62,12 +60,8 @@ public class DeployApplicationContext {
     this.lock = new Lock(sshHosts, hooks, localHost, lockManager, server, lock);
 
     this.audit = new Audit(sshHosts, hooks, localHost, audit);
-    this.deploy = new Deploy(sshHosts, hooks, localHost, lockManager, this.app, this.server, this.env, this.accessory, this.registry, build, this.prune, this.traefik, apps);
+    this.deploy = new Deploy(sshHosts, hooks, localHost, lockManager, this.app, this.server, this.accessory, this.registry, build, this.prune, this.traefik, apps);
 
-  }
-
-  public Env env() {
-    return env;
   }
 
   public Environment environment() {
