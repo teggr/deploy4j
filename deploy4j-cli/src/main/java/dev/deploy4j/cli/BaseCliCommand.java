@@ -4,7 +4,6 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import dev.deploy4j.deploy.DeployApplicationContext;
 import dev.deploy4j.deploy.DeployContext;
-import dev.deploy4j.deploy.Environment;
 import dev.deploy4j.deploy.Hooks;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
@@ -41,8 +40,6 @@ public abstract class BaseCliCommand implements Callable<Integer> {
   @Override
   public Integer call() throws Exception {
 
-    Environment environment = new Environment(destination);
-
     // configure Logback root logger level based on CLI flags
     Logger root = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
     if (( quiet != null && quiet) || (verbose != null && !verbose)) {
@@ -63,7 +60,7 @@ public abstract class BaseCliCommand implements Callable<Integer> {
 
     try (SshHosts sshHosts = new SshHosts(deployContext.config())) {
 
-      DeployApplicationContext deployApplicationContext = new DeployApplicationContext(environment, sshHosts, hooks, localhost, deployContext);
+      DeployApplicationContext deployApplicationContext = new DeployApplicationContext(sshHosts, hooks, localhost, deployContext);
 
       execute(deployApplicationContext);
 

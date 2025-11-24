@@ -1,8 +1,7 @@
 package dev.deploy4j.maven;
 
-import dev.deploy4j.deploy.DeployContext;
 import dev.deploy4j.deploy.DeployApplicationContext;
-import dev.deploy4j.deploy.Environment;
+import dev.deploy4j.deploy.DeployContext;
 import dev.deploy4j.deploy.Hooks;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
@@ -30,11 +29,9 @@ public class DeployMojo extends AbstractMojo {
 
     String version = project.getVersion();
     String destination = null;
-    String configFile = new File( project.getBasedir(), "config/deploy.yml" ).getAbsolutePath();
+    String configFile = new File(project.getBasedir(), "config/deploy.yml").getAbsolutePath();
     boolean skipHooks = false;
-      boolean skipPull = false;
-
-    Environment environment = new Environment(destination);
+    boolean skipPull = false;
 
     Configuration configuration = Configuration.createFrom(configFile, destination, version);
 
@@ -46,7 +43,7 @@ public class DeployMojo extends AbstractMojo {
 
     try (SshHosts sshHosts = new SshHosts(deployContext.config())) {
 
-      DeployApplicationContext deployApplicationContext = new DeployApplicationContext(environment, sshHosts, hooks, localHost, deployContext);
+      DeployApplicationContext deployApplicationContext = new DeployApplicationContext(sshHosts, hooks, localHost, deployContext);
 
       deployApplicationContext.deploy().deploy(deployContext, skipPull);
 

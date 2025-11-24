@@ -8,7 +8,6 @@ import java.util.Map;
 
 public class DeployApplicationContext {
 
-  private final Environment environment;
   private final Deploy deploy;
   private final Server server;
   private final Registry registry;
@@ -22,9 +21,8 @@ public class DeployApplicationContext {
   private final LockManager lockManager;
   private final Audit audit;
 
-  public DeployApplicationContext(Environment environment, SshHosts sshHosts, Hooks hooks, LocalHost localHost, DeployContext deployContext) {
+  public DeployApplicationContext(SshHosts sshHosts, Hooks hooks, LocalHost localHost, DeployContext deployContext) {
 
-    this.environment = environment;
     this.deployContext = deployContext;
 
     BuilderHostCommands builder = new BuilderHostCommands(deployContext.config());
@@ -62,10 +60,6 @@ public class DeployApplicationContext {
     this.audit = new Audit(sshHosts, hooks, localHost, audit);
     this.deploy = new Deploy(sshHosts, hooks, localHost, lockManager, this.app, this.server, this.accessory, this.registry, build, this.prune, this.traefik, apps);
 
-  }
-
-  public Environment environment() {
-    return environment;
   }
 
   public Server server() {
