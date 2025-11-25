@@ -3,6 +3,7 @@ package dev.deploy4j.deploy.host.commands;
 import dev.deploy4j.deploy.configuration.Accessory;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.rebelcraft.cmd.Cmd;
+import dev.rebelcraft.cmd.pkgs.Docker;
 
 import java.io.File;
 import java.util.List;
@@ -45,8 +46,15 @@ public class AccessoryHostCommands extends BaseHostCommands {
     return docker().container().args("stop", serviceName());
   }
 
-  public Cmd info() {
-    return docker().ps()
+  public Cmd info(boolean all, boolean quiet) {
+    Docker ps = docker().ps();
+    if(all) {
+      ps = ps.args("-a");
+    }
+    if(quiet) {
+      ps = ps.args("-q");
+    }
+    return ps
       .args(serviceFilter());
   }
 

@@ -74,7 +74,7 @@ class AccessoryHostCommandsTest {
 
     @Test
     void shouldGenerateInfoCommand() {
-        Cmd cmd = accessoryCommands.info();
+        Cmd cmd = accessoryCommands.info(false, false);
         
         assertThat(cmd).isNotNull();
         assertThat(cmd.build()).contains("docker");

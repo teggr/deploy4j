@@ -53,7 +53,7 @@ public class SshHost {
       .exec(command);
     boolean zeroExit = result.exitStatus() == 0;
     if (!zeroExit && raiseOnNonZeroExit) {
-      throw new RuntimeException("Command failed on host " + hostName + ": " + command + " with error " + result.execErrorOutput());
+      throw new RuntimeException("Command failed on host " + hostName + " with status " + result.exitStatus() + ": " + command + " with error " + result.execErrorOutput());
     }
     return zeroExit;
   }

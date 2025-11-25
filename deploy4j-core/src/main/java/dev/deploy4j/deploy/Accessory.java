@@ -7,12 +7,14 @@ import dev.deploy4j.deploy.host.commands.RegistryHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 import dev.deploy4j.deploy.local.LocalHost;
 import dev.rebelcraft.cmd.Cmd;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Accessory extends Base {
@@ -59,6 +61,20 @@ public class Accessory extends Base {
       } else {
 
         withAccessory(deployContext, name, (accessory, hosts) -> {
+
+          List<String> bootedHosts = new ArrayList<>();
+
+          on(deployContext, hosts, host -> {
+            String info = host.capture(accessory.info(true,true));
+            if(StringUtils.isNotBlank( info.trim() )) {
+              bootedHosts.add(host.hostName());
+            }
+          });
+
+          if(!bootedHosts.isEmpty()) {
+            log.info( "Skipping booting `"+name+"` on " + String.join(", ", bootedHosts) + ", a container already exists");
+            hosts = hosts.stream().filter( Predicate.not( bootedHosts::contains ) ).toList();
+          }
 
           directories(deployContext, name);
           upload(deployContext, name);
@@ -248,7 +264,7 @@ public class Accessory extends Base {
 
         on(deployContext, hosts, host -> {
 
-          log.info(host.capture(accessory.info()));
+          log.info(host.capture(accessory.info(false, false)));
 
         });
 

@@ -80,7 +80,7 @@ public class TraefikHostCommands extends BaseHostCommands {
   }
 
   public Cmd ensureEnvDirectory() {
-    return makeDirectory(config().envDirectory());
+    return makeDirectory(envDirectory());
   }
 
   // private
