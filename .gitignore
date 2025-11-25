@@ -33,7 +33,6 @@ build/
 !**/src/test/**/build/
 
 ### Project ###
-.env
 external/
 config/
 .test-deploy/

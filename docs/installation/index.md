@@ -50,7 +50,7 @@ This will:
 4. Build the image using the standard Dockerfile in the root of the application.
 5. Push the image to the registry.
 6. Pull the image from the registry onto the servers.
-7. Push the ENV variables from .env onto the servers.
+7. Push the secret variables from `.deploy4j/secrets` onto the servers.
 8. Ensure Traefik is running and accepting traffic on port 80.
 9. Ensure your app responds with 200 OK to GET /up (you must have curl installed inside your app image!).
 10. Start a new container with the version of the app that matches the current Git version hash.

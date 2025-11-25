@@ -10,7 +10,7 @@ public class Initializer {
   private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Initializer.class);
 
   /**
-   * Create config stub in config/deploy.yml and env stub in .env
+   * Create config stub in config/deploy.yml and env stub in .deploy4j/secrets
    */
   public void init(boolean bundle) {
 

@@ -7,7 +7,7 @@ import java.util.concurrent.Callable;
 
 @CommandLine.Command(
   name = "init",
-  description = "Create config stub in config/deploy.yml and env stub in .env")
+  description = "Create config stub in config/deploy.yml and env stub in .deploy4j/secrets")
 public class InitCliCommand implements Callable<Integer> {
 
   @CommandLine.Mixin

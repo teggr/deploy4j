@@ -34,10 +34,10 @@ To sign into Artifact Registry, you would need to [create a service account](htt
 
 Normally, assigning a roles/artifactregistry.writer role should be sufficient.
 
-Once the service account is ready, you need to generate and download a JSON key, base64 encode it and add to .env:
+Once the service account is ready, you need to generate and download a JSON key, base64 encode it and add to `.deploy4j/secrets`:
 
 ```shell
-echo "DEPLOY4J_REGISTRY_PASSWORD=$(base64 -i /path/to/key.json)" | tr -d "\\n"  >> .env
+echo "DEPLOY4J_REGISTRY_PASSWORD=$(base64 -i /path/to/key.json)" | tr -d "\\n"  >> .deploy4j/secrets
 ```
 
 Use the env variable as password along with _json_key_base64 as username.

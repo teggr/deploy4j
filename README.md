@@ -57,10 +57,7 @@ Commands:
   config     Show combined config (including secrets!)
   deploy     Deploy app to servers
   details    Show details about all containers
-  env        Manage environment files
-  envify     Create .env by evaluating .env.thyme (or .env.staging.thyme -> .
-               env.staging when using -d staging)
-  init       Create config stub in config/deploy.yml and env stub in .env
+  init       Create config stub in config/deploy.yml and env stub in .deploy4j/secrets
   lock       Manage the deploy lock
   prune      Prune old application images and containers
   redeploy   Deploy app to servers without bootstrapping servers, starting
@@ -81,7 +78,7 @@ Commands:
 # initialise your project with deploy4j files
 deploy4j init
 
-# edit config/deploy.yml and .env
+# edit config/deploy.yml and .deploy4j/secrets
 
 # setup the servers and deploy the app for the first time
 deploy4j setup 0.0.1
@@ -156,7 +153,7 @@ mvn verify deploy4j:deploy
 # initialise the project for the first time
 mvn deploy4j:init
 
-# edit config/deploy.yml and .env
+# edit config/deploy.yml and .deploy4j/secrets
 
 # setup the servers and deploy the app for the first time
 mvn deploy4j:setup

@@ -68,6 +68,6 @@ env:
     - SPRING_SECURITY_USER_PASSWORD
 ```
 
-Use the clear/secrets feature to ensure sensitive information is not hardcoded. Put the values for `SPRING_SECURITY_USER_NAME` and `SPRING_SECURITY_USER_PASSWORD` in your `.env` file.
+Use the clear/secrets feature to ensure sensitive information is not hardcoded. Put the values for `SPRING_SECURITY_USER_NAME` and `SPRING_SECURITY_USER_PASSWORD` in your `.deploy4j/secrets` file.
 
 This configuration will now require authentication to access the Actuator endpoints.

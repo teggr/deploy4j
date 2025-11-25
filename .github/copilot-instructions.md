@@ -83,7 +83,7 @@ Required configuration parameters:
 
 ### Environment Variables
 
-The project uses `.env` files for environment variable management:
+The project uses `.deploy4j/secret` files for environment variable management:
 - Read during deployment stage
 - Can be templated to fetch secrets from vaults
 - Pushed to servers during deployment

@@ -54,7 +54,7 @@ Note: Doing this at least once will ensure that the server's SSH fingerprint is 
 
 ## Initialisation
 
-Start by initialising the deploy4j configuration in your project. This will create a `config/deploy.yml` file and a `.env` in the root directory.
+Start by initialising the deploy4j configuration in your project. This will create a `config/deploy.yml` file and a `.deploy4j/secrets` in the root directory.
 
 ```shell
 deploy4j init
@@ -72,7 +72,7 @@ servers:
   - 138.68.182.132
 # Registry configuration for pulling the Docker image.
 # We are using Docker Hub in this case.
-# The username and password will be pulled from the .env file.
+# The username and password will be pulled from the .deploy4j/secrets file.
 registry:
   username:
     - DOCKER_USERNAME
@@ -88,7 +88,7 @@ env:
     SPRING_DATASOURCE_PASSWORD: testpass
 # SSH configuration for connecting to the server.
 # We are using key based authentication.
-# The private key and passphrase will be pulled from the .env file.
+# The private key and passphrase will be pulled from the .deploy4j/secrets file.
 ssh:
   key_path:
     - PRIVATE_KEY
@@ -120,7 +120,7 @@ traefik:
     publish: "8080:8080"
 ```
 
-As noted in the configuration, we need to setup some secrets in the `.env` file. Create a `.env` file in the root of the project with the following contents:
+As noted in the configuration, we need to setup some secrets in the `.deploy4j/secrets` file. Create a `.deploy4j/secrets` file in the root of the project with the following contents:
 
 ```text
 DOCKER_PASSWORD=*****
@@ -142,8 +142,6 @@ deploy4j setup --version 0.0.2-SNAPSHOT
 Acquiring the deploy lock...
 Ensure Docker is installed...
 Missing Docker on 138.68.182.132. Installing...
-Evaluate and push env files...
-Skipping envify (no .env.thyme exists)
 Boot accessories...
 Log into image registry...
 Pull app image...
