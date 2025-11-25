@@ -177,6 +177,17 @@ ssh -o StrictHostKeyChecking=no -p 2222 root@localhost
 docker exec -it deploy4j-droplet /bin/bash
 ```
 
+## Releasing
+
+Use `scripts/tag-for-jitpack.bat` to set Maven versions across modules, commit the change, create an annotated Git tag prefixed with v, and optionally push and bump to a next snapshot.
+
+Usage examples:
+
+```shell
+.\scripts\tag-for-jitpack.bat -Version 1.2.3 -Push
+.\scripts\tag-for-jitpack.bat -Version 1.2.3 -NextSnapshot 1.2.4-SNAPSHOT -Push
+```
+
 ## Notes on the Kamal Port
 
 The current port is based on Kamal v1. Once the v2 changes have been assessed then a decision can be made on whether to port those changes over.
