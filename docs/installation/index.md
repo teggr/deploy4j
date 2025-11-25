@@ -29,7 +29,12 @@ env:
     - DB_PASSWORD
 ```
 
-Then edit your `.env` file to add your registry password as `DEPLOY4J_REGISTRY_PASSWORD`.
+Then edit your `.deploy4j/secrets` file to add your registry and database password as:
+
+```properties
+DEPLOY4J_REGISTRY_PASSWORD=***
+DB_PASSWORD=***
+```
 
 Now you’re ready to deploy to the servers:
 

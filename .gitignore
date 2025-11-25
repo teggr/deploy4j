@@ -37,6 +37,7 @@ build/
 external/
 config/
 .test-deploy/
+.guide/
 
 ### VS Code ###
 .vscode/
