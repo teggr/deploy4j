@@ -42,7 +42,7 @@ Install via JBang:
 `deploy4j` is currently available via JitPack.
 
 ```shell
-jbang app install --name deploy4j --repos jitpack=https://jitpack.io --force --fresh com.github.teggr.deploy4j:deploy4j-cli:-SNAPSHOT
+jbang app install --name deploy4j --repos jitpack=https://jitpack.io --force --fresh com.github.teggr.deploy4j:deploy4j-cli:0.0.1
 ```
 
 ```shell
@@ -120,7 +120,7 @@ The project is distributed via JitPack. Add the JitPack repository and configure
     <plugin>
         <groupId>com.github.teggr.deploy4j</groupId>
         <artifactId>deploy4j-maven-plugin</artifactId>
-        <version>-SNAPSHOT</version>
+        <version>0.0.1</version>
     </plugin>
 </build>
 ```
@@ -132,7 +132,7 @@ The project includes a `jitpack.yml` configuration file that ensures proper vers
 You can use any JitPack version format:
 - Commit hash: `com.github.teggr.deploy4j:deploy4j-maven-plugin:abc123`
 - Branch: `com.github.teggr.deploy4j:deploy4j-maven-plugin:main-SNAPSHOT`
-- Tag: `com.github.teggr.deploy4j:deploy4j-maven-plugin:v1.0.0`
+- Tag: `com.github.teggr.deploy4j:deploy4j-maven-plugin:0.0.1`
 
 ### Run
 
@@ -168,7 +168,7 @@ Spin up a local ssh docker container for testing:
 
 ```bash
 # Running instructions
-docker run -d -p 2222:22 --name deploy4j-droplet -v "%USERPROFILE%\.ssh\id_rsa.pub":/tmp/authorized_keys:ro -v /var/run/docker.sock:/var/run/docker.sock teggr/deploy4j-docker-droplet:latest
+docker run -d -p 2222:22 --privileged -e DOCKER_TLS_CERTDIR="" -e DOCKERD_ARGS="--mtu=1400" --dns 8.8.8.8 --dns 1.1.1.1 --name deploy4j-droplet -v "%USERPROFILE%\.ssh\id_rsa.pub":/tmp/authorized_keys:ro -v /var/run/docker.sock:/var/run/docker.sock teggr/deploy4j-docker-droplet:latest
 
 # connect via ssh
 ssh -o StrictHostKeyChecking=no -p 2222 root@localhost 
