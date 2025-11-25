@@ -30,17 +30,20 @@ public class Initializer {
       log.info("Created configuration file in config/deploy.yml");
     }
 
-    deployFile = new File(".env");
-    if (!deployFile.exists()) {
+    File secretsFile = new File(".deploy4j/secrets");
+    if(secretsFile.exists()) {
+      log.info("Secrets file already exists in .deploy4j/secrets (remove first to create a new one)");
+    } else {
+      secretsFile.getParentFile().mkdirs();
       try {
         FileUtils.copyInputStreamToFile(
-          getClass().getClassLoader().getResourceAsStream("templates/template.env"),
+          getClass().getClassLoader().getResourceAsStream("templates/secrets"),
           deployFile
         );
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
-      log.info("Created .env file");
+      log.info("Created secrets file");
     }
 
     // TODO: hooks
