@@ -86,7 +86,7 @@ public class Configuration {
     this.healthcheck = new HealthCheck(rawConfig.healthCheck(), null);
     this.logging = new Logging(rawConfig.logging(), null);
     this.traefik = new Traefik(this);
-    this.ssh = new Ssh(this);
+    this.ssh = new Ssh(this, secrets);
 
     ensureDestinationIfRequired();
     ensureRequiredKeysPresent();
