@@ -39,9 +39,6 @@ class DeployTest {
   Server server;
 
   @Mock
-  Env env;
-
-  @Mock
   Accessory accessory;
 
   @Mock
@@ -101,7 +98,7 @@ class DeployTest {
     // server.test() returns a simple Cmd to avoid null invocation in tests
     when(server.test()).thenReturn(Cmd.cmd("pwd"));
 
-    deploy = new Deploy(sshHosts, hooks, localHost, lockManager, app, server, env, accessory, registry, build, prune, traefik, apps);
+    deploy = new Deploy(sshHosts, hooks, localHost, lockManager, app, server, accessory, registry, build, prune, traefik, apps);
   }
 
   @Test
@@ -113,8 +110,6 @@ class DeployTest {
 
     // verify bootstrap and env interactions and accessory boot
     verify(server).bootstrap(deployContext);
-    verify(env).envify(deployContext, false, null);
-    verify(env).push(deployContext);
     verify(accessory).boot(deployContext, "all", true);
 
     // deploy flow should also have invoked registry login and build.pull and traefik.boot and prune

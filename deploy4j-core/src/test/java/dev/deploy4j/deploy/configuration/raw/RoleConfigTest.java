@@ -56,7 +56,6 @@ class RoleConfigTest {
             null,
             null,
             null,
-            null,
             null
         );
         RoleConfig config = new RoleConfig(customRole);

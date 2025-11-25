@@ -1,6 +1,5 @@
 package dev.deploy4j.deploy.configuration;
 
-import dev.deploy4j.deploy.utils.file.File;
 import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
 import dev.deploy4j.deploy.configuration.raw.TraefikConfig;
 
@@ -9,7 +8,7 @@ import java.util.Map;
 
 public class Traefik {
 
-  private static final String DEFAULT_IMAGE = "traefik:v2.11";
+  private static final String DEFAULT_IMAGE = "traefik:v3.6.2";
   private static final Integer CONTAINER_PORT = 80;
   private static final Map<String, String> DEFAULT_ARGS = Map.of(
     "log.level", "DEBUG"
@@ -47,7 +46,7 @@ public class Traefik {
   public Env env() {
     return new Env(
       traefikConfig().env() != null ? traefikConfig().env() : new EnvironmentConfig(),
-      File.join(config().hostEnvDirectory(), "traefik", "traefik.env"),
+      config().secrets(),
       "traefik/env"
     );
   }

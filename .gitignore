@@ -33,10 +33,10 @@ build/
 !**/src/test/**/build/
 
 ### Project ###
-.env
 external/
 config/
 .test-deploy/
+.guide/
 
 ### VS Code ###
 .vscode/

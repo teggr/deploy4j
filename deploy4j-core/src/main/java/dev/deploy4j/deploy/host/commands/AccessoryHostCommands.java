@@ -3,6 +3,7 @@ package dev.deploy4j.deploy.host.commands;
 import dev.deploy4j.deploy.configuration.Accessory;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.rebelcraft.cmd.Cmd;
+import dev.rebelcraft.cmd.pkgs.Docker;
 
 import java.io.File;
 import java.util.List;
@@ -45,8 +46,15 @@ public class AccessoryHostCommands extends BaseHostCommands {
     return docker().container().args("stop", serviceName());
   }
 
-  public Cmd info() {
-    return docker().ps()
+  public Cmd info(boolean all, boolean quiet) {
+    Docker ps = docker().ps();
+    if(all) {
+      ps = ps.args("-a");
+    }
+    if(quiet) {
+      ps = ps.args("-q");
+    }
+    return ps
       .args(serviceFilter());
   }
 
@@ -96,12 +104,8 @@ public class AccessoryHostCommands extends BaseHostCommands {
     return docker().image().args("rm", "--force", image());
   }
 
-  public Cmd makeEnvDirectory() {
-    return makeDirectory(accessoryConfig().env().secretsDirectory());
-  }
-
-  public Cmd removeEnvFile() {
-    return Cmd.cmd("rm", "-f", accessoryConfig().env().secretsDirectory());
+  public Cmd ensureEnvDirectory() {
+    return makeDirectory(accessoryConfig().envDirectory());
   }
 
   // private
@@ -161,6 +165,14 @@ public class AccessoryHostCommands extends BaseHostCommands {
 
   public List<String> optionArgs() {
     return accessoryConfig().optionArgs();
+  }
+
+  public String secretsPath() {
+    return accessoryConfig().secretsPath();
+  }
+
+  public String secretsIO() {
+    return accessoryConfig().secretsIO();
   }
 
   // attributes

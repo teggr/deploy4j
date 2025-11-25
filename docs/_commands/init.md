@@ -7,6 +7,6 @@ Creates the files needed to deploy your application with `deploy4j`.
 ```shell
 $ deploy4j init
 Created configuration file in config/deploy.yml
-Created .env file
+Created .deploy4j/secrets file
 Created sample hooks in .deploy4j/hooks
 ```

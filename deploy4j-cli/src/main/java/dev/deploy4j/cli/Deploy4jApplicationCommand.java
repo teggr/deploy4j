@@ -15,8 +15,6 @@ import java.util.concurrent.Callable;
     ConfigCliCommand.class,
     DeployCliCommand.class,
     DetailsCliCommand.class,
-    EnvCliCommand.class,
-    EnvifyCliCommand.class,
     InitCliCommand.class,
     LockCliCommand.class,
     PruneCliCommand.class,

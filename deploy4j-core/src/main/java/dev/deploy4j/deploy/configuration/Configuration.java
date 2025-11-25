@@ -1,11 +1,11 @@
 package dev.deploy4j.deploy.configuration;
 
+import dev.deploy4j.deploy.Secrets;
 import dev.deploy4j.deploy.Version;
 import dev.deploy4j.deploy.configuration.env.Tag;
 import dev.deploy4j.deploy.configuration.raw.DeployConfig;
 import dev.deploy4j.deploy.configuration.raw.DeployConfigYamlReader;
 import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
-import dev.deploy4j.deploy.env.ENV;
 import dev.deploy4j.deploy.utils.RandomHex;
 import dev.deploy4j.deploy.utils.file.File;
 import org.apache.commons.lang.StringUtils;
@@ -54,6 +54,7 @@ public class Configuration {
   private final Servers servers;
   private final Ssh ssh;
   private final Registry registry;
+  private final Secrets secrets;
 
   private String declaredVersion;
   private String runId;
@@ -69,8 +70,10 @@ public class Configuration {
     this.destination = destination;
     this.declaredVersion = version;
 
+    this.secrets = new Secrets(destination);
+
     this.servers = new Servers(this);
-    this.registry = new Registry(this);
+    this.registry = new Registry(secrets, this);
 
     this.accessories = Optional
       .ofNullable(rawConfig.accessories())
@@ -78,12 +81,12 @@ public class Configuration {
       .keySet().stream().map(name -> new Accessory(name, this)).toList();
     this.boot = new Boot(this);
     this.builder = new Builder(this);
-    this.env = new Env(rawConfig.env());
+    this.env = new Env(rawConfig.env(), secrets);
 
     this.healthcheck = new HealthCheck(rawConfig.healthCheck(), null);
     this.logging = new Logging(rawConfig.logging(), null);
     this.traefik = new Traefik(this);
-    this.ssh = new Ssh(this);
+    this.ssh = new Ssh(this, secrets);
 
     ensureDestinationIfRequired();
     ensureRequiredKeysPresent();
@@ -91,6 +94,10 @@ public class Configuration {
     ensureRetainContainersValid();
     ensureValidServiceName();
 
+  }
+
+  public Secrets secrets() {
+    return secrets;
   }
 
   public void version(String version) {
@@ -102,7 +109,7 @@ public class Configuration {
     if (StringUtils.isNotBlank(declaredVersion)) {
       return declaredVersion;
     }
-    String env = ENV.fetch("VERSION");
+    String env = System.getenv().get("VERSION");
     if (env != null) {
       return env;
     }
@@ -122,6 +129,12 @@ public class Configuration {
 
   public String minumimVersion() {
     return rawConfig().minimumVersion();
+  }
+
+  public String serviceAndDestination() {
+    return Stream.of(service(), destination())
+      .filter(StringUtils::isNotBlank)
+      .collect(Collectors.joining("-"));
   }
 
   public List<Role> roles() {
@@ -264,6 +277,18 @@ public class Configuration {
     }
   }
 
+  public String appsDirectory() {
+    return File.join( runDirectory(), "apps");
+  }
+
+  public String appDirectory() {
+    return File.join( appsDirectory(), serviceAndDestination() );
+  }
+
+  public String envDirectory() {
+    return File.join(appDirectory(), "env");
+  }
+
   public String hooksPath() {
     return rawConfig().hooksPath() != null ?
       rawConfig().hooksPath() : ".deploy4j/hooks";
@@ -278,7 +303,7 @@ public class Configuration {
       Map<String, EnvironmentConfig> tags = rawConfig().env().tags();
       if (tags != null) {
         tags.entrySet().stream().forEach(entry -> {
-          envTags.add(new Tag(entry.getKey(), entry.getValue()));
+          envTags.add(new Tag(entry.getKey(), entry.getValue(), secrets()));
         });
       } else {
         envTags = List.of();

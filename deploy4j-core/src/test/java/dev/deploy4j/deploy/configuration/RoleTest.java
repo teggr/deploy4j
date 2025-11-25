@@ -108,7 +108,6 @@ class RoleTest {
       null,
       roleHealth,
       null,
-      null,
       null
     );
 

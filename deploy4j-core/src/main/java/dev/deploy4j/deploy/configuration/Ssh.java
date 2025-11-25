@@ -1,6 +1,6 @@
 package dev.deploy4j.deploy.configuration;
 
-import dev.deploy4j.deploy.env.ENV;
+import dev.deploy4j.deploy.Secrets;
 import dev.deploy4j.deploy.configuration.raw.PlainValueOrSecretKey;
 import dev.deploy4j.deploy.configuration.raw.SshConfig;
 
@@ -10,10 +10,12 @@ import java.util.Map;
 public class Ssh {
 
   private final SshConfig sshConfig;
+  private final Secrets secrets;
 
-  public Ssh(Configuration config) {
+  public Ssh(Configuration config, Secrets secrets) {
     this.sshConfig = config.rawConfig().ssh() != null ?
       config.rawConfig().ssh() : new SshConfig();
+    this.secrets = secrets;
   }
 
   public String user() {
@@ -80,7 +82,7 @@ public class Ssh {
       return null;
     }
     if (key.isKey()) {
-      return ENV.fetch(key.key());
+      return secrets.get(key.key());
     } else {
       return key.value();
     }

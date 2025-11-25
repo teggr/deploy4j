@@ -18,10 +18,7 @@ Commands:
   config     Show combined config (including secrets!)
   deploy     Deploy app to servers
   details    Show details about all containers
-  env        Manage environment files
-  envify     Create .env by evaluating .env.thyme (or .env.staging.thyme -> .
-               env.staging when using -d staging)
-  init       Create config stub in config/deploy.yml and env stub in .env
+  init       Create config stub in config/deploy.yml and env stub in .deploy4j/secrets
   lock       Manage the deploy lock
   prune      Prune old application images and containers
   redeploy   Deploy app to servers without bootstrapping servers, starting

@@ -4,10 +4,7 @@ import dev.deploy4j.deploy.configuration.env.Tag;
 import dev.deploy4j.deploy.configuration.raw.*;
 import dev.deploy4j.deploy.utils.file.File;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,7 +32,7 @@ public class Role {
 
     this.specializedEnv = new Env(
       specializations().env() != null ? specializations().env() : new EnvironmentConfig(),
-      File.join(config().hostEnvDirectory(), "roles", containerPrefix() + ".env"),
+      config().secrets(),
       "servers/%s/env".formatted(name())
     );
 
@@ -111,14 +108,29 @@ public class Role {
           Stream.of(config().env(), specializedEnv()),
           envTags(host).stream().map(Tag::env)
         ).reduce(Env::merge)
-        .orElse(new Env(new EnvironmentConfig()));
+        .orElse(new Env(new EnvironmentConfig(), config().secrets()));
       envs.put(host, env);
     }
     return env;
   }
 
   public List<String> envArgs(String host) {
-    return env(host).args();
+    List<String> list = new ArrayList<>();
+    list.addAll(env(host).clearArgs());
+    list.addAll(Arrays.asList(argumentize("--env-file", secretsPath())));
+    return list;
+  }
+
+  public String envDirectory() {
+    return File.join( config().envDirectory(), "roles" );
+  }
+
+  public String secretsIO(String host) {
+    return env(host).secretsIO();
+  }
+
+  public String secretsPath() {
+    return File.join( config().envDirectory(), "roles", name() + ".env" );
   }
 
   public List<String> healthCheckArgs() {

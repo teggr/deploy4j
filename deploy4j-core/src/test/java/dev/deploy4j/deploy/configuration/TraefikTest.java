@@ -27,7 +27,7 @@ class TraefikTest {
         Traefik traefik = new Traefik(config);
 
         // Assert
-        assertThat(traefik.image()).isEqualTo("traefik:v2.11");
+        assertThat(traefik.image()).isEqualTo("traefik:v3.6.2");
         assertThat(traefik.hostPort()).isEqualTo(80);
         assertThat(traefik.publish()).isTrue();
         assertThat(traefik.options()).isEmpty();
@@ -217,7 +217,6 @@ class TraefikTest {
 
         // Assert
         assertThat(env).isNotNull();
-        assertThat(env.secretsFile()).isEqualTo("/app/env/traefik/traefik.env");
         assertThat(env.context()).isEqualTo("traefik/env");
     }
 }

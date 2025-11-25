@@ -19,7 +19,7 @@ registry:
   password:
     - DOCKER_PASSWORD
 
-# Inject ENV variables into containers (secrets come from .env).
+# Inject ENV variables into containers (secrets come from .deploy4j/secrets).
 # Remember to run `deploy4j env push` after making changes!
 # env:
 #   clear:
@@ -39,7 +39,7 @@ ssh:
     - PRIVATE_KEY_PASSPHRASE
   strict_host_key_checking: false
 
-# Use accessory services (secrets come from .env).
+# Use accessory services (secrets come from .deploy4j/secrets).
 # accessories:
 #   db:
 #     image: mysql:8.0

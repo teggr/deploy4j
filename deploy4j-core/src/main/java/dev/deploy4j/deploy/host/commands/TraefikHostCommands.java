@@ -2,9 +2,12 @@ package dev.deploy4j.deploy.host.commands;
 
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.configuration.Env;
+import dev.deploy4j.deploy.utils.file.File;
 import dev.rebelcraft.cmd.Cmd;
 import dev.rebelcraft.cmd.Cmds;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -76,12 +79,8 @@ public class TraefikHostCommands extends BaseHostCommands {
     return docker().image().args("prune", "--force", "--filter", "label=org.opencontainers.image.title=Traefik").description("remove traefik image");
   }
 
-  public Cmd makeEnvDirectory() {
-    return makeDirectory(env().secretsDirectory());
-  }
-
-  public Cmd removeEnvFile() {
-    return Cmd.cmd("rm", "-f", env().secretsFile()).description("remove traefik env file");
+  public Cmd ensureEnvDirectory() {
+    return makeDirectory(envDirectory());
   }
 
   // private
@@ -98,8 +97,23 @@ public class TraefikHostCommands extends BaseHostCommands {
     return argumentize("--label", labels());
   }
 
-  private List<String> envArgs() {
-    return env().args();
+  public List<String> envArgs() {
+    List<String> list = new ArrayList<>();
+    list.addAll(env().clearArgs());
+    list.addAll(Arrays.asList(argumentize("--env-file", secretsPath())));
+    return list;
+  }
+
+  public String envDirectory() {
+    return File.join( config().envDirectory(), "traefik" );
+  }
+
+  public String secretsIO() {
+    return env().secretsIO();
+  }
+
+  public String secretsPath() {
+    return File.join( config().envDirectory(), "traefik", "traefik.env" );
   }
 
   private List<String> dockerOptionsArgs() {
