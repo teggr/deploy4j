@@ -24,6 +24,8 @@ If you are using destinations, secrets will instead be read from `.deploy4j/secr
 
 Common secrets across all destinations can be set in `.deploy4j/secrets-common`.
 
+Secrets can also be set in the environment where deploy4j is run.
+
 This file can be used to set variables like `DEPLOY4J_REGISTRY_PASSWORD` or database passwords. 
 
 Ensure `secret` files are not checked into Git or included in your Dockerfile. Example `.deploy4j/secrets` contents:

@@ -9,7 +9,7 @@
         <version>main-SNAPSHOT</version>
     </parent>
 
-    <artifactId>deplo4j-coverage-report</artifactId>
+    <artifactId>deploy4j-coverage-report</artifactId>
 
     <dependencies>
 

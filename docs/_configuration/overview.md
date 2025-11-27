@@ -12,10 +12,6 @@ Configuration is read from the `config/deploy.yml`.
 When running commands, you can specify a destination with the `-d` flag, e.g. `deploy4j deploy -d staging`.
 In that case the configuration will also be read from `config/deploy.staging.yml` and merged with the base configuration.
 
-## Extensions
-
-deploy4j will not accept unrecognized keys in the configuration file. You can declare extension blocks by prefixing them with `x-` to avoid errors; deploy4j will ignore keys with that prefix.
-
 ## Example configuration
 
 ```yaml
@@ -59,6 +55,11 @@ env:
 # Path to hooks, defaults to `.deploy4j/hooks`
 # See http://localhost:4000/deploy4j/hooks/overview for more information
 hooks_path: /user_home/deploy4j/hooks
+
+# Secrets path
+# 
+# Path to secrets, defaults to .deploy4j/secrets. deploy4j will look for <secrets_path>-common and <secrets_path> (or <secrets_path>.<destination> when using destinations):
+secrets_path: /user_home/deploy4j/secrets
 
 # Require destinations
 #
@@ -107,12 +108,6 @@ run_directory: /etc/deploy4j
 ssh:
   ...
 
-# Builder options
-#
-# See deploy4j docs builder
-builder:
-  ...
-
 # Accessories
 #
 # Additionals services to run in Docker, see deploy4j docs accessory
@@ -123,12 +118,6 @@ accessories:
 #
 # The Traefik proxy is used for zero-downtime deployments, see deploy4j docs traefik
 traefik:
-  ...
-
-# SSHKit
-#
-# See deploy4j docs sshkit
-sshkit:
   ...
 
 # Boot options

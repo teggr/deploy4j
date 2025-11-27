@@ -18,7 +18,8 @@ Commands:
   config     Show combined config (including secrets!)
   deploy     Deploy app to servers
   details    Show details about all containers
-  init       Create config stub in config/deploy.yml and env stub in .deploy4j/secrets
+  init       Create config stub in config/deploy.yml and env stub in .
+               deploy4j/secrets
   lock       Manage the deploy lock
   prune      Prune old application images and containers
   redeploy   Deploy app to servers without bootstrapping servers, starting

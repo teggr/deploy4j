@@ -32,7 +32,6 @@ layout: default
                     </ul>
                     {%- endif -%}
                 </li>
-                <li><a class="is-size-6 has-text-weight-bold {% if page.url=='/hooks/overview/' -%}is-active{%- endif -%}" href="{{ '/hooks/overview' | relative_url}}">Hooks</a></li>
                 <li>
                     {% assign hookIndexPage = site.hooks | where: 'default', true | first %}
                     <a class="is-size-6 has-text-weight-bold {% if page.collection=='hooks' -%}is-active{%- endif -%}" href="{{ hookIndexPage.url | relative_url }}">Hooks</a>

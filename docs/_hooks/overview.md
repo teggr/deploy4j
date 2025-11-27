@@ -7,9 +7,9 @@ date: 2025-11-03
 ---
 You can run custom scripts at specific points with hooks.
 
-Hooks should be stored in the .deploy4j/hooks folder. Running `deploy4j init` will build that folder and add some sample scripts.
+Hooks should be stored in the **.deploy4j/hooks** folder. Running `deploy4j init` will build that folder and add some sample scripts.
 
-You can change their location by setting hooks_path in the configuration file.
+You can change their location by setting `hooks_path` in the configuration file.
 
 If the script returns a non-zero exit code the command will be aborted.
 
@@ -32,9 +32,11 @@ The available hooks are:
 * [pre-connect]({{ 'hooks/pre-connect' | relative_url }})
 * [pre-deploy]({{ 'hooks/pre-deploy' | relative_url }})
 * [post-deploy]({{ 'hooks/post-deploy' | relative_url }})
+* [pre-app-boot]({{ 'hooks/pre-app-boot' | relative_url }})
+* [post-app-deploy]({{ 'hooks/post-app-boot' | relative_url }})
 * [pre-traefik-reboot]({{ 'hooks/pre-traefik-reboot' | relative_url }})
 * [post-traefik-reboot]({{ 'hooks/post-traefik-reboot' | relative_url }})
 
-You can pass --skip_hooks to avoid running the hooks.
+You can pass `--skip_hooks` to avoid running the hooks.
 
-Note: The hook filename must be the hook name without any extension. For example, the pre-deploy hook should be named “pre-deploy” (without any file extension such as .sh or .rb).
+Note: The hook filename must be the hook name without any extension (might need .bat for windows). For example, the pre-deploy hook should be named “pre-deploy” (without any file extension such as .sh or .bat).

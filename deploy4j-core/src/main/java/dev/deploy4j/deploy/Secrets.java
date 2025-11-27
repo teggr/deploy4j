@@ -9,6 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Manages secrets from environment variables and secrets files.
+ * <p>
+ * Lookups are performed in the following order:
+ * 1. Environment variables
+ * 2. .deploy4j/secrets-common (if it exists)
+ * 3. .deploy4j/secrets[.destination] (if it exists)
+ */
 public class Secrets {
 
   private final String destination;
@@ -31,6 +39,10 @@ public class Secrets {
     return Arrays.stream(secretsFilenames())
       .filter(f -> new File(f).exists()
       ).toList();
+  }
+
+  public Map<String, String> getAll() {
+    return secrets();
   }
 
   // private

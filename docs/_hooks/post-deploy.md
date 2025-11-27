@@ -2,7 +2,7 @@
 layout: page
 title: post-deploy
 ---
-Run after a deploy, redeploy or rollback. This hook is also passed a DEPLOY4J_RUNTIME env variable set to the total seconds the deploy took.
+Run after a deploy, redeploy or rollback. This hook is also passed a `DEPLOY4J_RUNTIME` env variable set to the total seconds the deploy took.
 
 This could be used to broadcast a deployment message, or register the new version with an APM.
 

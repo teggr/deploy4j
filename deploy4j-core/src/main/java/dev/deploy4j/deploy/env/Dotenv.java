@@ -6,11 +6,8 @@ import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Dotenv {
-
-  private static final ConcurrentHashMap<String, String> env = new ConcurrentHashMap<>(System.getenv());
 
   public static Map<String, String> parse(String file) {
 
@@ -25,14 +22,12 @@ public class Dotenv {
       for (String name : dotenv.stringPropertyNames()) {
         String property = dotenv.getProperty(name);
 
-        // if we have a value in the file, use it. otherwise fallback to existing env var or not set at all
-        if(StringUtils.isNotBlank(property)) {
-          resolvedMap.put(name, property);
-        } else {
-          if (env.containsKey(name)) {
-            resolvedMap.put(name, env.get(name));
-          }
+        // do we have a $REFERENCE to a env var?
+        if (StringUtils.isNotBlank(property) && property.startsWith("$") ) {
+          property = System.getenv(property.substring(1));
         }
+        resolvedMap.put(name, property);
+
       }
 
     } catch (Exception e) {

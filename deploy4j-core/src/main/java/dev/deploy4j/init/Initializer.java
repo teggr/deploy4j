@@ -46,7 +46,11 @@ public class Initializer {
       log.info("Created secrets file");
     }
 
-    // TODO: hooks
+    File hooksFolder = new File(".deploy4j/hooks");
+    if(!hooksFolder.exists()) {
+      hooksFolder.mkdirs();
+      log.info("Created hooks folder");
+    }
 
     // TODO: bundle add maven dependency?
 

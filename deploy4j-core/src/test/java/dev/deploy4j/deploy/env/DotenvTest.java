@@ -39,12 +39,28 @@ class DotenvTest {
   }
 
   @Test
-  @DisplayName("should get existing environment variables if no value in file")
+  @DisplayName("should load environment variables with empty values from dotenv file")
+  void shouldLoadFileEnvironmentVariablesWithEmptyValues() throws IOException {
+    // Arrange
+    Path envFile = tempDir.resolve(".env");
+    Files.writeString(envFile, """
+      APP_NAME=
+      """);
+
+    // Act
+    Map<String, String> environment = Dotenv.parse(envFile.toString());
+
+    // Assert
+    assertThat(environment.get("APP_NAME")).isEmpty();
+  }
+
+  @Test
+  @DisplayName("should get existing environment variables if $REFERENCE used")
   void shouldGetExistingVariablesIfNoValueInFile() throws IOException {
     // Arrange
     String existingEnvironmentVariableKey = System.getenv().keySet().stream().findFirst().orElseThrow();
     Path envFile = tempDir.resolve(".env");
-    Files.writeString(envFile, existingEnvironmentVariableKey + "=\n");
+    Files.writeString(envFile, existingEnvironmentVariableKey + "=$" + existingEnvironmentVariableKey);
 
     // Act
     Map<String, String> environment = Dotenv.parse(envFile.toString());

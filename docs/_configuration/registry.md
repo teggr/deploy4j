@@ -1,8 +1,9 @@
 ---
 layout: page
 title: Registry
+short_title: Docker Registry
 ---
-The default registry is Docker Hub, but you can change it using `registry.server` and credentials.
+The default registry is Docker Hub, but you can change it using `registry/server` and credentials.
 
 A reference to a secret (e.g. `DOCKER_REGISTRY_TOKEN`) will look up the secret in the local environment.
 
@@ -10,7 +11,7 @@ A reference to a secret (e.g. `DOCKER_REGISTRY_TOKEN`) will look up the secret i
 registry:
   server: registry.digitalocean.com
   username:
-    - DOCKER_REGISTRY_TOKEN
+    - <username>
   password:
     - DOCKER_REGISTRY_TOKEN
 ```
@@ -19,13 +20,17 @@ registry:
 
 You will need to have the aws CLI installed locally for this to work.
 
-AWS ECR’s access token is only valid for 12hrs. In order to not have to manually regenerate the token every time, you can use ERB in the deploy.yml file to shell out to the aws cli command, and obtain the token:
+AWS ECR’s access token is only valid for 12hrs.
+
+```shell
+export AWS_REPOSITORY_PASSWORD=$(aws ecr get-login-password)
+```
 
 ```yaml
 registry:
 server: <your aws account id>.dkr.ecr.<your aws region id>.amazonaws.com
 username: AWS
-password: <%= %x(aws ecr get-login-password) %>
+password: AWS_REPOSITORY_PASSWORD
 ```
 
 ## Using GCP Artifact Registry as the container registry

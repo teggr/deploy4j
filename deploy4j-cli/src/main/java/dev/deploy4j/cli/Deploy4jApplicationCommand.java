@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
     RegistryCliCommand.class,
     RemoveCliCommand.class,
     RollbackCliCommand.class,
+    SecretsCliCommand.class,
     ServerCliCommand.class,
     SetupCliCommand.class,
     TestCliCommand.class,

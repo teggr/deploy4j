@@ -8,7 +8,7 @@ Deploy4j will use the Traefik proxy to seamlessly move requests from the old ver
 
 The deployment process is:
 
-1. Login into the Docker registry locally and on all servers
+1. Login into the Docker registry on all servers
 2. Pull the app version onto the servers
 3. Ensure Traefik is booted
 4. Check the image boots on one server
