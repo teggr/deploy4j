@@ -46,10 +46,10 @@ public class LocalHost {
           String line;
           while ((line = reader.readLine()) != null) {
             stdout.append(line).append(System.lineSeparator());
-            log.debug(line);
+            log.info(line);
           }
         } catch (Exception e) {
-          log.debug("Failed to read stdout: {}", e.getMessage());
+          log.error("Failed to read stdout: {}", e.getMessage());
         }
       }, "process-stdout-reader");
 
@@ -59,10 +59,10 @@ public class LocalHost {
           String line;
           while ((line = reader.readLine()) != null) {
             stderr.append(line).append(System.lineSeparator());
-            log.debug(line);
+            log.info(line);
           }
         } catch (Exception e) {
-          log.debug("Failed to read stderr: {}", e.getMessage());
+          log.error("Failed to read stderr: {}", e.getMessage());
         }
       }, "process-stderr-reader");
 
