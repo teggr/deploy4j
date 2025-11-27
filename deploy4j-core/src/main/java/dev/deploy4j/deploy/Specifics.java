@@ -55,7 +55,7 @@ public class Specifics {
   }
 
   public List<String> appHosts() {
-    if(appHosts != null) {
+    if(appHosts == null) {
       appHosts = new ArrayList<>(config().appHosts());
       appHosts.retainAll(specifiedHosts());
       appHosts.sort(sortPrimaryRoleHostsFirst());

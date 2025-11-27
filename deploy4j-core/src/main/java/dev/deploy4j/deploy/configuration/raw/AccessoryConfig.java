@@ -21,6 +21,7 @@ public class AccessoryConfig  {
   private final List<String> files;
   private final List<String> directories;
   private final List<String> volumes;
+  private final String network;
 
   @JsonCreator
   public AccessoryConfig(
@@ -36,7 +37,8 @@ public class AccessoryConfig  {
     @JsonProperty("env") EnvironmentConfig env,
     @JsonProperty("files") List<String> files,
     @JsonProperty("directories") List<String> directories,
-    @JsonProperty("volumes") List<String> volumes
+    @JsonProperty("volumes") List<String> volumes,
+    @JsonProperty("network") String network
   ) {
     this.service = service;
     this.image = image;
@@ -51,6 +53,7 @@ public class AccessoryConfig  {
     this.files = files;
     this.directories = directories;
     this.volumes = volumes;
+    this.network = network;
   }
 
   public String service() {
@@ -103,5 +106,9 @@ public class AccessoryConfig  {
 
   public List<String> volumes() {
     return volumes;
+  }
+
+  public String network() {
+    return network;
   }
 }

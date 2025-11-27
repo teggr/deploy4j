@@ -54,7 +54,7 @@ public class DeployApplicationContext {
     this.registry = new Registry(sshHosts, hooks, localHost, registry);
     this.build = new Build(sshHosts, hooks, localHost, builder, audit);
     this.prune = new Prune(sshHosts, hooks, localHost, lockManager, prune, audit);
-    this.traefik = new Traefik(sshHosts, hooks, localHost, lockManager, registry, traefik, audit);
+    this.traefik = new Traefik(sshHosts, hooks, localHost, lockManager, registry, traefik, audit, docker);
     this.lock = new Lock(sshHosts, hooks, localHost, lockManager, server, lock);
 
     this.audit = new Audit(sshHosts, hooks, localHost, audit);

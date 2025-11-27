@@ -28,6 +28,7 @@ public class AccessoryHostCommands extends BaseHostCommands {
       .args("--name", serviceName())
       .args("--detach")
       .args("--restart", "unless-stopped")
+      .args(networkArgs())
       .args(config().loggingArgs())
       .args(publishArgs())
       .args(StringUtils.isNotBlank(host) ? new String[]{ "--env", "DEPLOY4J_HOST=\"" + host +"\"" } : null)
@@ -38,6 +39,10 @@ public class AccessoryHostCommands extends BaseHostCommands {
       .args(image())
       .args(cmd())
       .description("Run accessory");
+  }
+
+  private List<String> networkArgs() {
+    return accessoryConfig().networkArgs();
   }
 
   public Cmd start() {

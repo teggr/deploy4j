@@ -31,7 +31,8 @@ class AccessoryConfigTest {
             env,
             files,
             directories,
-            volumes
+            volumes,
+          null
         );
         
         assertThat(config.service()).isEqualTo("redis-service");
@@ -64,7 +65,8 @@ class AccessoryConfigTest {
             null,
             null,
             null,
-            null
+            null,
+          null
         );
         
         assertThat(config.service()).isEqualTo("my-service");
@@ -97,7 +99,8 @@ class AccessoryConfigTest {
             null,
             null,
             null,
-            null
+            null,
+          null
         );
         
         assertThat(config.service()).isEqualTo("postgres");
@@ -122,7 +125,8 @@ class AccessoryConfigTest {
             null,
             null,
             null,
-            null
+            null,
+          null
         );
         
         assertThat(config.hosts()).hasSize(3);
@@ -144,7 +148,8 @@ class AccessoryConfigTest {
             null,
             List.of(),
             List.of(),
-            List.of()
+            List.of(),
+          null
         );
         
         assertThat(config.hosts()).isEmpty();

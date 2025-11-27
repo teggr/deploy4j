@@ -38,7 +38,8 @@ public class AppHostCommands extends BaseHostCommands {
     Cmd cmd = docker().run()
       .args("--detach")
       .args("--restart", "unless-stopped")
-      .args("--name", containerName());
+      .args("--name", containerName())
+      .args("--network", "deploy4j");
     if (hostName != null) cmd = cmd.args("--hostname", hostName);
     cmd = cmd.args("-e", "DEPLOY4J_CONTAINER_NAME=\"" + containerName() + "\"")
       .args("-e", "DEPLOY4J_VERSION=\"" + config().version() + "\"")

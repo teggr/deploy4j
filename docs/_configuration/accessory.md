@@ -90,4 +90,11 @@ accessories:
     volumes:
       - /path/to/mysql-logs:/var/log/mysql
 
+    # Network
+    #
+    # The network the accessory will be attached to.
+    #
+    # Defaults to deploy4j
+    network: custom
+
 ```

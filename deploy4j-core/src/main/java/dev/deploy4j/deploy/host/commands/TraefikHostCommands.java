@@ -26,6 +26,7 @@ public class TraefikHostCommands extends BaseHostCommands {
   public Cmd run() {
     return docker().run()
       .args("--name", "traefik")
+      .args("--network", "deploy4j")
       .args("--detach")
       .args("--restart", "unless-stopped")
       .args(publishArgs())

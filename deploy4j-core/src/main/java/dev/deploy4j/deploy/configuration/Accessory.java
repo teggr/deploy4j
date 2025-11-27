@@ -12,6 +12,8 @@ import static dev.rebelcraft.cmd.CmdUtils.optionize;
 
 public class Accessory {
 
+  private static final String DEFAULT_NETWORK = "deploy4j";
+
   private final String name;
   private final Configuration config;
   private final AccessoryConfig accessoryConfig;
@@ -71,6 +73,9 @@ public class Accessory {
       }
     }
     return null;
+  }
+  public List<String> networkArgs() {
+return Arrays.asList(argumentize("--network", network()));
   }
 
   public String[] publishArgs() {
@@ -261,6 +266,13 @@ public class Accessory {
       })
       .toList();
   }
+
+
+  private String network() {
+    return accessoryConfig().network() != null ?
+      accessoryConfig().network() : DEFAULT_NETWORK;
+  }
+
 
   // attributes
 

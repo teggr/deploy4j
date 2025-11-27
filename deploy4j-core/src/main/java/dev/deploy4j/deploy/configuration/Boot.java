@@ -17,6 +17,9 @@ public class Boot {
   public Integer limit() {
 
     String limit = bootConfig().limit();
+    if(limit == null){
+      return null;
+    }
     if(limit.endsWith("%")) {
       return Math.max( hostCount() * Integer.parseInt(limit.substring(0, limit.length()-1)) / 100 , 1 );
     } else {

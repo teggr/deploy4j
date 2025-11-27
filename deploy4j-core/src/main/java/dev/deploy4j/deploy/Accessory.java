@@ -451,7 +451,7 @@ public class Accessory extends Base {
   }
 
   private List<String> accessoryHosts(DeployContext deployContext, AccessoryHostCommands accessory) {
-    List<String> intersection = new ArrayList<>(accessory.hosts());
+    List<String> intersection = new ArrayList<>(deployContext.accessoryHosts());
     intersection.retainAll(accessory.hosts());
     return intersection;
   }

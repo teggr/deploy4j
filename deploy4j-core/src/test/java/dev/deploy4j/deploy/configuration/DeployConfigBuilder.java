@@ -215,6 +215,7 @@ public class DeployConfigBuilder {
         private List<String> files;
         private List<String> directories;
         private List<String> volumes;
+        private String network;
 
         public AccessoryConfigBuilder service(String s) { this.service = s; return this; }
         public AccessoryConfigBuilder image(String i) { this.image = i; return this; }
@@ -233,9 +234,10 @@ public class DeployConfigBuilder {
         public AccessoryConfigBuilder addDirectory(String d) { if (this.directories == null) this.directories = new ArrayList<>(); this.directories.add(d); return this; }
         public AccessoryConfigBuilder volumes(List<String> v) { this.volumes = v; return this; }
         public AccessoryConfigBuilder addVolume(String v) { if (this.volumes == null) this.volumes = new ArrayList<>(); this.volumes.add(v); return this; }
+        public AccessoryConfigBuilder network(String n) { this.network = n; return this; }
 
         public AccessoryConfig build() {
-            return new AccessoryConfig(service, image, host, hosts, roles, cmd, port, labels, options, env, files, directories, volumes);
+            return new AccessoryConfig(service, image, host, hosts, roles, cmd, port, labels, options, env, files, directories, volumes, network);
         }
     }
 

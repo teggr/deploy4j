@@ -1,6 +1,7 @@
 package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
+import dev.deploy4j.deploy.host.commands.DockerHostCommands;
 import dev.deploy4j.deploy.host.commands.RegistryHostCommands;
 import dev.deploy4j.deploy.host.commands.TraefikHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
@@ -16,13 +17,15 @@ public class Traefik extends Base {
   private final RegistryHostCommands registry;
   private final TraefikHostCommands traefik;
   private final AuditorHostCommands audit;
+  private final DockerHostCommands docker;
 
-  public Traefik(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, RegistryHostCommands registry, TraefikHostCommands traefik, AuditorHostCommands audit) {
+  public Traefik(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, RegistryHostCommands registry, TraefikHostCommands traefik, AuditorHostCommands audit, DockerHostCommands docker) {
     super(sshHosts, hooks, localHost);
     this.lockManager = lockManager;
     this.registry = registry;
     this.traefik = traefik;
     this.audit = audit;
+    this.docker = docker;
   }
 
   /**
@@ -31,6 +34,10 @@ public class Traefik extends Base {
   public void boot(DeployContext deployContext) {
 
     lockManager.withLock(deployContext, () -> {
+
+      on(deployContext, deployContext.traefikHosts(), host -> {
+        host.execute(docker.createNetwork());
+      });
 
       on(deployContext, deployContext.traefikHosts(), host -> {
 
