@@ -3,6 +3,7 @@ package dev.deploy4j.deploy.host.commands;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.configuration.Role;
 import dev.rebelcraft.cmd.Cmd;
+import dev.rebelcraft.cmd.pkgs.Echo;
 import org.apache.commons.lang.StringUtils;
 
 import java.nio.file.Paths;
@@ -16,6 +17,7 @@ import java.util.stream.Stream;
 import static dev.rebelcraft.cmd.CmdUtils.argumentize;
 import static dev.rebelcraft.cmd.Cmds.*;
 import static dev.rebelcraft.cmd.pkgs.Docker.docker;
+import static dev.rebelcraft.cmd.pkgs.Echo.echo;
 import static dev.rebelcraft.cmd.pkgs.Grep.grep;
 
 public class AppHostCommands extends BaseHostCommands {
@@ -318,16 +320,36 @@ public class AppHostCommands extends BaseHostCommands {
 
   // logging
 
-  public Cmd logs(String version, String since, String lines, String grep, String grepOptions) {
+  public Cmd logs(Object containerId) {
+    return logs(containerId, true, null, null, null, null);
+  }
+
+  public Cmd logs(Object containerId, boolean timestamps, String since, String lines, String grep, String grepOptions) {
     return pipe(
-      version != null ? containerIdForVersion(version) : currentRunningContainerId(),
-      xargs( docker().logs().args(since != null ? "--since " + since : null, lines != null ? "--tail " + lines : null, "--timestamps", "2>&1") ),
+      containerIdCommand(containerId),
+      xargs( docker().logs().args(
+        timestamps ? "--timestamps" : null,
+        since != null ? "--since " + since : null,
+        lines != null ? "--tail " + lines : null,
+        "2>&1") ),
       grep != null ? grep().search(grep)
         .args(grepOptions) : null
     ).description("logs");
   }
 
   // TODO: follow logs
+
+  // private
+
+  public Cmd containerIdCommand(Object containerId) {
+    if(containerId instanceof Cmd) {
+      return (Cmd) containerId;
+    } else if ( containerId instanceof String ) {
+      return echo().message((String) containerId);
+    } else {
+      return currentRunningContainerId();
+    }
+  }
 
   // attributes
 

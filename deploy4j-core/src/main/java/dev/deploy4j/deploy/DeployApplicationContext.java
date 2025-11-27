@@ -48,9 +48,9 @@ public class DeployApplicationContext {
 
     this.lockManager = new LockManager(sshHosts, lock, server, deployContext.config().version());
 
-    this.app = new App(sshHosts, hooks, localHost, lockManager, audit, apps);
     this.server = new Server(sshHosts, hooks, localHost, lockManager, docker, server, audit);
-    this.accessory = new Accessory(sshHosts, hooks, localHost, lockManager, registry, audit, accessories);
+    this.app = new App(sshHosts, hooks, localHost, lockManager, audit, apps, server);
+    this.accessory = new Accessory(sshHosts, hooks, localHost, lockManager, registry, audit, accessories, docker);
     this.registry = new Registry(sshHosts, hooks, localHost, registry);
     this.build = new Build(sshHosts, hooks, localHost, builder, audit);
     this.prune = new Prune(sshHosts, hooks, localHost, lockManager, prune, audit);

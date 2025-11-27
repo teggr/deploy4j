@@ -11,7 +11,7 @@ class BootConfigTest {
         BootConfig config = new BootConfig();
         
         assertThat(config.limit()).isNull();
-        assertThat(config.waiter()).isNull();
+        assertThat(config.waitTime()).isNull();
     }
 
     @Test
@@ -19,7 +19,7 @@ class BootConfigTest {
         BootConfig config = new BootConfig("10", "5");
         
         assertThat(config.limit()).isEqualTo("10");
-        assertThat(config.waiter()).isEqualTo("5");
+        assertThat(config.waitTime()).isEqualTo("5");
     }
 
     @Test
@@ -27,7 +27,7 @@ class BootConfigTest {
         BootConfig config = new BootConfig(null, null);
         
         assertThat(config.limit()).isNull();
-        assertThat(config.waiter()).isNull();
+        assertThat(config.waitTime()).isNull();
     }
 
     @Test
@@ -35,7 +35,7 @@ class BootConfigTest {
         BootConfig config = new BootConfig("5", null);
         
         assertThat(config.limit()).isEqualTo("5");
-        assertThat(config.waiter()).isNull();
+        assertThat(config.waitTime()).isNull();
     }
 
     @Test
@@ -43,7 +43,7 @@ class BootConfigTest {
         BootConfig config = new BootConfig(null, "10");
         
         assertThat(config.limit()).isNull();
-        assertThat(config.waiter()).isEqualTo("10");
+        assertThat(config.waitTime()).isEqualTo("10");
     }
 
     @Test
@@ -51,6 +51,6 @@ class BootConfigTest {
         BootConfig config = new BootConfig("100", "30");
         
         assertThat(config.limit()).isEqualTo("100");
-        assertThat(config.waiter()).isEqualTo("30");
+        assertThat(config.waitTime()).isEqualTo("30");
     }
 }

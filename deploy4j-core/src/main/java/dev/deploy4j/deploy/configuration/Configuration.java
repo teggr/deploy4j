@@ -163,6 +163,12 @@ public class Configuration {
     return hosts.stream().distinct().collect(Collectors.toList());
   }
 
+  public List<String> appHosts() {
+    return roles().stream()
+      .flatMap( r -> r.hosts().stream() )
+      .distinct().toList();
+  }
+
   public String primaryHost() {
     if (primaryRole() != null) {
       return primaryRole().primaryHost();

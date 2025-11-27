@@ -45,7 +45,7 @@ public class DeployMojo extends AbstractMojo {
 
       DeployApplicationContext deployApplicationContext = new DeployApplicationContext(sshHosts, hooks, localHost, deployContext);
 
-      deployApplicationContext.deploy().deploy(deployContext, skipPull);
+      deployApplicationContext.deploy().deploy(deployContext, skipPull, false);
 
     } catch (Exception e) {
 

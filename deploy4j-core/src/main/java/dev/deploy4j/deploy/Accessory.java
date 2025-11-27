@@ -1,9 +1,6 @@
 package dev.deploy4j.deploy;
 
-import dev.deploy4j.deploy.host.commands.AccessoryHostCommands;
-import dev.deploy4j.deploy.host.commands.AccessoryHostCommandsFactory;
-import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
-import dev.deploy4j.deploy.host.commands.RegistryHostCommands;
+import dev.deploy4j.deploy.host.commands.*;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 import dev.deploy4j.deploy.local.LocalHost;
 import dev.rebelcraft.cmd.Cmd;
@@ -25,13 +22,15 @@ public class Accessory extends Base {
   private final RegistryHostCommands registry;
   private final AuditorHostCommands audit;
   private final AccessoryHostCommandsFactory accessories;
+  private final DockerHostCommands docker;
 
-  public Accessory(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, RegistryHostCommands registry, AuditorHostCommands audit, AccessoryHostCommandsFactory accessories) {
+  public Accessory(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, RegistryHostCommands registry, AuditorHostCommands audit, AccessoryHostCommandsFactory accessories, DockerHostCommands docker) {
     super(sshHosts, hooks, localHost);
     this.lockManager = lockManager;
     this.registry = registry;
     this.audit = audit;
     this.accessories = accessories;
+    this.docker = docker;
   }
 
   /**
@@ -46,34 +45,38 @@ public class Accessory extends Base {
   /**
    * Boot new accessory service on host
    *
-   * @param name  (use NAME=all to boot all accessories)
-   * @param login
+   * @param name    (use NAME=all to boot all accessories)
+   * @param prepare
    */
-  public void boot(DeployContext deployContext, String name, boolean login) {
+  public void boot(DeployContext deployContext, String name, boolean prepare) {
 
     lockManager.withLock(deployContext, () -> {
 
       if ("all".equalsIgnoreCase(name)) {
 
         deployContext.accessoryNames()
-          .forEach(accessoryName -> boot(deployContext, accessoryName, login));
+          .forEach(accessoryName -> boot(deployContext, accessoryName, prepare));
 
       } else {
+
+        if (prepare) {
+          prepare(deployContext, name);
+        }
 
         withAccessory(deployContext, name, (accessory, hosts) -> {
 
           List<String> bootedHosts = new ArrayList<>();
 
           on(deployContext, hosts, host -> {
-            String info = host.capture(accessory.info(true,true));
-            if(StringUtils.isNotBlank( info.trim() )) {
+            String info = host.capture(accessory.info(true, true));
+            if (StringUtils.isNotBlank(info.trim())) {
               bootedHosts.add(host.hostName());
             }
           });
 
-          if(!bootedHosts.isEmpty()) {
-            log.info( "Skipping booting `"+name+"` on " + String.join(", ", bootedHosts) + ", a container already exists");
-            hosts = hosts.stream().filter( Predicate.not( bootedHosts::contains ) ).toList();
+          if (!bootedHosts.isEmpty()) {
+            log.info("Skipping booting `" + name + "` on " + String.join(", ", bootedHosts) + ", a container already exists");
+            hosts = hosts.stream().filter(Predicate.not(bootedHosts::contains)).toList();
           }
 
           directories(deployContext, name);
@@ -81,13 +84,10 @@ public class Accessory extends Base {
 
           on(deployContext, hosts, host -> {
 
-            if (login) {
-              host.execute(registry.login());
-            }
             host.execute(audit.record("Booted " + name + " accessory"));
             host.execute(accessory.ensureEnvDirectory());
-            host.upload( accessory.secretsIO(), accessory.secretsPath(), 600 );
-            host.execute(accessory.run());
+            host.upload(accessory.secretsIO(), accessory.secretsPath(), 600);
+            host.execute(accessory.run(host.hostName()));
 
           });
 
@@ -164,16 +164,8 @@ public class Accessory extends Base {
 
       } else {
 
-        withAccessory(deployContext, name, (accessory, hosts) -> {
-
-          on(deployContext, hosts, host -> {
-
-            host.execute(registry.login());
-
-          });
-
-        });
-
+        prepare(deployContext, name);
+        pullImage(deployContext, name);
         stop(deployContext, name);
         removeContainer(deployContext, name);
         boot(deployContext, name, false);
@@ -235,12 +227,8 @@ public class Accessory extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      withAccessory(deployContext, name, (accessory, hosts) -> {
-
-        stop(deployContext, name);
-        start(deployContext, name);
-
-      });
+      stop(deployContext, name);
+      start(deployContext, name);
 
     });
 
@@ -249,12 +237,12 @@ public class Accessory extends Base {
   /**
    * Show details about accessory on host (use NAME=all to show all accessories)
    */
-  public void details(DeployContext deployContext, String name) {
+  public void details(DeployContext deployContext, String name, boolean quiet) {
 
     if ("all".equalsIgnoreCase(name)) {
 
       deployContext.accessoryNames()
-        .forEach(accessoryName -> details(deployContext, accessoryName));
+        .forEach(accessoryName -> details(deployContext, accessoryName, quiet));
 
     } else {
 
@@ -264,7 +252,7 @@ public class Accessory extends Base {
 
         on(deployContext, hosts, host -> {
 
-          log.info(host.capture(accessory.info(false, false)));
+          log.info(host.capture(accessory.info(false, quiet)));
 
         });
 
@@ -303,11 +291,12 @@ public class Accessory extends Base {
   /**
    * Show log lines from accessory on host (use --help to show options)
    *
-   * @param since       Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)
-   * @param lines       Number of log lines to pull from each server
-   * @param grep        Show lines with grep match only (use this to fetch specific requests by id)
-   * @param grepOptions Additional options supplied to grep
-   * @param follow      Follow logs on primary server (or specific host set by --hosts)
+   * @param since          Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)
+   * @param lines          Number of log lines to pull from each server
+   * @param grep           Show lines with grep match only (use this to fetch specific requests by id)
+   * @param grepOptions    Additional options supplied to grep
+   * @param follow         Follow logs on primary server (or specific host set by --hosts)
+   * @param skipTimestamps Skip appending timestamps to logging output
    */
   public void logs(
     DeployContext deployContext,
@@ -316,6 +305,7 @@ public class Accessory extends Base {
     String grep,
     String grepOptions,
     boolean follow,
+    boolean skipTimestamps,
     String name
   ) {
 
@@ -331,10 +321,26 @@ public class Accessory extends Base {
 //      Integer finalLines = lines;
       on(deployContext, hosts, host -> {
 
-        log.info(host.capture(accessory.logs(since, lines != null ? lines.toString() : null, grep, grepOptions)));
+        log.info(host.capture(accessory.logs(!skipTimestamps, since, lines != null ? lines.toString() : null, grep, grepOptions)));
 
       });
 
+    });
+
+  }
+
+  /**
+   * Pull accessory image on host
+   */
+  public void pullImage(DeployContext deployContext, String name) {
+
+    lockManager.withLock(deployContext, () -> {
+      withAccessory(deployContext, name, (accessory, hosts) -> {
+        on(deployContext, hosts, host -> {
+          host.execute(audit.record("Pull " + name + " accessory image"));
+          host.execute(accessory.pullImage());
+        });
+      });
     });
 
   }
@@ -445,26 +451,31 @@ public class Accessory extends Base {
   }
 
   private List<String> accessoryHosts(DeployContext deployContext, AccessoryHostCommands accessory) {
-    if (deployContext.specificHosts() != null) {
-      List<String> intersection = new ArrayList<>(deployContext.specificHosts());
-      intersection.retainAll(accessory.hosts());
-      return intersection;
-    } else {
-      return accessory.hosts();
-    }
+    List<String> intersection = new ArrayList<>(accessory.hosts());
+    intersection.retainAll(accessory.hosts());
+    return intersection;
   }
 
   private void removeAccessory(DeployContext deployContext, String name) {
 
+    stop(deployContext, name);
+    removeContainer(deployContext, name);
+    removeImage(deployContext, name);
+    removeServiceDirectory(deployContext, name);
+
+  }
+
+  public void prepare(DeployContext deployContext, String name) {
     withAccessory(deployContext, name, (accessory, hosts) -> {
 
-      stop(deployContext, name);
-      removeContainer(deployContext, name);
-      removeImage(deployContext, name);
-      removeServiceDirectory(deployContext, name);
+      on(deployContext, hosts, host -> {
+
+        host.execute(registry.login());
+        host.execute(docker.createNetwork());
+
+      });
 
     });
-
   }
 
 }

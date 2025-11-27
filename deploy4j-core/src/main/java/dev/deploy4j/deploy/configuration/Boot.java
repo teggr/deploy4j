@@ -25,8 +25,8 @@ public class Boot {
 
   }
 
-  public String waiter() {
-    return bootConfig().waiter();
+  public String waitTime() {
+    return bootConfig().waitTime();
   }
 
   // attributes

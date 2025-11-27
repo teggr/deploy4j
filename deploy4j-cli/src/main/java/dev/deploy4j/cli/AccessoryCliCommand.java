@@ -166,7 +166,7 @@ public class AccessoryCliCommand implements Callable<Integer> {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.accessory().details(deployApplicationContext.deployContext(), name);
+      deployApplicationContext.accessory().details(deployApplicationContext.deployContext(), name, quiet != null ? quiet : false);
     }
 
   }

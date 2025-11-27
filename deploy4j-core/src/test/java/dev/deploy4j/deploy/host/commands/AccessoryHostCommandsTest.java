@@ -43,7 +43,7 @@ class AccessoryHostCommandsTest {
 
     @Test
     void shouldGenerateRunCommand() {
-        Cmd cmd = accessoryCommands.run();
+        Cmd cmd = accessoryCommands.run("redis-host");
         
         assertThat(cmd).isNotNull();
         assertThat(cmd.build()).contains("docker");
@@ -83,7 +83,7 @@ class AccessoryHostCommandsTest {
 
     @Test
     void shouldGenerateLogsCommand() {
-        Cmd cmd = accessoryCommands.logs(null, null, null, null);
+        Cmd cmd = accessoryCommands.logs(true, null,null, null, null);
         
         assertThat(cmd).isNotNull();
         assertThat(cmd.build()).contains("docker");
@@ -93,7 +93,7 @@ class AccessoryHostCommandsTest {
 
     @Test
     void shouldGenerateLogsCommandWithParameters() {
-        Cmd cmd = accessoryCommands.logs("5m", "50", "ERROR", "-i");
+        Cmd cmd = accessoryCommands.logs(true, "5m", "50", "ERROR", "-i");
         
         assertThat(cmd).isNotNull();
         assertThat(String.join(" ", cmd.build())).contains("logs");
@@ -160,7 +160,7 @@ class AccessoryHostCommandsTest {
     void shouldHandleNullCmd() {
         when(mockAccessory.cmd()).thenReturn(null);
         
-        Cmd cmd = accessoryCommands.run();
+        Cmd cmd = accessoryCommands.run("redis-host");
         
         assertThat(cmd).isNotNull();
         assertThat(cmd.build()).contains("docker");
@@ -170,7 +170,7 @@ class AccessoryHostCommandsTest {
     void shouldHandleNonNullCmd() {
         when(mockAccessory.cmd()).thenReturn("redis-server --appendonly yes");
         
-        Cmd cmd = accessoryCommands.run();
+        Cmd cmd = accessoryCommands.run("redis-host");
         
         assertThat(cmd).isNotNull();
         assertThat(String.join(" ", cmd.build())).contains("redis-server --appendonly yes");

@@ -155,7 +155,7 @@ public class Boot {
     if (barrier().close()) {
 
       log.info("First " + deployContext.primaryRole() + " container is unhealthy on " + host + ", not booting any other roles");
-      log.error(sshHost.capture(app().logs(version(), null, null, null, null)));
+      log.error(sshHost.capture(app().logs(app().containerIdForVersion(version()))));
       log.error(sshHost.capture(app().containerHealthLog(version())));
     }
 

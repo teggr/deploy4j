@@ -4,10 +4,7 @@ import dev.deploy4j.deploy.configuration.Accessory;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.configuration.Role;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Optional.ofNullable;
 
@@ -21,6 +18,7 @@ public class Specifics {
   private final Configuration config;
   private final List<String> specificHosts;
   private final List<Role> specificRoles;
+  private List<String> appHosts;
 
   public Specifics(Configuration config, List<String> specificHosts, List<Role> specificRoles) {
 
@@ -45,11 +43,7 @@ public class Specifics {
       if (role2.equals(primaryRole)) return 1;
       return 0;
     });
-    hosts.sort((host1, host2) -> {
-      boolean host1HasPrimary = rolesOn(host1).stream().anyMatch(role -> role.equals(primaryRole));
-      boolean host2HasPrimary = rolesOn(host2).stream().anyMatch(role -> role.equals(primaryRole));
-      return Boolean.compare(!host1HasPrimary, !host2HasPrimary);
-    });
+    hosts.sort(sortPrimaryRoleHostsFirst());
   }
 
   public List<Role> rolesOn(String host) {
@@ -58,6 +52,15 @@ public class Specifics {
         return role.hosts().contains(host);
       }
     ).toList();
+  }
+
+  public List<String> appHosts() {
+    if(appHosts != null) {
+      appHosts = new ArrayList<>(config().appHosts());
+      appHosts.retainAll(specifiedHosts());
+      appHosts.sort(sortPrimaryRoleHostsFirst());
+    }
+    return appHosts;
   }
 
   public List<String> traefikHosts() {
@@ -133,6 +136,14 @@ public class Specifics {
       .toList() );
   }
 
+  private Comparator<String> sortPrimaryRoleHostsFirst() {
+    return (host1, host2) -> {
+      boolean host1HasPrimary = rolesOn(host1).stream().anyMatch(role -> role.equals(primaryRole));
+      boolean host2HasPrimary = rolesOn(host2).stream().anyMatch(role -> role.equals(primaryRole));
+      return Boolean.compare(!host1HasPrimary, !host2HasPrimary);
+    };
+  }
+
   // attributes
 
   public String primaryHost() {
@@ -162,4 +173,6 @@ public class Specifics {
   private List<Role> specificRoles() {
     return specificRoles;
   }
+
+
 }

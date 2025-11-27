@@ -102,7 +102,7 @@ class DeployTest {
   }
 
   @Test
-  void setup_runs_bootstrap_pushes_env_and_deploys() {
+  void setup_runs_bootstrap_and_deploys() {
     when(deployContext.hosts()).thenReturn(List.of("host1"));
 
     // run
@@ -113,7 +113,6 @@ class DeployTest {
     verify(accessory).boot(deployContext, "all", true);
 
     // deploy flow should also have invoked registry login and build.pull and traefik.boot and prune
-    verify(registry).login(deployContext);
     verify(build).pull(deployContext);
     verify(traefik).boot(deployContext);
     verify(app).staleContainers(deployContext);
@@ -149,7 +148,7 @@ class DeployTest {
   void rollback_does_not_boot_if_container_unavailable() {
     String version = "v1";
 
-    when(deployContext.hosts()).thenReturn(List.of("host1"));
+    when(deployContext.appHosts()).thenReturn(List.of("host1"));
     // rolesOn will return a single role for the host
     Role role = mock(Role.class);
     when(deployContext.rolesOn("host1")).thenReturn(List.of(role));
@@ -179,7 +178,7 @@ class DeployTest {
 
     verify(traefik).details(deployContext);
     verify(app).details(deployContext);
-    verify(accessory).details(deployContext, "all");
+    verify(accessory).details(deployContext, "all", false);
   }
 
   @Test

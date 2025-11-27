@@ -28,7 +28,7 @@ public class BootConfig {
     return limit;
   }
 
-  public String waiter() {
+  public String waitTime() {
     return wait;
   }
 

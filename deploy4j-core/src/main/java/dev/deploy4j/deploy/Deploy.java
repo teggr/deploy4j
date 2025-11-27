@@ -48,10 +48,7 @@ public class Deploy extends Base {
       log.info("Ensure Docker is installed...");
       server.bootstrap(deployContext);
 
-      log.info("Boot accessories...");
-      accessory.boot(deployContext, "all", true);
-
-      deploy(deployContext, false);
+      deploy(deployContext, false, true);
 
     });
 
@@ -61,11 +58,9 @@ public class Deploy extends Base {
    * Deploy the app to servers
    *
    * @param skipPull Skip image pull
+   *                 @param bootAccessories Whether to boot accessories before deploying the app
    */
-  public void deploy(DeployContext deployContext, boolean skipPull) {
-
-    log.info("Log into image registry...");
-    registry.login(deployContext);
+  public void deploy(DeployContext deployContext, boolean skipPull, boolean bootAccessories) {
 
     if (skipPull) {
       log.info("Skip pulling app image as requested.");
@@ -80,6 +75,10 @@ public class Deploy extends Base {
 
       log.info("Ensure Traefik is running...");
       traefik.boot(deployContext);
+
+      if (bootAccessories) {
+        accessory.boot(deployContext, "all", true);
+      }
 
       log.info("Detect stale containers...");
       app.staleContainers(deployContext);
@@ -158,7 +157,7 @@ public class Deploy extends Base {
   public void details(DeployContext deployContext) {
     traefik.details(deployContext);
     app.details(deployContext);
-    accessory.details(deployContext, "all");
+    accessory.details(deployContext, "all", false);
   }
 
   /**
@@ -193,7 +192,7 @@ public class Deploy extends Base {
 
     try {
 
-      on(deployContext, deployContext.hosts(), host -> {
+      on(deployContext, deployContext.appHosts(), host -> {
 
         for (Role role : deployContext.rolesOn(host.hostName())) {
 

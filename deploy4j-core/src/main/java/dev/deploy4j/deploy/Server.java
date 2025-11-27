@@ -39,7 +39,6 @@ public class Server extends Base {
 
     List<String> hosts = new ArrayList<>();
     hosts.addAll(deployContext.hosts());
-    hosts.addAll(deployContext.accessoryHosts());
 
     // TODO: interactive mode
     log.info( "Running '"+cmd+"' on " + String.join(",", hosts) +  "..." );
@@ -64,7 +63,6 @@ public class Server extends Base {
 
       List<String> hosts = new ArrayList<>();
       hosts.addAll(deployContext.hosts());
-      hosts.addAll(deployContext.accessoryHosts());
 
       on(deployContext, hosts, host -> {
 

@@ -140,4 +140,7 @@ public class DeployContext implements LockContext {
     return specifics.accessoryHosts();
   }
 
+  public List<String> appHosts() {
+    return specifics.appHosts();
+  }
 }

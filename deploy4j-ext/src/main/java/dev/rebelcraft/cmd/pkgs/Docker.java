@@ -90,4 +90,7 @@ public class Docker extends FluentCmd<Docker> {
     return this.args("version");
   }
 
+  public Docker network() {
+    return this.args("network");
+  }
 }

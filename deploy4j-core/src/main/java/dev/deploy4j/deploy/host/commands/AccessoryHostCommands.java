@@ -4,6 +4,7 @@ import dev.deploy4j.deploy.configuration.Accessory;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.rebelcraft.cmd.Cmd;
 import dev.rebelcraft.cmd.pkgs.Docker;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.util.List;
@@ -22,13 +23,14 @@ public class AccessoryHostCommands extends BaseHostCommands {
     this.accessoryConfig = config.accessory(name);
   }
 
-  public Cmd run() {
+  public Cmd run(String host) {
     return docker().run()
       .args("--name", serviceName())
       .args("--detach")
       .args("--restart", "unless-stopped")
       .args(config().loggingArgs())
       .args(publishArgs())
+      .args(StringUtils.isNotBlank(host) ? new String[]{ "--env", "DEPLOY4J_HOST=\"" + host +"\"" } : null)
       .args(envArgs())
       .args(volumeArgs())
       .args(labelArgs())
@@ -58,13 +60,13 @@ public class AccessoryHostCommands extends BaseHostCommands {
       .args(serviceFilter());
   }
 
-  public Cmd logs(String since, String lines, String grep, String grepOptions) {
+  public Cmd logs( boolean timestamps, String since, String lines, String grep, String grepOptions) {
     return pipe(
       docker().logs()
         .args(serviceName())
         .args(since != null ? List.of("--since", since) : List.of())
         .args(lines != null ? List.of("--tail", lines) : List.of())
-        .args("--timestamps")
+        .args(timestamps ? "--timestamps" : null)
         .args("2>&1"),
       grep != null ? grep().search(grep)
         .args(grepOptions) : null
@@ -89,6 +91,10 @@ public class AccessoryHostCommands extends BaseHostCommands {
     if (!new File(localFile).exists()) {
       throw new RuntimeException("Missing file: " + localFile);
     }
+  }
+
+  public Cmd pullImage() {
+    return docker().image().args("pull", image());
   }
 
   public Cmd removeServiceDirectory() {

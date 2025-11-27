@@ -6,6 +6,7 @@ import dev.deploy4j.deploy.healthcheck.Barrier;
 import dev.deploy4j.deploy.host.commands.AppHostCommands;
 import dev.deploy4j.deploy.host.commands.AppHostCommandsFactory;
 import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
+import dev.deploy4j.deploy.host.commands.ServerHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 import dev.deploy4j.deploy.local.LocalHost;
 import org.slf4j.Logger;
@@ -22,12 +23,14 @@ public class App extends Base {
   private final LockManager lockManager;
   private final AuditorHostCommands audit;
   private final AppHostCommandsFactory apps;
+  private final ServerHostCommands server;
 
-  public App(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, AuditorHostCommands audit, AppHostCommandsFactory apps) {
+  public App(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, AuditorHostCommands audit, AppHostCommandsFactory apps, ServerHostCommands server) {
     super(sshHosts, hooks, localHost);
     this.lockManager = lockManager;
     this.audit = audit;
     this.apps = apps;
+    this.server = server;
   }
 
   /**
@@ -37,26 +40,44 @@ public class App extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      log.info( "Get most recent version available as an image..." );
+      log.info("Get most recent version available as an image...");
 
       usingVersion(deployContext, versionOrLatest(deployContext), (version) -> {
 
-        log.info("Start container with version " + version + " using a " + deployContext.config().readinessDelay() + "s readiness delay (or reboot if already running)..." );
+        log.info("Start container with version " + version + " using a " + deployContext.config().readinessDelay() + "s readiness delay (or reboot if already running)...");
 
         Barrier barrier = new Barrier();
 
-        on(deployContext, deployContext.hosts(), host -> {
+        hostBootGroups(deployContext).forEach(hosts -> {
 
-          for( Role role : deployContext.rolesOn(host.hostName()) ) {
+          String hostList = String.join(",", hosts);
+          runHook(deployContext, "pre-app-boot", Map.of("hosts", hostList));
 
-            Boot appBoot = new Boot(host.hostName(), role, host, version, barrier, deployContext, audit, apps);
-            appBoot.run();
+          on(deployContext, hosts, host -> {
 
+            for (Role role : deployContext.rolesOn(host.hostName())) {
+
+              Boot appBoot = new Boot(host.hostName(), role, host, version, barrier, deployContext, audit, apps);
+              appBoot.run();
+
+            }
+
+          });
+
+          runHook(deployContext, "post-app-boot", Map.of("hosts", hostList));
+
+          if( deployContext.config().boot().waitTime() != null ){
+            try {
+              Thread.sleep( Long.parseLong( deployContext.config().boot().waitTime() ) * 1000L );
+            } catch (InterruptedException e) {
+              throw new RuntimeException(e);
+            }
           }
 
         });
 
-        on(deployContext, deployContext.hosts(), host -> {
+
+        on(deployContext, deployContext.appHosts(), host -> {
 
           host.execute(audit.record("Tagging " + deployContext.config().absoluteImage() + " as the latest image"));
           host.execute(apps.app(null, null)
@@ -70,6 +91,7 @@ public class App extends Base {
 
   }
 
+
   /**
    * Start existing app container on servers
    */
@@ -77,7 +99,7 @@ public class App extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext, deployContext.hosts(), host -> {
+      on(deployContext, deployContext.appHosts(), host -> {
 
         for (Role role : deployContext.rolesOn(host.hostName())) {
 
@@ -99,7 +121,7 @@ public class App extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext, deployContext.hosts(), host -> {
+      on(deployContext, deployContext.appHosts(), host -> {
 
         for (Role role : deployContext.rolesOn(host.hostName())) {
 
@@ -119,7 +141,7 @@ public class App extends Base {
    */
   public void details(DeployContext deployContext) {
 
-    on(deployContext, deployContext.hosts(), host -> {
+    on(deployContext, deployContext.appHosts(), host -> {
 
       for (Role role : deployContext.rolesOn(host.hostName())) {
 
@@ -148,7 +170,7 @@ public class App extends Base {
 
       log.info("Launching command with version " + version + " from existing container...");
 
-      on(deployContext, deployContext.hosts(), host -> {
+      on(deployContext, deployContext.appHosts(), host -> {
 
         for (Role role : deployContext.rolesOn(host.hostName())) {
 
@@ -168,7 +190,7 @@ public class App extends Base {
    */
   public void containers(DeployContext deployContext) {
 
-    on(deployContext, deployContext.hosts(), host -> {
+    on(deployContext, deployContext.appHosts(), host -> {
 
       log.info(host.capture(apps.app(null, host.hostName()).listContainers()));
 
@@ -187,7 +209,7 @@ public class App extends Base {
 
     withLockIfStopping(deployContext, stop, () -> {
 
-      on(deployContext, deployContext.hosts(), host -> {
+      on(deployContext, deployContext.appHosts(), host -> {
 
         List<Role> roles = deployContext.rolesOn(host.hostName());
 
@@ -199,10 +221,10 @@ public class App extends Base {
 
           for (String version : versions) {
             if (stop) {
-              log.info( "Stopping stale container for role #{role} with version #{version}" );
+              log.info("Stopping stale container for role #{role} with version #{version}");
               host.execute(app.stop(version), false);
             } else {
-              log.info(  "Detected stale container for role #{role} with version #{version} (use `deploy4j app stale_containers --stop` to stop)" );
+              log.info("Detected stale container for role #{role} with version #{version} (use `deploy4j app stale_containers --stop` to stop)");
             }
           }
 
@@ -219,7 +241,7 @@ public class App extends Base {
    */
   public void images(DeployContext deployContext) {
 
-    on(deployContext, deployContext.hosts(), host -> {
+    on(deployContext, deployContext.appHosts(), host -> {
 
       log.info(host.capture(apps.app(null, host.hostName()).listImages()));
 
@@ -252,11 +274,11 @@ public class App extends Base {
 //      lines = 100;
 //    }
 
-    on(deployContext, deployContext.hosts(), host -> {
+    on(deployContext, deployContext.appHosts(), host -> {
 
       for (Role role : deployContext.rolesOn(host.hostName())) {
 
-        log.info(host.capture(apps.app(role, host.hostName()).logs(null, since, lines != null ? lines.toString() : null, grep, grepOptions)));
+        log.info(host.capture(apps.app(role, host.hostName()).logs(null, true, since, lines != null ? lines.toString() : null, grep, grepOptions)));
 
       }
 
@@ -272,6 +294,7 @@ public class App extends Base {
       stop(deployContext);
       removeContainers(deployContext);
       removeImages(deployContext);
+      removeAppDirectories(deployContext);
     });
   }
 
@@ -282,7 +305,7 @@ public class App extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext, deployContext.hosts(), host -> {
+      on(deployContext, deployContext.appHosts(), host -> {
 
         for (Role role : deployContext.rolesOn(host.hostName())) {
 
@@ -304,7 +327,7 @@ public class App extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext, deployContext.hosts(), host -> {
+      on(deployContext, deployContext.appHosts(), host -> {
 
         for (Role role : deployContext.rolesOn(host.hostName())) {
 
@@ -326,12 +349,34 @@ public class App extends Base {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext, deployContext.hosts(), host -> {
+      on(deployContext, deployContext.appHosts(), host -> {
 
         for (Role role : deployContext.rolesOn(host.hostName())) {
 
           host.execute(audit.record("Removed all app images"));
           host.execute(apps.app(role, host.hostName()).removeImages());
+
+        }
+
+      });
+
+    });
+
+  }
+
+  /**
+   * Remove the app directories from servers
+   */
+  public void removeAppDirectories(DeployContext deployContext) {
+
+    lockManager.withLock(deployContext, () -> {
+
+      on(deployContext, deployContext.appHosts(), host -> {
+
+        for (Role role : deployContext.rolesOn(host.hostName())) {
+
+          host.execute(audit.record("Removed " + deployContext.config().appDirectory()));
+          host.execute(server.removeAppDirectory());
 
         }
 
@@ -369,7 +414,7 @@ public class App extends Base {
         deployContext.config().version(oldVersion);
       }
     } else {
-      block.accept( deployContext.config().version() );
+      block.accept(deployContext.config().version());
     }
   }
 
@@ -380,11 +425,24 @@ public class App extends Base {
   }
 
   private void withLockIfStopping(DeployContext deployContext, boolean stop, Runnable block) {
-    if(stop) {
+    if (stop) {
       lockManager.withLock(deployContext, block);
-    }else {
+    } else {
       block.run();
     }
+  }
+
+  private List<List<String>> hostBootGroups(DeployContext deployContext) {
+      Integer limit = deployContext.config().boot().limit();
+      List<String> hosts = deployContext.appHosts();
+      if (limit != null && limit > 0) {
+        List<List<String>> groups = new java.util.ArrayList<>();
+        for (int i = 0; i < hosts.size(); i += limit) {
+          groups.add(new java.util.ArrayList<>(hosts.subList(i, Math.min(i + limit, hosts.size()))));
+        }
+        return groups;
+      }
+      return List.of(hosts);
   }
 
 }

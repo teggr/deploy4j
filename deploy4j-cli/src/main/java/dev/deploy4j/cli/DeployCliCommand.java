@@ -16,7 +16,7 @@ public class DeployCliCommand extends BaseCliCommand {
 
     printRuntime(() -> {
 
-      deployApplicationContext.deploy().deploy(deployApplicationContext.deployContext(), skipPull);
+      deployApplicationContext.deploy().deploy(deployApplicationContext.deployContext(), skipPull, false);
 
     });
 

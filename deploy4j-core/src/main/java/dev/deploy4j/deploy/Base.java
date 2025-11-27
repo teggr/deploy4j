@@ -5,6 +5,7 @@ import dev.deploy4j.deploy.host.ssh.SshHosts;
 import dev.deploy4j.deploy.local.LocalHost;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class Base {
@@ -30,6 +31,11 @@ public class Base {
 
   public void runHook(DeployContext deployContext, String hookName) {
     hooks.runHook(deployContext, hookName);
+  }
+
+
+  public void runHook(DeployContext deployContext, String hookName, Map<String,String> extraDetails) {
+    runHook(deployContext, hookName);
   }
 
   public void runLocally(Consumer<LocalHost> block) {

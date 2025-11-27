@@ -46,4 +46,10 @@ public class DockerHostCommands extends BaseHostCommands {
     ).description("get docker");
   }
 
+  public Cmd createNetwork() {
+    return any(
+      docker().network().args("inspect", "deploy4j", ">", "/dev/null", "2>&1"),
+      docker().network().args("create", "deploy4j")
+    );
+  }
 }

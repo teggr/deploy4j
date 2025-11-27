@@ -102,7 +102,7 @@ class BootTest {
 
     @Test
     @DisplayName("should return waiter value from config")
-    void shouldReturnWaiterValueFromConfig() {
+    void shouldReturnWaitTimeValueFromConfig() {
         // Arrange
         BootConfig bootConfig = new BootConfig("2", "30");
         DeployConfig deployConfig = DeployConfigBuilder.minimal().boot(bootConfig).build();
@@ -114,7 +114,7 @@ class BootTest {
         Boot boot = new Boot(config);
 
         // Assert
-        assertThat(boot.waiter()).isEqualTo("30");
+        assertThat(boot.waitTime()).isEqualTo("30");
     }
 
     @Test
