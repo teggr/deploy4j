@@ -42,7 +42,7 @@ Install via JBang:
 `deploy4j` is currently available via JitPack.
 
 ```shell
-jbang app install --name deploy4j --repos jitpack=https://jitpack.io --force --fresh com.github.teggr.deploy4j:deploy4j-cli:0.0.1
+jbang app install --name deploy4j --repos jitpack=https://jitpack.io --force --fresh com.github.teggr.deploy4j:deploy4j-cli:0.0.2
 ```
 
 ```shell
@@ -132,7 +132,7 @@ The project includes a `jitpack.yml` configuration file that ensures proper vers
 You can use any JitPack version format:
 - Commit hash: `com.github.teggr.deploy4j:deploy4j-maven-plugin:abc123`
 - Branch: `com.github.teggr.deploy4j:deploy4j-maven-plugin:main-SNAPSHOT`
-- Tag: `com.github.teggr.deploy4j:deploy4j-maven-plugin:0.0.1`
+- Tag: `com.github.teggr.deploy4j:deploy4j-maven-plugin:0.0.2`
 
 ### Run
 
