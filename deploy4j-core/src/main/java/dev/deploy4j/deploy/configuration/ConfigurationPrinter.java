@@ -1,21 +1,42 @@
 package dev.deploy4j.deploy.configuration;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
 public class ConfigurationPrinter {
 
-  public void print(Configuration configuration) {
+  private final static ObjectMapper mapper = new ObjectMapper(new YAMLFactory())
+    .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
-    Map<String, Object> config = configuration.resolve();
+  public void print(Configuration configuration, String format) {
 
-    StringBuilder sb = new StringBuilder();
-    try {
-      printValue(sb, config, 0);
-      System.out.println(sb.toString());
-    } catch (Exception e) {
-      e.printStackTrace();
-      System.out.println(config);
+    if ("yaml".equalsIgnoreCase(format) ) {
+
+      try {
+        mapper.writeValue(System.out, configuration.rawConfig());
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+
+    } else {
+
+      Map<String, Object> config = configuration.resolve();
+
+      StringBuilder sb = new StringBuilder();
+      try {
+        printValue(sb, config, 0);
+        System.out.println(sb.toString());
+      } catch (Exception e) {
+        e.printStackTrace();
+        System.out.println(config);
+      }
+
     }
 
   }

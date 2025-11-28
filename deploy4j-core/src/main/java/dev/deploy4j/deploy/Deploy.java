@@ -163,10 +163,10 @@ public class Deploy extends Base {
   /**
    * Show combined config (including secrets!)
    */
-  public void config(DeployContext deployContext) {
+  public void config(DeployContext deployContext, String format) {
 
     ConfigurationPrinter configurationPrinter = new ConfigurationPrinter();
-    configurationPrinter.print(deployContext.config());
+    configurationPrinter.print(deployContext.config(), format);
 
   }
 

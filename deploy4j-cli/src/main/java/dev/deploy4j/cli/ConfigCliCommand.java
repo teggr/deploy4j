@@ -8,9 +8,12 @@ import picocli.CommandLine;
   description = "Show combined config (including secrets!)")
 public class ConfigCliCommand extends BaseCliCommand {
 
+  @CommandLine.Option(names = {"--format"}, description = "Format for the output [yaml]")
+  String format;
+
   @Override
   protected void execute(DeployApplicationContext deployApplicationContext) {
-    deployApplicationContext.deploy().config(deployApplicationContext.deployContext());
+    deployApplicationContext.deploy().config(deployApplicationContext.deployContext(), format);
   }
 
 }

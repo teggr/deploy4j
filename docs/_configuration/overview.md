@@ -5,11 +5,21 @@ default: true
 short_title: Overview
 date: 2025-11-03
 ---
-Configuration is read from the `config/deploy.yml`.
+Configuration is read first from the `config/deploy.yml`.
+
+Each configuration file is processed as a [thymeleaf template](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#textual-template-modes), so you can use variables and conditionals in the configuration.
+
+An environment variable can be accessed with the `env.get()` method, e.g.:
+
+```yaml
+service: [(${env.get("DYNAMIC_SERVICE_NAME")})]
+image: [(${env.get("DYNAMIC_IMAGE_NAME", "DEFAULT_IMAGE_NAME")})]
+```
 
 ## Destinations
 
 When running commands, you can specify a destination with the `-d` flag, e.g. `deploy4j deploy -d staging`.
+
 In that case the configuration will also be read from `config/deploy.staging.yml` and merged with the base configuration.
 
 ## Example configuration

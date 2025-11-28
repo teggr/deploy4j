@@ -218,4 +218,40 @@ class DeployConfigYamlReaderTest {
         assertThat(config.image()).isEqualTo("repo/myapp:v2");
         assertThat(config.servers().list()).hasSize(1);
     }
+
+  @Test
+  @DisplayName("should process thymeleaf expressions in YAML files")
+  void shouldProcessThymeleafExpressionsInYamlFiles(@TempDir Path tempDir) throws IOException {
+
+      System.setProperty("test_prop", "dynamicServiceName");
+
+    // Arrange
+    Path file1 = tempDir.resolve("base.yml");
+    Files.writeString(file1, """
+            service: [(${props.get('test_prop')})]
+            registry:
+              server: registry.example.com
+              username: baseuser
+            """);
+
+    Path file2 = tempDir.resolve("override.yml");
+    Files.writeString(file2, """
+            registry:
+              username: overrideuser
+              password:
+                - REGISTRY_PASSWORD
+            """);
+
+    // Act
+    DeployConfig config = DeployConfigYamlReader.loadConfigFiles(
+      List.of(file1.toString(), file2.toString())
+    );
+
+    // Assert
+    assertThat(config.service()).isEqualTo("dynamicServiceName");
+    assertThat(config.registry().server()).isEqualTo("registry.example.com");
+    assertThat(config.registry().username().value()).isEqualTo("overrideuser");
+    assertThat(config.registry().password().key()).isEqualTo("REGISTRY_PASSWORD");
+  }
+
 }
