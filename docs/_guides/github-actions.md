@@ -26,10 +26,10 @@ Before creating the workflow, you need to store your sensitive deployment creden
 | `DOCKER_USERNAME` | Your Docker registry username |
 | `DOCKER_PASSWORD` | Your Docker registry password or access token |
 
-To get the known_hosts entry for your server, run:
+To get the known_hosts entry for your server, run (replace `<your-server-ip>` with your actual server IP):
 
 ```shell
-ssh-keyscan -H your-server-ip
+ssh-keyscan -H <your-server-ip>
 ```
 
 ## Creating the Workflow File
@@ -78,6 +78,7 @@ jobs:
           PRIVATE_KEY_PASSPHRASE=${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}
           KNOWN_HOSTS_PATH=/tmp/known_hosts
           EOF
+          chmod 600 .deploy4j/secrets
 
       - name: Set up SSH credentials
         run: |
@@ -204,6 +205,7 @@ registry:
           DOCKER_PASSWORD=${{ secrets.GITHUB_TOKEN }}
           # ... rest of secrets ...
           EOF
+          chmod 600 .deploy4j/secrets
 ```
 
 ### Running on Tags
@@ -247,8 +249,10 @@ If you encounter SSH connection issues:
 ```yaml
       - name: Debug SSH connection
         run: |
-          ssh -vvv -i /tmp/ssh_key -o UserKnownHostsFile=/tmp/known_hosts root@your-server-ip "echo 'Connection successful'"
+          ssh -vvv -i /tmp/ssh_key -o UserKnownHostsFile=/tmp/known_hosts root@<your-server-ip> "echo 'Connection successful'"
 ```
+
+Replace `<your-server-ip>` with your actual server IP address.
 
 ### Docker Registry Authentication
 
