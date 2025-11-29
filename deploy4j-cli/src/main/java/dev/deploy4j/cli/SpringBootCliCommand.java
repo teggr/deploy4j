@@ -36,6 +36,7 @@ public class SpringBootCliCommand implements Callable<Integer> {
       ManageCliCommand.HeapdumpCliCommand.class,
       ManageCliCommand.ScheduledtasksCliCommand.class,
       ManageCliCommand.HttptraceCliCommand.class,
+      ManageCliCommand.HttpexchangesCliCommand.class,
       ManageCliCommand.BeansCliCommand.class,
       ManageCliCommand.ConditionsCliCommand.class,
       ManageCliCommand.ConfigpropsCliCommand.class,
@@ -157,12 +158,23 @@ public class SpringBootCliCommand implements Callable<Integer> {
 
     @CommandLine.Command(
       name = "httptrace",
-      description = "Get HTTP trace from Spring Boot Actuator httptrace endpoint"
+      description = "Get HTTP trace from Spring Boot Actuator httptrace endpoint (deprecated, use httpexchanges for Spring Boot 3.x+)"
     )
     public static class HttptraceCliCommand extends BaseCliCommand {
       @Override
       protected void execute(DeployApplicationContext deployApplicationContext) {
         deployApplicationContext.springBootManage().httptrace(deployApplicationContext.deployContext());
+      }
+    }
+
+    @CommandLine.Command(
+      name = "httpexchanges",
+      description = "Get HTTP exchange info from Spring Boot Actuator httpexchanges endpoint (Spring Boot 3.x+)"
+    )
+    public static class HttpexchangesCliCommand extends BaseCliCommand {
+      @Override
+      protected void execute(DeployApplicationContext deployApplicationContext) {
+        deployApplicationContext.springBootManage().httpexchanges(deployApplicationContext.deployContext());
       }
     }
 

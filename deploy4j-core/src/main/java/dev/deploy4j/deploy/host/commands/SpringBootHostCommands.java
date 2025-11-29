@@ -90,11 +90,22 @@ public class SpringBootHostCommands extends BaseHostCommands {
   }
 
   /**
-   * Get HTTP trace information.
+   * Get HTTP trace information (deprecated, use httpexchanges for Spring Boot 3.x+).
    * @see <a href="https://docs.spring.io/spring-boot/reference/actuator/endpoints.html#actuator.endpoints.httptrace">Httptrace endpoint</a>
+   * @deprecated Use {@link #httpexchanges()} for Spring Boot 3.x and later
    */
+  @Deprecated
   public Cmd httptrace() {
     return curlEndpoint("httptrace").description("actuator httptrace");
+  }
+
+  /**
+   * Get HTTP exchange information (Spring Boot 3.x+).
+   * This replaces the deprecated httptrace endpoint.
+   * @see <a href="https://docs.spring.io/spring-boot/reference/actuator/endpoints.html#actuator.endpoints.httpexchanges">Httpexchanges endpoint</a>
+   */
+  public Cmd httpexchanges() {
+    return curlEndpoint("httpexchanges").description("actuator httpexchanges");
   }
 
   /**

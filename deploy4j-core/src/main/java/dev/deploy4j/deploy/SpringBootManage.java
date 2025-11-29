@@ -89,10 +89,20 @@ public class SpringBootManage extends Base {
   }
 
   /**
-   * Get HTTP trace from Spring Boot Actuator httptrace endpoint.
+   * Get HTTP trace from Spring Boot Actuator httptrace endpoint (deprecated, use httpexchanges for Spring Boot 3.x+).
+   * @deprecated Use {@link #httpexchanges(DeployContext)} for Spring Boot 3.x and later
    */
+  @Deprecated
   public void httptrace(DeployContext deployContext) {
     executeOnSpringBootHosts(deployContext, "httptrace", () -> springBoot.httptrace());
+  }
+
+  /**
+   * Get HTTP exchange information from Spring Boot Actuator httpexchanges endpoint (Spring Boot 3.x+).
+   * This replaces the deprecated httptrace endpoint.
+   */
+  public void httpexchanges(DeployContext deployContext) {
+    executeOnSpringBootHosts(deployContext, "httpexchanges", () -> springBoot.httpexchanges());
   }
 
   /**

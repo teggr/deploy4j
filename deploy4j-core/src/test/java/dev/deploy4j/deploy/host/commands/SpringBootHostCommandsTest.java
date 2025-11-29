@@ -143,6 +143,18 @@ class SpringBootHostCommandsTest {
     }
 
     @Test
+    @DisplayName("should create httpexchanges command")
+    void shouldCreateHttpexchangesCommand() {
+        // Act
+        Cmd cmd = springBootCommands.httpexchanges();
+
+        // Assert
+        assertThat(cmd.build())
+            .contains("curl", "-s", "http://localhost:8081/actuator/httpexchanges");
+        assertThat(cmd.description()).isEqualTo("actuator httpexchanges");
+    }
+
+    @Test
     @DisplayName("should create beans command")
     void shouldCreateBeansCommand() {
         // Act

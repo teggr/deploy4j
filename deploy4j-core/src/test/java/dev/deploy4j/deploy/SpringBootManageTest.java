@@ -316,6 +316,20 @@ class SpringBootManageTest {
     }
 
     @Test
+    @DisplayName("should call sshHosts for httpexchanges endpoint")
+    void shouldCallSshHostsForHttpexchangesEndpoint() {
+        // Arrange
+        List<String> hosts = Arrays.asList("host1");
+        when(deployContext.specificHosts()).thenReturn(hosts);
+
+        // Act
+        springBootManage.httpexchanges(deployContext);
+
+        // Assert
+        verify(sshHosts).on(eq(hosts), any());
+    }
+
+    @Test
     @DisplayName("should call sshHosts for flyway endpoint")
     void shouldCallSshHostsForFlywayEndpoint() {
         // Arrange
