@@ -254,4 +254,32 @@ class DeployConfigYamlReaderTest {
     assertThat(config.registry().password().key()).isEqualTo("REGISTRY_PASSWORD");
   }
 
+  @Test
+  @DisplayName("should handle yaml anchors and aliases")
+  void shouldHandleYamlAnchorsAndAliases(@TempDir Path tempDir) throws IOException {
+    // Arrange
+    Path file1 = tempDir.resolve("base.yml");
+    Files.writeString(file1, """
+            x-worker-healthcheck: &worker-healthcheck
+              cmd: bin/worker-healthcheck
+              path: /some/url
+            service: my-app
+            registry:
+              server: registry.example.com
+              username: baseuser
+            healthcheck:
+              <<: *worker-healthcheck
+            """);
+
+    // Act
+    DeployConfig config = DeployConfigYamlReader.loadConfigFiles(
+      List.of(file1.toString())
+    );
+
+    // Assert
+    assertThat(config.service()).isEqualTo("my-app");
+    assertThat(config.healthCheck().cmd()).isEqualTo("bin/worker-healthcheck");
+    assertThat(config.healthCheck().path()).isEqualTo("/some/url");
+  }
+
 }

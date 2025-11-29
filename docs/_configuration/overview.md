@@ -22,6 +22,14 @@ When running commands, you can specify a destination with the `-d` flag, e.g. `d
 
 In that case the configuration will also be read from `config/deploy.staging.yml` and merged with the base configuration.
 
+## Extensions
+
+deploy4j will ignore unrecognized keys in the configuration file.
+
+You can declare a configuration block using YAML anchors and aliases to avoid repetition.
+
+You can prefix a configuration section with x- to indicate that it is an extension.
+
 ## Example configuration
 
 ```yaml

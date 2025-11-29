@@ -24,7 +24,7 @@ accessories:
 
     # Image
     #
-    # The Docker image to use, prefix with a registry if not using Docker hub
+    # The Docker image to use. Prefix it with its server when using root level registry different from Docker Hub. Define registry directly or via anchors when it differs from root level registry.
     image: mysql:8.0
 
     # Accessory hosts
