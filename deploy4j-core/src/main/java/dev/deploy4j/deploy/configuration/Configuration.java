@@ -55,6 +55,7 @@ public class Configuration {
   private final Ssh ssh;
   private final Registry registry;
   private final Secrets secrets;
+  private final SpringBoot springBoot;
 
   private String declaredVersion;
   private String runId;
@@ -87,6 +88,7 @@ public class Configuration {
     this.logging = new Logging(rawConfig.logging(), null);
     this.traefik = new Traefik(this);
     this.ssh = new Ssh(this, secrets);
+    this.springBoot = new SpringBoot(rawConfig.springBoot(), this);
 
     ensureDestinationIfRequired();
     ensureRequiredKeysPresent();
@@ -464,6 +466,10 @@ public class Configuration {
 
   public Registry registry() {
     return registry;
+  }
+
+  public SpringBoot springBoot() {
+    return springBoot;
   }
 
   // delegates
