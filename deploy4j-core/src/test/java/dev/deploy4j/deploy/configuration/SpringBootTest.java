@@ -165,7 +165,7 @@ class SpringBootTest {
     }
 
     @Test
-    @DisplayName("should generate correct endpoint URL")
+    @DisplayName("should generate correct endpoint URL with container name")
     void shouldGenerateCorrectEndpointUrl() {
         // Arrange
         SpringBootConfig springBootConfig = new SpringBootConfig(
@@ -180,10 +180,10 @@ class SpringBootTest {
         Configuration configuration = new Configuration(deployConfig, null, null);
 
         // Act
-        String url = configuration.springBoot().endpointUrl("health");
+        String url = configuration.springBoot().endpointUrl("health", "myservice-web-1.0.0");
 
         // Assert
-        assertThat(url).isEqualTo("http://localhost:8081/actuator/health");
+        assertThat(url).isEqualTo("http://myservice-web-1.0.0:8081/actuator/health");
     }
 
     @Test
@@ -202,10 +202,10 @@ class SpringBootTest {
         Configuration configuration = new Configuration(deployConfig, null, null);
 
         // Act
-        String url = configuration.springBoot().endpointUrl("health");
+        String url = configuration.springBoot().endpointUrl("health", "myservice-web-1.0.0");
 
         // Assert
-        assertThat(url).isEqualTo("http://localhost:8080/actuator/health");
+        assertThat(url).isEqualTo("http://myservice-web-1.0.0:8080/actuator/health");
     }
 
     @Test
@@ -224,10 +224,10 @@ class SpringBootTest {
         Configuration configuration = new Configuration(deployConfig, null, null);
 
         // Act
-        String url = configuration.springBoot().endpointUrl("/health");
+        String url = configuration.springBoot().endpointUrl("/health", "myservice-web-1.0.0");
 
         // Assert
-        assertThat(url).isEqualTo("http://localhost:8080/actuator/health");
+        assertThat(url).isEqualTo("http://myservice-web-1.0.0:8080/actuator/health");
     }
 
     @Test

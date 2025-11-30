@@ -66,7 +66,15 @@ public class SpringBoot {
     return effectiveHosts.isEmpty() ? configuredHosts : effectiveHosts;
   }
 
-  public String endpointUrl(String endpoint) {
+  /**
+   * Generates the endpoint URL for the given endpoint path.
+   * Uses the container name as the hostname since the container is running in a Docker network.
+   * 
+   * @param endpoint the endpoint path (e.g., "health")
+   * @param containerName the name of the target container
+   * @return the full URL to the actuator endpoint
+   */
+  public String endpointUrl(String endpoint, String containerName) {
     String basePath = actuatorBasePath();
     if (!basePath.startsWith("/")) {
       basePath = "/" + basePath;
@@ -77,6 +85,6 @@ public class SpringBoot {
     if (!endpoint.startsWith("/")) {
       endpoint = "/" + endpoint;
     }
-    return "http://localhost:" + actuatorPort() + basePath + endpoint;
+    return "http://" + containerName + ":" + actuatorPort() + basePath + endpoint;
   }
 }

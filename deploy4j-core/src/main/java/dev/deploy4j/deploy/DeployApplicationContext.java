@@ -44,7 +44,7 @@ public class DeployApplicationContext {
 
     AuditorHostCommands audit = new AuditorHostCommands(deployContext.config(), Map.of());
 
-    SpringBootHostCommands springBoot = new SpringBootHostCommands(deployContext.config());
+    SpringBootHostCommandsFactory springBootFactory = new SpringBootHostCommandsFactory(deployContext.config());
 
     AppHostCommandsFactory apps = new AppHostCommandsFactory(deployContext.config());
     AccessoryHostCommandsFactory accessories = new AccessoryHostCommandsFactory(deployContext.config());
@@ -61,7 +61,7 @@ public class DeployApplicationContext {
     this.lock = new Lock(sshHosts, hooks, localHost, lockManager, server, lock);
 
     this.audit = new Audit(sshHosts, hooks, localHost, audit);
-    this.springBootManage = new SpringBootManage(sshHosts, hooks, localHost, springBoot);
+    this.springBootManage = new SpringBootManage(sshHosts, hooks, localHost, springBootFactory, apps);
     this.deploy = new Deploy(sshHosts, hooks, localHost, lockManager, this.app, this.server, this.accessory, this.registry, build, this.prune, this.traefik, apps);
 
   }

@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("SpringBootHostCommands")
 class SpringBootHostCommandsTest {
 
+    private static final String CONTAINER_NAME = "test-service-web-1.0.0";
     private SpringBootHostCommands springBootCommands;
 
     @BeforeEach
@@ -31,18 +32,31 @@ class SpringBootHostCommandsTest {
             .springBoot(springBootConfig)
             .build();
         Configuration configuration = new Configuration(deployConfig, null, null);
-        springBootCommands = new SpringBootHostCommands(configuration);
+        springBootCommands = new SpringBootHostCommands(configuration, CONTAINER_NAME);
     }
 
     @Test
-    @DisplayName("should create health command with correct URL")
+    @DisplayName("should create pull curl image command")
+    void shouldCreatePullCurlImageCommand() {
+        // Act
+        Cmd cmd = springBootCommands.pullCurlImage();
+
+        // Assert
+        assertThat(cmd.build())
+            .contains("docker", "pull", "curlimages/curl");
+        assertThat(cmd.description()).isEqualTo("pull curl image");
+    }
+
+    @Test
+    @DisplayName("should create health command using docker run with curl container")
     void shouldCreateHealthCommand() {
         // Act
         Cmd cmd = springBootCommands.health();
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/health");
+            .contains("docker", "run", "--rm", "--network", "deploy4j", "curlimages/curl", "-s", 
+                "http://" + CONTAINER_NAME + ":8081/actuator/health");
         assertThat(cmd.description()).isEqualTo("actuator health");
     }
 
@@ -54,7 +68,8 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/info");
+            .contains("docker", "run", "--rm", "--network", "deploy4j", "curlimages/curl", "-s",
+                "http://" + CONTAINER_NAME + ":8081/actuator/info");
         assertThat(cmd.description()).isEqualTo("actuator info");
     }
 
@@ -66,7 +81,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/env");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/env");
         assertThat(cmd.description()).isEqualTo("actuator env");
     }
 
@@ -78,7 +93,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/loggers");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/loggers");
         assertThat(cmd.description()).isEqualTo("actuator loggers");
     }
 
@@ -90,7 +105,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/metrics");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/metrics");
         assertThat(cmd.description()).isEqualTo("actuator metrics");
     }
 
@@ -102,7 +117,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/metrics/jvm.memory.used");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/metrics/jvm.memory.used");
         assertThat(cmd.description()).isEqualTo("actuator metrics jvm.memory.used");
     }
 
@@ -114,7 +129,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/threaddump");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/threaddump");
         assertThat(cmd.description()).isEqualTo("actuator threaddump");
     }
 
@@ -126,7 +141,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/heapdump");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/heapdump");
         assertThat(cmd.description()).isEqualTo("actuator heapdump");
     }
 
@@ -138,7 +153,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/scheduledtasks");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/scheduledtasks");
         assertThat(cmd.description()).isEqualTo("actuator scheduledtasks");
     }
 
@@ -150,7 +165,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/httpexchanges");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/httpexchanges");
         assertThat(cmd.description()).isEqualTo("actuator httpexchanges");
     }
 
@@ -162,7 +177,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/beans");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/beans");
         assertThat(cmd.description()).isEqualTo("actuator beans");
     }
 
@@ -174,7 +189,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/conditions");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/conditions");
         assertThat(cmd.description()).isEqualTo("actuator conditions");
     }
 
@@ -186,7 +201,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/configprops");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/configprops");
         assertThat(cmd.description()).isEqualTo("actuator configprops");
     }
 
@@ -198,7 +213,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/mappings");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/mappings");
         assertThat(cmd.description()).isEqualTo("actuator mappings");
     }
 
@@ -210,7 +225,8 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "-X", "POST", "http://localhost:8081/actuator/shutdown");
+            .contains("docker", "run", "--rm", "--network", "deploy4j", "curlimages/curl", 
+                "-s", "-X", "POST", "http://" + CONTAINER_NAME + ":8081/actuator/shutdown");
         assertThat(cmd.description()).isEqualTo("actuator shutdown");
     }
 
@@ -222,7 +238,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/caches");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/caches");
         assertThat(cmd.description()).isEqualTo("actuator caches");
     }
 
@@ -234,7 +250,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/flyway");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/flyway");
         assertThat(cmd.description()).isEqualTo("actuator flyway");
     }
 
@@ -246,7 +262,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/liquibase");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/liquibase");
         assertThat(cmd.description()).isEqualTo("actuator liquibase");
     }
 
@@ -258,7 +274,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/sessions");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/sessions");
         assertThat(cmd.description()).isEqualTo("actuator sessions");
     }
 
@@ -270,7 +286,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/startup");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/startup");
         assertThat(cmd.description()).isEqualTo("actuator startup");
     }
 
@@ -282,7 +298,7 @@ class SpringBootHostCommandsTest {
 
         // Assert
         assertThat(cmd.build())
-            .contains("curl", "-s", "http://localhost:8081/actuator/custom/endpoint");
+            .contains("http://" + CONTAINER_NAME + ":8081/actuator/custom/endpoint");
         assertThat(cmd.description()).isEqualTo("actuator custom/endpoint");
     }
 
@@ -294,14 +310,14 @@ class SpringBootHostCommandsTest {
             .springBoot(null)
             .build();
         Configuration configuration = new Configuration(deployConfig, null, null);
-        SpringBootHostCommands commands = new SpringBootHostCommands(configuration);
+        SpringBootHostCommands commands = new SpringBootHostCommands(configuration, CONTAINER_NAME);
 
         // Act
         Cmd cmd = commands.health();
 
         // Assert
         assertThat(cmd.build())
-            .contains("http://localhost:8080/actuator/health");
+            .contains("http://" + CONTAINER_NAME + ":8080/actuator/health");
     }
 
     @Test
@@ -318,14 +334,14 @@ class SpringBootHostCommandsTest {
             .springBoot(springBootConfig)
             .build();
         Configuration configuration = new Configuration(deployConfig, null, null);
-        SpringBootHostCommands commands = new SpringBootHostCommands(configuration);
+        SpringBootHostCommands commands = new SpringBootHostCommands(configuration, CONTAINER_NAME);
 
         // Act
         Cmd cmd = commands.health();
 
         // Assert
         assertThat(cmd.build())
-            .contains("http://localhost:9090/actuator/health");
+            .contains("http://" + CONTAINER_NAME + ":9090/actuator/health");
     }
 
     @Test
@@ -341,13 +357,13 @@ class SpringBootHostCommandsTest {
             .springBoot(springBootConfig)
             .build();
         Configuration configuration = new Configuration(deployConfig, null, null);
-        SpringBootHostCommands commands = new SpringBootHostCommands(configuration);
+        SpringBootHostCommands commands = new SpringBootHostCommands(configuration, CONTAINER_NAME);
 
         // Act
         Cmd cmd = commands.health();
 
         // Assert
         assertThat(cmd.build())
-            .contains("http://localhost:8080/management/health");
+            .contains("http://" + CONTAINER_NAME + ":8080/management/health");
     }
 }

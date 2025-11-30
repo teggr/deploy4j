@@ -3,18 +3,32 @@ package dev.deploy4j.deploy.host.commands;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.rebelcraft.cmd.Cmd;
 
-import static dev.rebelcraft.cmd.pkgs.Curl.curl;
+import static dev.rebelcraft.cmd.pkgs.Docker.docker;
 
 /**
  * Host commands for Spring Boot Actuator endpoints.
  * 
- * These commands generate curl commands to call actuator endpoints on the local host,
- * which will be executed via SSH on each target server.
+ * These commands generate docker run commands that execute curl in a container
+ * attached to the deploy4j network, allowing access to app containers by their name.
  */
 public class SpringBootHostCommands extends BaseHostCommands {
 
-  public SpringBootHostCommands(Configuration config) {
+  private static final String CURL_IMAGE = "curlimages/curl";
+  private static final String NETWORK = "deploy4j";
+
+  private final String containerName;
+
+  public SpringBootHostCommands(Configuration config, String containerName) {
     super(config);
+    this.containerName = containerName;
+  }
+
+  /**
+   * Pull the curl Docker image to ensure it's available before executing commands.
+   * This prevents Docker pull logs from mixing with curl output.
+   */
+  public Cmd pullCurlImage() {
+    return docker().pull().args(CURL_IMAGE).description("pull curl image");
   }
 
   /**
@@ -198,13 +212,25 @@ public class SpringBootHostCommands extends BaseHostCommands {
 
   // Private helper methods
 
+  /**
+   * Creates a docker run command that executes curl in a container attached to the deploy4j network.
+   * This allows curl to access app containers by their container name.
+   */
   private Cmd curlEndpoint(String endpoint) {
-    String url = config().springBoot().endpointUrl(endpoint);
-    return curl().options("-s").url(url);
+    String url = config().springBoot().endpointUrl(endpoint, containerName);
+    return docker().run()
+      .args("--rm")
+      .args("--network", NETWORK)
+      .args(CURL_IMAGE)
+      .args("-s", url);
   }
 
   private Cmd curlEndpointPost(String endpoint) {
-    String url = config().springBoot().endpointUrl(endpoint);
-    return curl().options("-s", "-X", "POST").url(url);
+    String url = config().springBoot().endpointUrl(endpoint, containerName);
+    return docker().run()
+      .args("--rm")
+      .args("--network", NETWORK)
+      .args(CURL_IMAGE)
+      .args("-s", "-X", "POST", url);
   }
 }

@@ -1,6 +1,9 @@
 package dev.deploy4j.deploy;
 
+import dev.deploy4j.deploy.configuration.Role;
+import dev.deploy4j.deploy.host.commands.AppHostCommandsFactory;
 import dev.deploy4j.deploy.host.commands.SpringBootHostCommands;
+import dev.deploy4j.deploy.host.commands.SpringBootHostCommandsFactory;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 import dev.deploy4j.deploy.local.LocalHost;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +19,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,7 +30,13 @@ class SpringBootManageTest {
     private SshHosts sshHosts;
 
     @Mock
+    private SpringBootHostCommandsFactory springBootFactory;
+
+    @Mock
     private SpringBootHostCommands springBootHostCommands;
+
+    @Mock
+    private AppHostCommandsFactory appFactory;
 
     @Mock
     private DeployContext deployContext;
@@ -47,7 +57,7 @@ class SpringBootManageTest {
 
     @BeforeEach
     void setUp() {
-        springBootManage = new SpringBootManage(sshHosts, hooks, localHost, springBootHostCommands);
+        springBootManage = new SpringBootManage(sshHosts, hooks, localHost, springBootFactory, appFactory);
     }
 
     @Test
