@@ -13,44 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SpringBootTest {
 
     @Test
-    @DisplayName("should return configured hosts")
-    void shouldReturnConfiguredHosts() {
-        // Arrange
-        SpringBootConfig springBootConfig = new SpringBootConfig(
-            List.of("host1", "host2", "host3"),
-            null,
-            8080,
-            "/actuator"
-        );
-        DeployConfig deployConfig = DeployConfigBuilder.minimal()
-            .springBoot(springBootConfig)
-            .build();
-        Configuration configuration = new Configuration(deployConfig, null, null);
-
-        // Act
-        List<String> hosts = configuration.springBoot().hosts();
-
-        // Assert
-        assertThat(hosts).containsExactly("host1", "host2", "host3");
-    }
-
-    @Test
-    @DisplayName("should return app hosts when no spring boot hosts configured")
-    void shouldReturnAppHostsWhenNoSpringBootHostsConfigured() {
-        // Arrange
-        DeployConfig deployConfig = DeployConfigBuilder.minimal()
-            .springBoot(null)
-            .build();
-        Configuration configuration = new Configuration(deployConfig, null, null);
-
-        // Act
-        List<String> hosts = configuration.springBoot().hosts();
-
-        // Assert
-        assertThat(hosts).containsExactly("host1");
-    }
-
-    @Test
     @DisplayName("should return default actuator port")
     void shouldReturnDefaultActuatorPort() {
         // Arrange
@@ -71,8 +33,6 @@ class SpringBootTest {
     void shouldReturnConfiguredActuatorPort() {
         // Arrange
         SpringBootConfig springBootConfig = new SpringBootConfig(
-            null,
-            null,
             9999,
             null
         );
@@ -110,8 +70,6 @@ class SpringBootTest {
         // Arrange
         SpringBootConfig springBootConfig = new SpringBootConfig(
             null,
-            null,
-            null,
             "/management"
         );
         DeployConfig deployConfig = DeployConfigBuilder.minimal()
@@ -127,50 +85,10 @@ class SpringBootTest {
     }
 
     @Test
-    @DisplayName("should return configured tags")
-    void shouldReturnConfiguredTags() {
-        // Arrange
-        SpringBootConfig springBootConfig = new SpringBootConfig(
-            null,
-            List.of("web", "api"),
-            null,
-            null
-        );
-        DeployConfig deployConfig = DeployConfigBuilder.minimal()
-            .springBoot(springBootConfig)
-            .build();
-        Configuration configuration = new Configuration(deployConfig, null, null);
-
-        // Act
-        List<String> tags = configuration.springBoot().tags();
-
-        // Assert
-        assertThat(tags).containsExactly("web", "api");
-    }
-
-    @Test
-    @DisplayName("should return empty tags when not configured")
-    void shouldReturnEmptyTagsWhenNotConfigured() {
-        // Arrange
-        DeployConfig deployConfig = DeployConfigBuilder.minimal()
-            .springBoot(null)
-            .build();
-        Configuration configuration = new Configuration(deployConfig, null, null);
-
-        // Act
-        List<String> tags = configuration.springBoot().tags();
-
-        // Assert
-        assertThat(tags).isEmpty();
-    }
-
-    @Test
     @DisplayName("should generate correct endpoint URL with container name")
     void shouldGenerateCorrectEndpointUrl() {
         // Arrange
         SpringBootConfig springBootConfig = new SpringBootConfig(
-            null,
-            null,
             8081,
             "/actuator"
         );
@@ -191,8 +109,6 @@ class SpringBootTest {
     void shouldGenerateCorrectEndpointUrlWithTrailingSlashBasePath() {
         // Arrange
         SpringBootConfig springBootConfig = new SpringBootConfig(
-            null,
-            null,
             8080,
             "/actuator/"
         );
@@ -213,8 +129,6 @@ class SpringBootTest {
     void shouldGenerateCorrectEndpointUrlWithSlashEndpoint() {
         // Arrange
         SpringBootConfig springBootConfig = new SpringBootConfig(
-            null,
-            null,
             8080,
             "/actuator"
         );
@@ -230,25 +144,4 @@ class SpringBootTest {
         assertThat(url).isEqualTo("http://myservice-web-1.0.0:8080/actuator/health");
     }
 
-    @Test
-    @DisplayName("should return effective hosts from configured hosts when no tags")
-    void shouldReturnEffectiveHostsFromConfiguredHostsWhenNoTags() {
-        // Arrange
-        SpringBootConfig springBootConfig = new SpringBootConfig(
-            List.of("host1", "host2"),
-            null,
-            null,
-            null
-        );
-        DeployConfig deployConfig = DeployConfigBuilder.minimal()
-            .springBoot(springBootConfig)
-            .build();
-        Configuration configuration = new Configuration(deployConfig, null, null);
-
-        // Act
-        List<String> effectiveHosts = configuration.springBoot().effectiveHosts();
-
-        // Assert
-        assertThat(effectiveHosts).containsExactly("host1", "host2");
-    }
 }

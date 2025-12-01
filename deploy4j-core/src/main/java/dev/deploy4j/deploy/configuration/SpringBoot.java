@@ -18,52 +18,12 @@ public class SpringBoot {
     this.configuration = configuration;
   }
 
-  public List<String> hosts() {
-    if (springBootConfig.hosts() != null && !springBootConfig.hosts().isEmpty()) {
-      return springBootConfig.hosts();
-    }
-    // Fall back to app hosts if no specific spring boot hosts defined
-    return configuration.appHosts();
-  }
-
-  public List<String> tags() {
-    return springBootConfig.tags() != null ? springBootConfig.tags() : List.of();
-  }
-
   public Integer actuatorPort() {
     return springBootConfig.actuatorPort() != null ? springBootConfig.actuatorPort() : DEFAULT_ACTUATOR_PORT;
   }
 
   public String actuatorBasePath() {
     return springBootConfig.actuatorBasePath() != null ? springBootConfig.actuatorBasePath() : DEFAULT_ACTUATOR_BASE_PATH;
-  }
-
-  /**
-   * Gets the hosts that match the configured tags.
-   * If tags are defined, filters hosts by role tags.
-   * If no tags are defined, returns all configured hosts.
-   */
-  public List<String> effectiveHosts() {
-    List<String> configuredHosts = hosts();
-    List<String> configuredTags = tags();
-    
-    if (configuredTags.isEmpty()) {
-      return configuredHosts;
-    }
-    
-    // Filter hosts by tags - for now, tags correspond to role names
-    List<String> effectiveHosts = new ArrayList<>();
-    for (Role role : configuration.roles()) {
-      if (configuredTags.contains(role.name())) {
-        for (String host : role.hosts()) {
-          if (configuredHosts.contains(host) && !effectiveHosts.contains(host)) {
-            effectiveHosts.add(host);
-          }
-        }
-      }
-    }
-    
-    return effectiveHosts.isEmpty() ? configuredHosts : effectiveHosts;
   }
 
   /**

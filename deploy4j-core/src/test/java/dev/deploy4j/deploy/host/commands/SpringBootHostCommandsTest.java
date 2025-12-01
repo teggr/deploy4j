@@ -23,8 +23,6 @@ class SpringBootHostCommandsTest {
     void setUp() {
         // Create minimal configuration with spring boot settings
         SpringBootConfig springBootConfig = new SpringBootConfig(
-            List.of("host1", "host2"),
-            null,
             8081,
             "/actuator"
         );
@@ -325,8 +323,6 @@ class SpringBootHostCommandsTest {
     void shouldUseDefaultBasePathWhenNotConfigured() {
         // Create config without custom base path
         SpringBootConfig springBootConfig = new SpringBootConfig(
-            List.of("host1"),
-            null,
             9090,
             null
         );
@@ -348,8 +344,6 @@ class SpringBootHostCommandsTest {
     @DisplayName("should handle custom base path without leading slash")
     void shouldHandleCustomBasePathWithoutLeadingSlash() {
         SpringBootConfig springBootConfig = new SpringBootConfig(
-            List.of("host1"),
-            null,
             8080,
             "management"
         );

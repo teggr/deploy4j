@@ -198,26 +198,30 @@ public class SpringBootManage extends Base {
 
   private void executeOnSpringBootHosts(DeployContext deployContext, String endpointName,
                                         java.util.function.Function<SpringBootHostCommands, dev.rebelcraft.cmd.Cmd> cmdFunction) {
-    List<String> springBootHosts = getSpringBootHosts(deployContext);
-    
-    if (springBootHosts.isEmpty()) {
+
+    List<String> hosts = deployContext.appHosts();
+
+    if (hosts.isEmpty()) {
       log.warn("No Spring Boot hosts configured. Check your spring_boot configuration.");
       return;
     }
+
+    log.info("Running actuator {} on {} host(s)...", endpointName, hosts.size());
     
-    log.info("Running actuator {} on {} host(s)...", endpointName, springBootHosts.size());
-    
-    on(deployContext, springBootHosts, host -> {
+    on(deployContext, hosts, host -> {
+
       // Get the roles for this host
       List<Role> roles = deployContext.rolesOn(host.hostName());
       
       for (Role role : roles) {
+
         // Get the container name for this role using the current version
         String containerName = role.containerName(deployContext.config().version());
         
         log.info("=== {} ({}) ===", host.hostName(), containerName);
         
         try {
+
           // Create commands for this specific container
           SpringBootHostCommands commands = springBootFactory.forContainer(containerName);
           
@@ -227,20 +231,14 @@ public class SpringBootManage extends Base {
           // Execute the actual command and capture output
           String result = host.capture(cmdFunction.apply(commands), false);
           System.out.println(result);
+
         } catch (Exception e) {
           log.warn("Failed to get {} from {} ({}): {}", endpointName, host.hostName(), containerName, e.getMessage());
         }
+
       }
+
     });
   }
 
-  private List<String> getSpringBootHosts(DeployContext deployContext) {
-    // If specific hosts are set in the deploy context, use those
-    if (deployContext.specificHosts() != null && !deployContext.specificHosts().isEmpty()) {
-      return deployContext.specificHosts();
-    }
-    
-    // Otherwise use the configured spring boot hosts
-    return deployContext.config().springBoot().effectiveHosts();
-  }
 }

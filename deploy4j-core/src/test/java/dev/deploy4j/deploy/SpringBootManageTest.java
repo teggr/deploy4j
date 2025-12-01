@@ -1,6 +1,5 @@
 package dev.deploy4j.deploy;
 
-import dev.deploy4j.deploy.configuration.Role;
 import dev.deploy4j.deploy.host.commands.AppHostCommandsFactory;
 import dev.deploy4j.deploy.host.commands.SpringBootHostCommands;
 import dev.deploy4j.deploy.host.commands.SpringBootHostCommandsFactory;
@@ -19,7 +18,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,10 +63,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsWithConfiguredHostsForHealth() {
         // Arrange
         List<String> hosts = Arrays.asList("host1", "host2");
-        when(deployContext.specificHosts()).thenReturn(null);
-        when(deployContext.config()).thenReturn(configuration);
-        when(configuration.springBoot()).thenReturn(springBootConfig);
-        when(springBootConfig.effectiveHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<String>> hostsCaptor = ArgumentCaptor.forClass(List.class);
@@ -86,7 +81,7 @@ class SpringBootManageTest {
     void shouldUseSpecificHostsFromDeployContextForInfo() {
         // Arrange
         List<String> specificHosts = Arrays.asList("specificHost1");
-        when(deployContext.specificHosts()).thenReturn(specificHosts);
+        when(deployContext.appHosts()).thenReturn(specificHosts);
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<String>> hostsCaptor = ArgumentCaptor.forClass(List.class);
@@ -104,7 +99,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForEnvEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.env(deployContext);
@@ -118,7 +113,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForLoggersEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.loggers(deployContext);
@@ -132,7 +127,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForMetricsEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.metrics(deployContext);
@@ -146,7 +141,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForMetricsEndpointWithName() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.metrics(deployContext, "jvm.memory.used");
@@ -160,7 +155,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForThreaddumpEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.threaddump(deployContext);
@@ -174,7 +169,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForHeapdumpEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.heapdump(deployContext);
@@ -188,7 +183,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForBeansEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.beans(deployContext);
@@ -202,7 +197,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForShutdownEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.shutdown(deployContext);
@@ -216,7 +211,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForGenericEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.endpoint(deployContext, "custom/endpoint");
@@ -229,10 +224,7 @@ class SpringBootManageTest {
     @DisplayName("should not call sshHosts when no hosts are configured")
     void shouldNotCallSshHostsWhenNoHostsConfigured() {
         // Arrange
-        when(deployContext.specificHosts()).thenReturn(null);
-        when(deployContext.config()).thenReturn(configuration);
-        when(configuration.springBoot()).thenReturn(springBootConfig);
-        when(springBootConfig.effectiveHosts()).thenReturn(List.of());
+        when(deployContext.appHosts()).thenReturn(List.of());
 
         // Act
         springBootManage.health(deployContext);
@@ -246,7 +238,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForConditionsEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.conditions(deployContext);
@@ -260,7 +252,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForConfigpropsEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.configprops(deployContext);
@@ -274,7 +266,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForMappingsEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.mappings(deployContext);
@@ -288,7 +280,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForCachesEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.caches(deployContext);
@@ -302,7 +294,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForScheduledtasksEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.scheduledtasks(deployContext);
@@ -316,7 +308,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForHttptraceEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.httptrace(deployContext);
@@ -330,7 +322,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForHttpexchangesEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.httpexchanges(deployContext);
@@ -344,7 +336,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForFlywayEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.flyway(deployContext);
@@ -358,7 +350,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForLiquibaseEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.liquibase(deployContext);
@@ -372,7 +364,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForSessionsEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.sessions(deployContext);
@@ -386,7 +378,7 @@ class SpringBootManageTest {
     void shouldCallSshHostsForStartupEndpoint() {
         // Arrange
         List<String> hosts = Arrays.asList("host1");
-        when(deployContext.specificHosts()).thenReturn(hosts);
+        when(deployContext.appHosts()).thenReturn(hosts);
 
         // Act
         springBootManage.startup(deployContext);
