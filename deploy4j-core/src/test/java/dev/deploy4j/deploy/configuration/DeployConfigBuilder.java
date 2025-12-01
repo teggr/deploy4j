@@ -38,6 +38,7 @@ public class DeployConfigBuilder {
     private BootConfig boot;
     private HealthCheckConfig healthCheck;
     private LoggingConfig logging;
+    private SpringBootConfig springBoot;
 
     public DeployConfigBuilder() {
         // defaults
@@ -75,6 +76,7 @@ public class DeployConfigBuilder {
     public DeployConfigBuilder boot(BootConfig boot) { this.boot = boot; return this; }
     public DeployConfigBuilder healthCheck(HealthCheckConfig healthCheck) { this.healthCheck = healthCheck; return this; }
     public DeployConfigBuilder logging(LoggingConfig logging) { this.logging = logging; return this; }
+    public DeployConfigBuilder springBoot(SpringBootConfig springBoot) { this.springBoot = springBoot; return this; }
 
     public DeployConfig build() {
         return new DeployConfig(
@@ -99,7 +101,8 @@ public class DeployConfigBuilder {
             traefik,
             boot,
             healthCheck,
-            logging
+            logging,
+            springBoot
         );
     }
 
