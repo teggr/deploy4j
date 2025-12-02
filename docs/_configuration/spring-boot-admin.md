@@ -4,6 +4,24 @@ title: Spring Boot Admin
 ---
 Spring Boot Admin is a community project to manage and monitor Spring Boot applications. Deploy4j provides first-class support for running Spring Boot Admin dashboard alongside your deployed applications.
 
+## Deployment
+
+By default, Spring Boot Admin runs on the same hosts as Traefik (hosts with the `traefik: true` configuration in their role). This ensures that the admin dashboard is co-located with your load balancer for optimal performance and accessibility.
+
+You can configure which hosts run Spring Boot Admin by setting `traefik: true` in the role configuration:
+
+```yaml
+servers:
+  web:
+    hosts:
+      - 192.168.1.1
+    traefik: true  # Both Traefik and Spring Boot Admin will run on this host
+  workers:
+    hosts:
+      - 192.168.1.2
+      - 192.168.1.3
+```
+
 ## Spring Boot Admin settings
 
 Configured under `spring_boot_admin` in the root configuration. Example:
@@ -57,10 +75,6 @@ spring_boot_admin:
 
 ```
 
-## Using Spring Boot Admin
-
-Once deployed, the Spring Boot Admin dashboard will be available on the configured port (default 8080) on servers where it's running. Your Spring Boot applications can register with the admin server using the Spring Boot Admin Client library.
-
 ### Configuring Spring Boot applications
 
 Add the Spring Boot Admin Client dependency to your applications and configure them to register with the admin server:
@@ -80,7 +94,3 @@ The admin dashboard provides:
 - Environment property inspection
 - JVM thread dumps and heap dumps
 - HTTP request tracing
-
-## Deployment
-
-Spring Boot Admin runs on the same hosts as Traefik (hosts with the `traefik: true` configuration). This ensures that the admin dashboard is co-located with your load balancer for optimal performance and accessibility.

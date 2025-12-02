@@ -24,7 +24,7 @@ public class SpringBootAdmin {
   }
 
   public boolean publish() {
-    return springBootAdminConfig().publish() == null || springBootAdminConfig().publish() != false;
+    return springBootAdminConfig().publish() != Boolean.FALSE;
   }
 
   public Map<String, String> labels() {
