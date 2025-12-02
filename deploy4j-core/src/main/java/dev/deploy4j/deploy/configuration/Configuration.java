@@ -51,6 +51,7 @@ public class Configuration {
   private final HealthCheck healthcheck;
   private final Logging logging;
   private final Traefik traefik;
+  private final SpringBootAdmin springBootAdmin;
   private final Servers servers;
   private final Ssh ssh;
   private final Registry registry;
@@ -87,6 +88,7 @@ public class Configuration {
     this.healthcheck = new HealthCheck(rawConfig.healthCheck(), null);
     this.logging = new Logging(rawConfig.logging(), null);
     this.traefik = new Traefik(this);
+    this.springBootAdmin = new SpringBootAdmin(this);
     this.ssh = new Ssh(this, secrets);
     this.springBoot = new SpringBoot(rawConfig.springBoot(), this);
 
@@ -205,6 +207,19 @@ public class Configuration {
 
   public List<String> traefikHosts() {
     return traefikRoles().stream()
+      .flatMap(r -> r.hosts().stream())
+      .distinct()
+      .toList();
+  }
+
+  private List<Role> springBootAdminRoles() {
+    return roles().stream()
+      .filter(Role::runningTraefik)
+      .toList();
+  }
+
+  public List<String> springBootAdminHosts() {
+    return springBootAdminRoles().stream()
       .flatMap(r -> r.hosts().stream())
       .distinct()
       .toList();
@@ -454,6 +469,10 @@ public class Configuration {
 
   public Traefik traefik() {
     return traefik;
+  }
+
+  public SpringBootAdmin springBootAdmin() {
+    return springBootAdmin;
   }
 
   public Servers servers() {

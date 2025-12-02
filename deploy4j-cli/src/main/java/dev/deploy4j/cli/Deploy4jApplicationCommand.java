@@ -26,6 +26,7 @@ import java.util.concurrent.Callable;
     ServerCliCommand.class,
     SetupCliCommand.class,
     SpringBootCliCommand.class,
+    SpringBootAdminCliCommand.class,
     TestCliCommand.class,
     TraefikCliCommand.class,
     VersionCliCommand.class

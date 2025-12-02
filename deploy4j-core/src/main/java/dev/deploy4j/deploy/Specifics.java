@@ -70,6 +70,13 @@ public class Specifics {
     return list.stream().toList();
   }
 
+  public List<String> springBootAdminHosts() {
+    Set<String> list = new HashSet<>();
+    list.addAll(config().springBootAdminHosts());
+    list.addAll(specifiedHosts());
+    return list.stream().toList();
+  }
+
   public List<String> accessoryHosts() {
     Set<String> accessoryHosts = new HashSet<>();
     accessoryHosts.addAll(config().accessories().stream().flatMap(a -> a.hosts().stream()).toList());

@@ -136,6 +136,10 @@ public class DeployContext implements LockContext {
     return specifics.traefikHosts();
   }
 
+  public List<String> springBootAdminHosts() {
+    return specifics.springBootAdminHosts();
+  }
+
   public List<String> accessoryHosts() {
     return specifics.accessoryHosts();
   }

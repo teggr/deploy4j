@@ -13,6 +13,7 @@ public class DeployApplicationContext {
   private final Registry registry;
   private final Build build;
   private final Traefik traefik;
+  private final SpringBootAdmin springBootAdmin;
   private final App app;
   private final Prune prune;
   private final Accessory accessory;
@@ -42,6 +43,8 @@ public class DeployApplicationContext {
 
     TraefikHostCommands traefik = new TraefikHostCommands(deployContext.config());
 
+    SpringBootAdminHostCommands springBootAdmin = new SpringBootAdminHostCommands(deployContext.config());
+
     AuditorHostCommands audit = new AuditorHostCommands(deployContext.config(), Map.of());
 
     SpringBootHostCommandsFactory springBootFactory = new SpringBootHostCommandsFactory(deployContext.config());
@@ -58,6 +61,7 @@ public class DeployApplicationContext {
     this.build = new Build(sshHosts, hooks, localHost, builder, audit);
     this.prune = new Prune(sshHosts, hooks, localHost, lockManager, prune, audit);
     this.traefik = new Traefik(sshHosts, hooks, localHost, lockManager, registry, traefik, audit, docker);
+    this.springBootAdmin = new SpringBootAdmin(sshHosts, hooks, localHost, lockManager, registry, springBootAdmin, audit, docker);
     this.lock = new Lock(sshHosts, hooks, localHost, lockManager, server, lock);
 
     this.audit = new Audit(sshHosts, hooks, localHost, audit);
@@ -84,6 +88,10 @@ public class DeployApplicationContext {
 
   public Traefik traefik() {
     return traefik;
+  }
+
+  public SpringBootAdmin springBootAdmin() {
+    return springBootAdmin;
   }
 
   public App app() {

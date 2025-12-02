@@ -29,6 +29,7 @@ public class DeployConfig {
   private final SshConfig ssh;
   private final Map<String, AccessoryConfig> accessories;
   private final TraefikConfig traefik;
+  private final SpringBootAdminConfig springBootAdmin;
   private final BootConfig boot;
   private final HealthCheckConfig healthCheck;
   private final LoggingConfig logging;
@@ -55,6 +56,7 @@ public class DeployConfig {
     @JsonProperty("ssh") SshConfig ssh,
     @JsonProperty("accessories") Map<String, AccessoryConfig> accessories,
     @JsonProperty("traefik") TraefikConfig traefik,
+    @JsonProperty("spring_boot_admin") SpringBootAdminConfig springBootAdmin,
     @JsonProperty("boot") BootConfig boot,
     @JsonProperty("healthcheck") HealthCheckConfig healthCheck,
     @JsonProperty("logging") LoggingConfig logging,
@@ -79,6 +81,7 @@ public class DeployConfig {
     this.ssh = ssh;
     this.accessories = accessories;
     this.traefik = traefik;
+    this.springBootAdmin = springBootAdmin;
     this.boot = boot;
     this.healthCheck = healthCheck;
     this.logging = logging;
@@ -159,6 +162,10 @@ public class DeployConfig {
 
   public TraefikConfig traefik() {
     return traefik;
+  }
+
+  public SpringBootAdminConfig springBootAdmin() {
+    return springBootAdmin;
   }
 
   public BootConfig boot() {
