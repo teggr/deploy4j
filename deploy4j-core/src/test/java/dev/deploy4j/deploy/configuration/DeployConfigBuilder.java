@@ -35,6 +35,7 @@ public class DeployConfigBuilder {
     private SshConfig ssh;
     private Map<String, AccessoryConfig> accessories;
     private TraefikConfig traefik;
+    private SpringBootAdminConfig springBootAdmin;
     private BootConfig boot;
     private HealthCheckConfig healthCheck;
     private LoggingConfig logging;
@@ -73,6 +74,7 @@ public class DeployConfigBuilder {
     public DeployConfigBuilder ssh(SshConfig ssh) { this.ssh = ssh; return this; }
     public DeployConfigBuilder accessories(Map<String, AccessoryConfig> accessories) { this.accessories = accessories; return this; }
     public DeployConfigBuilder traefik(TraefikConfig traefik) { this.traefik = traefik; return this; }
+    public DeployConfigBuilder springBootAdmin(SpringBootAdminConfig springBootAdmin) { this.springBootAdmin = springBootAdmin; return this; }
     public DeployConfigBuilder boot(BootConfig boot) { this.boot = boot; return this; }
     public DeployConfigBuilder healthCheck(HealthCheckConfig healthCheck) { this.healthCheck = healthCheck; return this; }
     public DeployConfigBuilder logging(LoggingConfig logging) { this.logging = logging; return this; }
@@ -99,6 +101,7 @@ public class DeployConfigBuilder {
             ssh,
             accessories,
             traefik,
+            springBootAdmin,
             boot,
             healthCheck,
             logging,
