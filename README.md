@@ -1,6 +1,6 @@
 # deploy4j
 
-![Maven Central Version](https://img.shields.io/maven-central/v/dev.deploy4j/deploy4j)
+![Maven Central Version](https://img.shields.io/maven-central/v/dev.deploy4j/deploy4j-parent)
 
 ## What?
 
