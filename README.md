@@ -20,7 +20,7 @@ Some advantages:
 
 ## How?
 
-See [deploy4j](https://teggr.github.io/deploy4j/installation/) for further documentation.
+See [deploy4j](https://deploy4j.dev/installation/) for further documentation.
 
 * Connects to server
 * Installs docker
@@ -35,7 +35,7 @@ Requires Java 21.
 
 ## Command Line
 
-[View all commands](https://teggr.github.io/deploy4j/commands/view-all-commands.html).
+[View all commands](https://deploy4j.dev/commands/view-all-commands.html).
 
 Install via JBang:
 
