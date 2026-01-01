@@ -6,7 +6,7 @@
 
     <groupId>dev.deploy4j</groupId>
     <artifactId>deploy4j-parent</artifactId>
-    <version>main-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
         <module>deploy4j-ext</module>
@@ -15,6 +15,10 @@
         <module>deploy4j-maven-plugin</module>
         <module>deploy4j-coverage-report</module>
     </modules>
+
+    <name>deploy4j</name>
+    <description>Deploy4j is designed to make it easy to deploy Java web applications to self hosted VMs using Docker. Deploying a simple web application can be a complex process involving multiple steps and configurations. Deploy4j simplifies this process by automating the deployment steps and providing a consistent deployment experience.</description>
+    <url>https://www.deploy4j.dev</url>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -114,6 +118,11 @@
                         <reuseForks>true</reuseForks>
                      </configuration>
                  </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>3.1.4</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -165,5 +174,71 @@
          </plugins>
 
      </build>
+
+    <profiles>
+        <profile>
+            <id>publication</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <!-- 3.12.0 is the current version at the time of writing, please check if there is a newer version -->
+                        <version>3.12.0</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <attach>true</attach>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <!-- 3.4.0 is the current version at the time of writing, please check if there is a newer version -->
+                        <version>3.4.0</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <attach>true</attach>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Robin Tegg</name>
+            <email>robin@tegg.me.uk</email>
+            <organization>RebelCraft</organization>
+            <organizationUrl>https://www.rebelcraft.dev</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/teggr/deploy4j</connection>
+        <developerConnection>scm:git:ssh://github.com:teggr/deploy4j.git</developerConnection>
+        <url>http://github.com/teggr/deploy4j/tree/main</url>
+    </scm>
 
  </project>

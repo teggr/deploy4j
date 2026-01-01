@@ -1,6 +1,6 @@
 # deploy4j
 
-[![](https://jitpack.io/v/teggr/deploy4j.svg)](https://jitpack.io/#teggr/deploy4j/deploy)
+![Maven Central Version](https://img.shields.io/maven-central/v/dev.deploy4j/deploy4j)
 
 ## What?
 
@@ -42,7 +42,7 @@ Install via JBang:
 `deploy4j` is currently available via JitPack.
 
 ```shell
-jbang app install --name deploy4j --repos jitpack=https://jitpack.io --force --fresh com.github.teggr.deploy4j:deploy4j-cli:0.0.2
+jbang app install --name deploy4j --force --fresh dev.deploy4j:deploy4j-cli:0.0.3
 ```
 
 ```shell
@@ -91,31 +91,9 @@ deploy4j deploy --version 0.0.2
 
 ### Configure
 
-The project is distributed via JitPack. Add the JitPack repository and configure the plugin:
+The project is distributed via Maven Central.
 
 ```xml
-<pluginRepositories>
-    <pluginRepository>
-        <id>central</id>
-        <url>https://repo.maven.apache.org/maven2</url>
-    </pluginRepository>
-    <pluginRepository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </pluginRepository>
-</pluginRepositories>
-
-<repositories>
-    <repository>
-        <id>central</id>
-        <url>https://repo.maven.apache.org/maven2</url>
-    </repository>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
-</repositories>
-
 <build>
     <plugin>
         <groupId>com.github.teggr.deploy4j</groupId>
@@ -124,15 +102,6 @@ The project is distributed via JitPack. Add the JitPack repository and configure
     </plugin>
 </build>
 ```
-
-#### JitPack Configuration
-
-The project includes a `jitpack.yml` configuration file that ensures proper version resolution during JitPack builds. When JitPack builds the project from a commit, tag, or branch, it automatically replaces all internal version references (currently `main-SNAPSHOT`) with the actual JitPack version. This ensures that inter-module dependencies resolve correctly.
-
-You can use any JitPack version format:
-- Commit hash: `com.github.teggr.deploy4j:deploy4j-maven-plugin:abc123`
-- Branch: `com.github.teggr.deploy4j:deploy4j-maven-plugin:main-SNAPSHOT`
-- Tag: `com.github.teggr.deploy4j:deploy4j-maven-plugin:0.0.2`
 
 ### Run
 
@@ -179,13 +148,22 @@ docker exec -it deploy4j-droplet /bin/bash
 
 ## Releasing
 
-Use `scripts/tag-for-jitpack.bat` to set Maven versions across modules, commit the change, create an annotated Git tag prefixed with v, and optionally push and bump to a next snapshot.
-
-Usage examples:
+The project uses [jreleaser](https://jreleaser.org/) for releases. Based on the [foojay article](https://foojay.io/today/how-to-publish-a-java-maven-project-to-maven-central-using-jreleaser-and-github-actions-2025-guide/).
 
 ```shell
-.\scripts\tag-for-jitpack.bat -Version 1.2.3 -Push
-.\scripts\tag-for-jitpack.bat -Version 1.2.3 -NextSnapshot 1.2.4-SNAPSHOT -Push
+# set the version for all modules
+mvn versions:set -DnewVersion=0.0.1
+
+# create staging directory
+mvn -Ppublication deploy -DaltDeploymentRepository=local::file:./target/staging-deploy
+
+# release via jreleaser
+export JRELEASER_PROJECT_VERSION=0.0.1
+jreleaser full-release
+
+# set the next snapshot version for all modules
+mvn versions:set -DnextSnapshot
+mvn versions:commit
 ```
 
 ## Notes on the Kamal Port
