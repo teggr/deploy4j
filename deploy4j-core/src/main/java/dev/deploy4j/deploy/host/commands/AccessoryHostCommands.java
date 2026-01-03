@@ -4,7 +4,7 @@ import dev.deploy4j.deploy.configuration.Accessory;
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.rebelcraft.cmd.Cmd;
 import dev.rebelcraft.cmd.pkgs.Docker;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.List;

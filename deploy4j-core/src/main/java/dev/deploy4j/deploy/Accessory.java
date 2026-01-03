@@ -4,7 +4,7 @@ import dev.deploy4j.deploy.host.commands.*;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 import dev.deploy4j.deploy.local.LocalHost;
 import dev.rebelcraft.cmd.Cmd;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

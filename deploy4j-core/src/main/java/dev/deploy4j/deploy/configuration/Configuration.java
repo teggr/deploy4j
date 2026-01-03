@@ -8,7 +8,7 @@ import dev.deploy4j.deploy.configuration.raw.DeployConfigYamlReader;
 import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
 import dev.deploy4j.deploy.utils.RandomHex;
 import dev.deploy4j.deploy.utils.file.File;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Paths;
 import java.util.*;
