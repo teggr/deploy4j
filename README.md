@@ -15,7 +15,7 @@ Deploy4j is designed to make it easy to deploy Java web applications to self hos
 Some advantages:
 
 * Quick setup process (start vm + deploy)
-* No build service required. Works locally and also well from a pipeline
+* Works locally and also well from a pipeline
 * Cheaper to run multiple services on a single vm compared to entry level tiers on some PAAS. $6 per month on Digital Ocean.
 
 ## How?

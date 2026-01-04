@@ -66,11 +66,6 @@ layout: default
             </div>
             
             <div class="feature-card">
-                <h3>📦 Remote Builds</h3>
-                <p>Build your Docker images on target servers to reduce bandwidth and deployment time.</p>
-            </div>
-            
-            <div class="feature-card">
                 <h3>🧩 Accessory Services</h3>
                 <p>Manage databases, caches, and other services alongside your application with ease.</p>
             </div>
