@@ -42,7 +42,7 @@ Install via JBang:
 `deploy4j` is currently available via JitPack.
 
 ```shell
-jbang app install --name deploy4j --force --fresh dev.deploy4j:deploy4j-cli:0.0.4
+jbang app install --name deploy4j --force --fresh dev.deploy4j:deploy4j-cli:0.0.5
 ```
 
 ```shell
@@ -155,7 +155,7 @@ The project uses [jreleaser](https://jreleaser.org/) for releases. Based on the 
 mvn versions:set -DnewVersion=0.0.1
 
 # create staging directory
-mvn -Ppublication deploy -DaltDeploymentRepository=local::file:./target/staging-deploy
+mvn -Ppublication clean deploy -DaltDeploymentRepository=local::file:./target/staging-deploy
 
 # release via jreleaser
 export JRELEASER_PROJECT_VERSION=0.0.1
