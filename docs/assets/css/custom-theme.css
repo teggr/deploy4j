@@ -200,6 +200,11 @@ h1, h2, h3, h4, h5, h6 {
     background-color: var(--color-text-primary);
 }
 
+/* Navbar Menu (Mobile) */
+.navbar-menu {
+    background-color: var(--color-bg-medium) !important;
+}
+
 /* Navbar Dropdown */
 .navbar-dropdown {
     background-color: var(--color-bg-medium) !important;
