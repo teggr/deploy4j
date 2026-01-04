@@ -42,7 +42,7 @@ Install via JBang:
 `deploy4j` is currently available via JitPack.
 
 ```shell
-jbang app install --name deploy4j --force --fresh dev.deploy4j:deploy4j-cli:0.0.3
+jbang app install --name deploy4j --force --fresh dev.deploy4j:deploy4j-cli:0.0.4
 ```
 
 ```shell

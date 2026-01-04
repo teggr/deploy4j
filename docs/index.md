@@ -84,7 +84,7 @@ layout: default
         <div class="content quick-start-content">
             <p>Get started with deploy4j in just a few commands:</p>
             <pre><code># Install deploy4j with JBang
-jbang app install --name deploy4j dev.deploy4j:deploy4j-cli:0.0.3
+jbang app install --name deploy4j dev.deploy4j:deploy4j-cli:0.0.4
 
 # Initialize your project
 deploy4j init
