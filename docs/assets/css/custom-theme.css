@@ -244,35 +244,36 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Sidebar Menu */
 .menu {
-    background-color: var(--color-bg-medium);
+    background-color: var(--color-bg-medium) !important;
     padding: 1.5rem;
     border-radius: 8px;
     border: 1px solid var(--color-border);
 }
 
 .menu-list a {
-    color: var(--color-text-secondary);
+    color: var(--color-text-secondary) !important;
     transition: all 0.2s ease;
     border-radius: 4px;
+    background-color: transparent !important;
 }
 
 .menu-list a:hover {
-    background-color: var(--color-bg-light);
-    color: var(--color-accent);
+    background-color: var(--color-bg-light) !important;
+    color: var(--color-accent) !important;
 }
 
 .menu-list a.is-active {
-    background-color: var(--color-accent);
-    color: var(--color-bg-darker);
+    background-color: var(--color-accent) !important;
+    color: var(--color-bg-darker) !important;
 }
 
 .menu-list a.has-text-weight-bold {
-    color: var(--color-text-primary);
+    color: var(--color-text-primary) !important;
     font-weight: 600;
 }
 
 .menu-list ul {
-    background-color: transparent;
+    background-color: transparent !important;
     margin-top: 0.5rem;
     margin-left: 0.75rem;
     padding-left: 0.75rem;
@@ -281,6 +282,21 @@ h1, h2, h3, h4, h5, h6 {
 
 .menu-list li {
     list-style: none;
+    background-color: transparent !important;
+}
+
+.menu-list ul a {
+    color: var(--color-text-secondary) !important;
+    background-color: transparent !important;
+}
+
+.menu-list ul a:hover {
+    background-color: var(--color-bg-light) !important;
+    color: var(--color-accent) !important;
+}
+
+.menu-list ul a.has-text-weight-bold {
+    color: var(--color-text-primary) !important;
 }
 
 /* Content */
