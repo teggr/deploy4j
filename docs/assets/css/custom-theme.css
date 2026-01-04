@@ -388,3 +388,40 @@ h1, h2, h3, h4, h5, h6 {
 .border-accent {
     border-color: var(--color-accent);
 }
+
+/* Landing Page Specific Classes */
+.hero-cta-buttons {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.section-title-large {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.section-title-large-spaced {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+}
+
+.section-subtitle-spaced {
+    margin-bottom: 3rem;
+}
+
+.quick-start-section {
+    background-color: var(--color-bg-medium);
+    padding: 4rem 1.5rem;
+}
+
+.quick-start-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.cta-spacing {
+    margin-top: 2rem;
+}

@@ -11,8 +11,8 @@ layout: default
             <h2 class="subtitle">
                 From bare metal to cloud VMs.
             </h2>
-            <p class="subtitle">Zero-downtime deploys for Java applications with Docker</p>
-            <div class="cta-buttons" style="justify-content: center;">
+            <p class="subtitle">Zero-downtime deploys for containerized web applications</p>
+            <div class="hero-cta-buttons">
                 <a class="button is-primary is-large" href="{{ '/installation' | relative_url }}">
                     <strong>Get Started</strong>
                 </a>
@@ -27,8 +27,8 @@ layout: default
 
 <section class="features-section">
     <div class="container">
-        <h2 class="title has-text-centered" style="font-size: 2.5rem; margin-bottom: 1rem;">Why deploy4j?</h2>
-        <p class="subtitle has-text-centered" style="margin-bottom: 3rem;">Everything you need to deploy and manage Java web apps in production</p>
+        <h2 class="title has-text-centered section-title-large">Why deploy4j?</h2>
+        <p class="subtitle has-text-centered section-subtitle-spaced">Everything you need to deploy and manage Java web apps in production</p>
         
         <div class="features-grid">
             <div class="feature-card">
@@ -79,10 +79,10 @@ layout: default
     </div>
 </section>
 
-<section class="section" style="background-color: var(--color-bg-medium); padding: 4rem 1.5rem;">
+<section class="section quick-start-section">
     <div class="container">
-        <h2 class="title has-text-centered" style="font-size: 2.5rem; margin-bottom: 3rem;">Quick Start</h2>
-        <div class="content" style="max-width: 800px; margin: 0 auto;">
+        <h2 class="title has-text-centered section-title-large-spaced">Quick Start</h2>
+        <div class="content quick-start-content">
             <p>Get started with deploy4j in just a few commands:</p>
             <pre><code># Install deploy4j with JBang
 jbang app install --name deploy4j dev.deploy4j:deploy4j-cli:0.0.3
@@ -93,7 +93,7 @@ deploy4j init
 # Deploy your application
 deploy4j setup</code></pre>
         </div>
-        <div class="has-text-centered" style="margin-top: 2rem;">
+        <div class="has-text-centered cta-spacing">
             <a class="button is-primary is-medium" href="{{ '/installation' | relative_url }}">
                 <strong>View Full Documentation</strong>
             </a>
