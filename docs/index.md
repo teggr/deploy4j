@@ -16,7 +16,8 @@ layout: default
                 <a class="button is-primary is-large" href="{{ '/installation' | relative_url }}">
                     <strong>Get Started</strong>
                 </a>
-                <a class="button is-outlined is-large" href="{{ '/installation' | relative_url }}">
+                {% assign confIndexPage = site.configuration | where: 'default', true | first %}
+                <a class="button is-outlined is-large" href="{{ confIndexPage.url | relative_url }}">
                     Read Documentation
                 </a>
             </div>

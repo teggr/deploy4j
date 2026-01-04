@@ -3,7 +3,7 @@
  * A sleek, modern dark monochrome theme with grid graphics
  */
 
-/* Import RM Mono font for technical look */
+/* Import Space Mono for headers and Roboto Mono for body text */
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Roboto+Mono:wght@300;400;500;600;700&display=swap');
 
 /* Color Palette */
