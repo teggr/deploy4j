@@ -28,7 +28,7 @@ layout: default
 <section class="features-section">
     <div class="container">
         <h2 class="title has-text-centered section-title-large">Why deploy4j?</h2>
-        <p class="subtitle has-text-centered section-subtitle-spaced">Everything you need to deploy and manage Java web apps in production</p>
+        <p class="subtitle has-text-centered section-subtitle-spaced">Everything you need to deploy and manage web applications in production</p>
         
         <div class="features-grid">
             <div class="feature-card">
