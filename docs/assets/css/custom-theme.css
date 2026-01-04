@@ -200,6 +200,21 @@ h1, h2, h3, h4, h5, h6 {
     background-color: var(--color-text-primary);
 }
 
+/* Navbar Link (Dropdown Trigger) */
+.navbar-link {
+    color: var(--color-text-secondary) !important;
+    background-color: var(--color-bg-medium) !important;
+}
+
+.navbar-link:hover {
+    color: var(--color-accent) !important;
+    background-color: var(--color-bg-light) !important;
+}
+
+.navbar-link::after {
+    border-color: var(--color-text-secondary) !important;
+}
+
 /* Navbar Menu (Mobile) */
 .navbar-menu {
     background-color: var(--color-bg-medium) !important;

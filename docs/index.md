@@ -20,6 +20,10 @@ layout: default
                 <a class="button is-outlined is-large" href="{{ confIndexPage.url | default: '/installation' | relative_url }}">
                     Read Documentation
                 </a>
+                {% assign guidesIndexPage = site.guides | where: 'default', true | first %}
+                <a class="button is-outlined is-large" href="{{ guidesIndexPage.url | default: '/guides' | relative_url }}">
+                    View Guides
+                </a>
             </div>
         </div>
     </div>
