@@ -38,7 +38,7 @@ public class Initializer {
       try {
         FileUtils.copyInputStreamToFile(
           getClass().getClassLoader().getResourceAsStream("templates/secrets"),
-          deployFile
+          secretsFile
         );
       } catch (IOException e) {
         throw new RuntimeException(e);
