@@ -68,7 +68,7 @@ The `deploy4j traefik reboot` command will restart Traefik with the new configur
 
 Once deployed, you can access your application using HTTPS:
 
-```shell
+```
 https://your-host-ip-or-domain
 ```
 
