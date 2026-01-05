@@ -35,7 +35,6 @@ public class Build extends Base {
       host.execute(audit.record("Pulled image with version " + deployContext.config().version()));
       host.execute(builder.clean(), false);
       host.execute(builder.pull());
-      host.execute(builder.validateImage());
 
     });
 
