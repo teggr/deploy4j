@@ -14,7 +14,7 @@ public class TraefikConfig {
   private final Boolean publish;
   private final Map<String, String> labels;
   private final Map<String, String> args;
-  private final Map<String, String> options;
+  private final Map<String, FlexibleValue> options;
   private final EnvironmentConfig env;
 
   @JsonCreator
@@ -24,7 +24,7 @@ public class TraefikConfig {
     @JsonProperty("publish") Boolean publish,
     @JsonProperty("labels") Map<String, String> labels,
     @JsonProperty("args") Map<String, String> args,
-    @JsonProperty("options") Map<String, String> options,
+    @JsonProperty("options") Map<String, FlexibleValue> options,
     @JsonProperty("env") EnvironmentConfig env
   ) {
     this.image = image;
@@ -66,7 +66,7 @@ public class TraefikConfig {
     return args;
   }
 
-  public Map<String, String> options() {
+  public Map<String, FlexibleValue> options() {
     return options;
   }
 
