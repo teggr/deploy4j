@@ -1,9 +1,11 @@
 package dev.deploy4j.init;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class Initializer {
 
@@ -13,6 +15,15 @@ public class Initializer {
    * Create config stub in config/deploy.yml and env stub in .deploy4j/secrets
    */
   public void init(boolean bundle) {
+    init(bundle, null);
+  }
+
+  /**
+   * Create config stub in config/deploy.yml and env stub in .deploy4j/secrets
+   * @param bundle whether to add deploy4j to the maven file
+   * @param serviceName custom service name to use in deploy.yml, or null for default
+   */
+  public void init(boolean bundle, String serviceName) {
 
     File deployFile = new File("config/deploy.yml");
     if (deployFile.exists()) {
@@ -20,10 +31,24 @@ public class Initializer {
     } else {
       deployFile.getParentFile().mkdirs();
       try {
-        FileUtils.copyInputStreamToFile(
+        String deployContent = IOUtils.toString(
           getClass().getClassLoader().getResourceAsStream("templates/deploy.yml"),
-          deployFile
+          StandardCharsets.UTF_8
         );
+        
+        // Replace service name if provided
+        if (serviceName != null && !serviceName.trim().isEmpty()) {
+          deployContent = deployContent.replaceFirst(
+            "service: deploy4j-demo",
+            "service: " + serviceName.trim()
+          );
+          deployContent = deployContent.replaceFirst(
+            "image: teggr/deploy4j-demo",
+            "image: " + serviceName.trim()
+          );
+        }
+        
+        FileUtils.writeStringToFile(deployFile, deployContent, StandardCharsets.UTF_8);
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
