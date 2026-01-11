@@ -63,6 +63,39 @@ class ConfigurationTest {
         }
 
         @Test
+        @DisplayName("should handle version shorter than 7 characters")
+        void shouldHandleShortVersion() {
+            // Arrange
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
+            Configuration configuration = new Configuration(deployConfig, "prod", "0.0.5");
+
+            // Act & Assert
+            assertThat(configuration.abbreviatedVersion()).isEqualTo("0.0.5");
+        }
+
+        @Test
+        @DisplayName("should handle very short version")
+        void shouldHandleVeryShortVersion() {
+            // Arrange
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
+            Configuration configuration = new Configuration(deployConfig, "prod", "1.0");
+
+            // Act & Assert
+            assertThat(configuration.abbreviatedVersion()).isEqualTo("1.0");
+        }
+
+        @Test
+        @DisplayName("should handle single character version")
+        void shouldHandleSingleCharacterVersion() {
+            // Arrange
+            DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
+            Configuration configuration = new Configuration(deployConfig, "prod", "1");
+
+            // Act & Assert
+            assertThat(configuration.abbreviatedVersion()).isEqualTo("1");
+        }
+
+        @Test
         @DisplayName("should allow updating version after construction")
         void shouldAllowUpdatingVersion() {
             // Arrange

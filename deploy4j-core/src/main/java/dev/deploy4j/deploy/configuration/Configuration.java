@@ -123,7 +123,7 @@ public class Configuration {
       if (version().contains("_")) {
         return version();
       } else {
-        return version().substring(0, 7);
+        return version().substring(0, Math.min(version().length(), 7));
       }
     }
     return null;
