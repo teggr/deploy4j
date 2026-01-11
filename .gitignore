@@ -37,8 +37,6 @@ external/
 config/
 .test-deploy/
 .guide/
-.deploy4j/secrets*
-!.deploy4j/hooks/
 
 ### VS Code ###
 .vscode/
