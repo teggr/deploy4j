@@ -2,23 +2,42 @@ package dev.deploy4j.init;
 
 /**
  * Model for initialization templates
- * @param serviceName the name of the service to deploy
  */
-public record InitializationModel(String serviceName) {
+public class InitializationModel {
+  
+  private String serviceName = "deploy4j-demo";
   
   /**
-   * Get the service name, defaulting to "deploy4j-demo" if not provided
+   * Create a new InitializationModel with default values
+   */
+  public InitializationModel() {
+  }
+  
+  /**
+   * Set the service name
+   * @param serviceName the name of the service to deploy
+   * @return this model for chaining
+   */
+  public InitializationModel serviceName(String serviceName) {
+    if (serviceName != null && !serviceName.trim().isEmpty()) {
+      this.serviceName = serviceName.trim();
+    }
+    return this;
+  }
+  
+  /**
+   * Get the service name
+   * @return the service name
    */
   public String serviceName() {
-    return serviceName != null && !serviceName.trim().isEmpty() 
-      ? serviceName.trim() 
-      : "deploy4j-demo";
+    return serviceName;
   }
   
   /**
    * Get the image name, using the service name
+   * @return the image name
    */
   public String imageName() {
-    return serviceName();
+    return serviceName;
   }
 }

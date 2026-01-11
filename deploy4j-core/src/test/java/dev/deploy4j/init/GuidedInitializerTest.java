@@ -14,7 +14,7 @@ class GuidedInitializerTest {
     // Arrange
     TemplateProcessor templateProcessor = new TemplateProcessor();
     String customServiceName = "my-custom-service";
-    InitializationModel model = new InitializationModel(customServiceName);
+    InitializationModel model = new InitializationModel().serviceName(customServiceName);
 
     // Act
     String result = templateProcessor.processTemplate("deploy.yml", model);
@@ -31,7 +31,7 @@ class GuidedInitializerTest {
   void shouldUseDefaultServiceNameWhenNull() {
     // Arrange
     TemplateProcessor templateProcessor = new TemplateProcessor();
-    InitializationModel model = new InitializationModel(null);
+    InitializationModel model = new InitializationModel().serviceName(null);
 
     // Act
     String result = templateProcessor.processTemplate("deploy.yml", model);
@@ -46,7 +46,7 @@ class GuidedInitializerTest {
   void shouldUseDefaultServiceNameWhenEmpty() {
     // Arrange
     TemplateProcessor templateProcessor = new TemplateProcessor();
-    InitializationModel model = new InitializationModel("  ");
+    InitializationModel model = new InitializationModel().serviceName("  ");
 
     // Act
     String result = templateProcessor.processTemplate("deploy.yml", model);
@@ -60,9 +60,9 @@ class GuidedInitializerTest {
   @DisplayName("InitializationModel should provide serviceName and imageName")
   void initializationModelShouldProvideAccessors() {
     // Arrange & Act
-    InitializationModel model1 = new InitializationModel("test-service");
-    InitializationModel model2 = new InitializationModel(null);
-    InitializationModel model3 = new InitializationModel("  ");
+    InitializationModel model1 = new InitializationModel().serviceName("test-service");
+    InitializationModel model2 = new InitializationModel().serviceName(null);
+    InitializationModel model3 = new InitializationModel().serviceName("  ");
 
     // Assert
     assertThat(model1.serviceName()).isEqualTo("test-service");

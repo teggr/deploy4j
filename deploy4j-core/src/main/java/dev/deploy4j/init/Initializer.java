@@ -36,7 +36,10 @@ public class Initializer {
       deployFile.getParentFile().mkdirs();
       try {
         // Create model for template processing
-        InitializationModel model = new InitializationModel(serviceName);
+        InitializationModel model = new InitializationModel();
+        if (serviceName != null) {
+          model.serviceName(serviceName);
+        }
         
         // Process template using Thymeleaf
         String deployContent = templateProcessor.processTemplate("deploy.yml", model);
