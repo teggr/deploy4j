@@ -2,10 +2,6 @@ package dev.deploy4j.init;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.apache.commons.io.IOUtils;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,77 +9,69 @@ import static org.assertj.core.api.Assertions.assertThat;
 class GuidedInitializerTest {
 
   @Test
-  @DisplayName("should replace service name in template content")
-  void shouldReplaceServiceNameInTemplateContent() throws IOException {
-    // Arrange - Load the template
-    String template = IOUtils.toString(
-      getClass().getClassLoader().getResourceAsStream("templates/deploy.yml"),
-      StandardCharsets.UTF_8
-    );
+  @DisplayName("should process template with custom service name")
+  void shouldProcessTemplateWithCustomServiceName() {
+    // Arrange
+    TemplateProcessor templateProcessor = new TemplateProcessor();
     String customServiceName = "my-custom-service";
+    InitializationModel model = new InitializationModel(customServiceName);
 
-    // Act - Replace service name like Initializer does
-    String result = template.replaceFirst(
-      "service: deploy4j-demo",
-      "service: " + customServiceName
-    );
-    result = result.replaceFirst(
-      "image: teggr/deploy4j-demo",
-      "image: " + customServiceName
-    );
+    // Act
+    String result = templateProcessor.processTemplate("deploy.yml", model);
 
-    // Assert - verify the replacements worked
+    // Assert - verify the template was processed correctly
     assertThat(result).contains("service: " + customServiceName);
     assertThat(result).contains("image: " + customServiceName);
-    assertThat(result).doesNotContain("service: deploy4j-demo");
-    // Should still have the teggr/ prefix for the original, but our custom one doesn't
-    assertThat(result).doesNotContain("image: teggr/deploy4j-demo");
+    assertThat(result).doesNotContain("[(${model.serviceName()})]");
+    assertThat(result).doesNotContain("[(${model.imageName()})]");
   }
 
   @Test
-  @DisplayName("should preserve template when service name is null")
-  void shouldPreserveTemplateWhenServiceNameIsNull() throws IOException {
+  @DisplayName("should use default service name when null is provided")
+  void shouldUseDefaultServiceNameWhenNull() {
     // Arrange
-    String template = IOUtils.toString(
-      getClass().getClassLoader().getResourceAsStream("templates/deploy.yml"),
-      StandardCharsets.UTF_8
-    );
+    TemplateProcessor templateProcessor = new TemplateProcessor();
+    InitializationModel model = new InitializationModel(null);
 
-    // Act - null service name means no replacement
-    String result = template;
+    // Act
+    String result = templateProcessor.processTemplate("deploy.yml", model);
 
-    // Assert - should keep default values
+    // Assert - should use default values
     assertThat(result).contains("service: deploy4j-demo");
-    assertThat(result).contains("image: teggr/deploy4j-demo");
+    assertThat(result).contains("image: deploy4j-demo");
   }
 
   @Test
-  @DisplayName("should preserve template when service name is empty")
-  void shouldPreserveTemplateWhenServiceNameIsEmpty() throws IOException {
+  @DisplayName("should use default service name when empty string is provided")
+  void shouldUseDefaultServiceNameWhenEmpty() {
     // Arrange
-    String template = IOUtils.toString(
-      getClass().getClassLoader().getResourceAsStream("templates/deploy.yml"),
-      StandardCharsets.UTF_8
-    );
-    String emptyServiceName = "  ";
+    TemplateProcessor templateProcessor = new TemplateProcessor();
+    InitializationModel model = new InitializationModel("  ");
 
-    // Act - empty/whitespace service name should be treated as no replacement
-    String result;
-    if (emptyServiceName == null || emptyServiceName.trim().isEmpty()) {
-      result = template;
-    } else {
-      result = template.replaceFirst(
-        "service: deploy4j-demo",
-        "service: " + emptyServiceName.trim()
-      );
-      result = result.replaceFirst(
-        "image: teggr/deploy4j-demo",
-        "image: " + emptyServiceName.trim()
-      );
-    }
+    // Act
+    String result = templateProcessor.processTemplate("deploy.yml", model);
 
-    // Assert - should keep default values
+    // Assert - should use default values when empty/whitespace
     assertThat(result).contains("service: deploy4j-demo");
-    assertThat(result).contains("image: teggr/deploy4j-demo");
+    assertThat(result).contains("image: deploy4j-demo");
+  }
+  
+  @Test
+  @DisplayName("InitializationModel should provide serviceName and imageName")
+  void initializationModelShouldProvideAccessors() {
+    // Arrange & Act
+    InitializationModel model1 = new InitializationModel("test-service");
+    InitializationModel model2 = new InitializationModel(null);
+    InitializationModel model3 = new InitializationModel("  ");
+
+    // Assert
+    assertThat(model1.serviceName()).isEqualTo("test-service");
+    assertThat(model1.imageName()).isEqualTo("test-service");
+    
+    assertThat(model2.serviceName()).isEqualTo("deploy4j-demo");
+    assertThat(model2.imageName()).isEqualTo("deploy4j-demo");
+    
+    assertThat(model3.serviceName()).isEqualTo("deploy4j-demo");
+    assertThat(model3.imageName()).isEqualTo("deploy4j-demo");
   }
 }

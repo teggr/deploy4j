@@ -1,7 +1,6 @@
 package dev.deploy4j.init;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +9,11 @@ import java.nio.charset.StandardCharsets;
 public class Initializer {
 
   private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Initializer.class);
+  private final TemplateProcessor templateProcessor;
+
+  public Initializer() {
+    this.templateProcessor = new TemplateProcessor();
+  }
 
   /**
    * Create config stub in config/deploy.yml and env stub in .deploy4j/secrets
@@ -31,22 +35,11 @@ public class Initializer {
     } else {
       deployFile.getParentFile().mkdirs();
       try {
-        String deployContent = IOUtils.toString(
-          getClass().getClassLoader().getResourceAsStream("templates/deploy.yml"),
-          StandardCharsets.UTF_8
-        );
+        // Create model for template processing
+        InitializationModel model = new InitializationModel(serviceName);
         
-        // Replace service name if provided
-        if (serviceName != null && !serviceName.trim().isEmpty()) {
-          deployContent = deployContent.replaceFirst(
-            "service: deploy4j-demo",
-            "service: " + serviceName.trim()
-          );
-          deployContent = deployContent.replaceFirst(
-            "image: teggr/deploy4j-demo",
-            "image: " + serviceName.trim()
-          );
-        }
+        // Process template using Thymeleaf
+        String deployContent = templateProcessor.processTemplate("deploy.yml", model);
         
         FileUtils.writeStringToFile(deployFile, deployContent, StandardCharsets.UTF_8);
       } catch (IOException e) {

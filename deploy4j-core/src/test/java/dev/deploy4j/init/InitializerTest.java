@@ -84,11 +84,11 @@ class InitializerTest {
     var deployYmlStream = getClass().getClassLoader().getResourceAsStream("templates/deploy.yml");
     var secretsStream = getClass().getClassLoader().getResourceAsStream("templates/secrets");
     
-    // Assert - deploy.yml template should contain deploy configuration
+    // Assert - deploy.yml template should contain deploy configuration with Thymeleaf expressions
     assertThat(deployYmlStream).isNotNull();
     String deployContent = new String(deployYmlStream.readAllBytes());
-    assertThat(deployContent).contains("service: deploy4j-demo");
-    assertThat(deployContent).contains("image: teggr/deploy4j-demo");
+    assertThat(deployContent).contains("service: [(${model.serviceName()})]");
+    assertThat(deployContent).contains("image: [(${model.imageName()})]");
     assertThat(deployContent).contains("servers:");
     // Ensure it's not the secrets content
     assertThat(deployContent).doesNotContain("DOCKER_PASSWORD=");
@@ -102,5 +102,6 @@ class InitializerTest {
     assertThat(secretsContent).contains("PRIVATE_KEY_PASSPHRASE=");
     // Ensure it's not the deploy config
     assertThat(secretsContent).doesNotContain("service: deploy4j-demo");
+    assertThat(secretsContent).doesNotContain("service: [(${model.serviceName()})]");
   }
 }
