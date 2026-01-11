@@ -65,7 +65,7 @@ traefik:
     publish:
       - "443:443"
     volume:
-      - "/letsencrypt/acme.json:/letsencrypt/acme.json"
+      - "letsencrypt/acme.json:/letsencrypt/acme.json"
   args:
     entryPoints.web.address: ":80"
     entryPoints.websecure.address: ":443"
@@ -88,34 +88,13 @@ traefik:
 #### Traefik Configuration
 
 * `publish: "443:443"` - Expose HTTPS port 443
-* `volume: "/letsencrypt/acme.json:/letsencrypt/acme.json"` - Persist Let's Encrypt certificates
+* `volume: "letsencrypt/acme.json:/letsencrypt/acme.json"` - Persist Let's Encrypt certificates within the deploy4j data directory
 * `entryPoints.web.address: ":80"` - Define HTTP entry point (required for HTTP challenge)
 * `entryPoints.websecure.address: ":443"` - Define HTTPS entry point
 * `entryPoints.web.http.redirections.*` - Automatically redirect HTTP to HTTPS
 * `certificatesResolvers.letsencrypt.acme.email` - Your email for Let's Encrypt notifications
 * `certificatesResolvers.letsencrypt.acme.storage` - Where to store certificates
 * `certificatesResolvers.letsencrypt.acme.httpChallenge.entryPoint: web` - Use HTTP challenge on port 80
-
-## Initial Setup
-
-Before deploying your application, you need to prepare the certificate storage on your server:
-
-```shell
-# SSH into your server
-ssh root@your-server-ip
-
-# Create the directory for Let's Encrypt data
-mkdir -p /letsencrypt
-
-# Create the acme.json file with proper permissions
-touch /letsencrypt/acme.json
-chmod 600 /letsencrypt/acme.json
-
-# Exit the server
-exit
-```
-
-**Important:** The `acme.json` file must have `600` permissions (read/write for owner only) or Traefik will refuse to use it.
 
 ## Deployment
 
@@ -165,7 +144,7 @@ traefik:
     publish:
       - "443:443"
     volume:
-      - "/letsencrypt/acme.json:/letsencrypt/acme.json"
+      - "letsencrypt/acme.json:/letsencrypt/acme.json"
   args:
     entryPoints.web.address: ":80"
     entryPoints.websecure.address: ":443"
@@ -246,7 +225,7 @@ traefik:
     publish:
       - "443:443"
     volume:
-      - "/letsencrypt/acme.json:/letsencrypt/acme.json"
+      - "letsencrypt/acme.json:/letsencrypt/acme.json"
   args:
     entryPoints.web.address: ":80"
     entryPoints.websecure.address: ":443"
@@ -317,7 +296,7 @@ traefik:
     publish:
       - "443:443"
     volume:
-      - "/letsencrypt/acme.json:/letsencrypt/acme.json"
+      - "letsencrypt/acme.json:/letsencrypt/acme.json"
   env:
     clear:
       CLOUDFLARE_EMAIL: "your-email@example.com"
