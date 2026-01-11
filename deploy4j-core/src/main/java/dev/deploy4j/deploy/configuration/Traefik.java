@@ -1,6 +1,7 @@
 package dev.deploy4j.deploy.configuration;
 
 import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
+import dev.deploy4j.deploy.configuration.raw.FlexibleValue;
 import dev.deploy4j.deploy.configuration.raw.TraefikConfig;
 
 import java.util.HashMap;
@@ -57,10 +58,23 @@ public class Traefik {
       CONTAINER_PORT;
   }
 
-  public Map<String, String> options() {
-    return traefikConfig().options() != null ?
-      traefikConfig().options() :
-      Map.of();
+  public Map<String, Object> options() {
+    if (traefikConfig().options() == null) {
+      return Map.of();
+    }
+    
+    Map<String, Object> result = new HashMap<>();
+    for (Map.Entry<String, FlexibleValue> entry : traefikConfig().options().entrySet()) {
+      FlexibleValue flexValue = entry.getValue();
+      if (flexValue != null && !flexValue.isEmpty()) {
+        if (flexValue.isList()) {
+          result.put(entry.getKey(), flexValue.asList());
+        } else {
+          result.put(entry.getKey(), flexValue.asSingleValue());
+        }
+      }
+    }
+    return result;
   }
 
   public String port() {

@@ -13,6 +13,7 @@ import java.util.Map;
 
 import static dev.rebelcraft.cmd.CmdUtils.argumentize;
 import static dev.rebelcraft.cmd.CmdUtils.optionize;
+import static dev.rebelcraft.cmd.CmdUtils.optionizeFlexible;
 import static dev.rebelcraft.cmd.Cmds.*;
 import static dev.rebelcraft.cmd.Cmds.any;
 import static dev.rebelcraft.cmd.pkgs.Docker.docker;
@@ -118,7 +119,7 @@ public class TraefikHostCommands extends BaseHostCommands {
   }
 
   private List<String> dockerOptionsArgs() {
-    return optionize(options());
+    return optionizeFlexible(options());
   }
 
   private List<String> cmdOptionArgs() {
@@ -147,7 +148,7 @@ public class TraefikHostCommands extends BaseHostCommands {
     return config.traefik().image();
   }
 
-  public Map<String, String> options() {
+  public Map<String, Object> options() {
     return config.traefik().options();
   }
 

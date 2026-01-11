@@ -1,6 +1,7 @@
 package dev.deploy4j.deploy.configuration;
 
 import dev.deploy4j.deploy.configuration.raw.DeployConfig;
+import dev.deploy4j.deploy.configuration.raw.FlexibleValue;
 import dev.deploy4j.deploy.configuration.raw.TraefikConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ class TraefikTest {
         // Arrange
         Map<String, String> labels = Map.of("custom.label", "value");
         Map<String, String> args = Map.of("api.insecure", "true");
-        Map<String, String> options = Map.of("network", "host");
+        Map<String, FlexibleValue> options = Map.of("network", FlexibleValue.from("host"));
         TraefikConfig traefikConfig = new TraefikConfig(
                 "traefik:v3.0",
                 8080,
@@ -62,7 +63,7 @@ class TraefikTest {
         assertThat(traefik.image()).isEqualTo("traefik:v3.0");
         assertThat(traefik.hostPort()).isEqualTo(8080);
         assertThat(traefik.publish()).isFalse();
-        assertThat(traefik.options()).containsExactlyInAnyOrderEntriesOf(options);
+        assertThat(traefik.options()).containsEntry("network", "host");
     }
 
     @Test
