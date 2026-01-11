@@ -46,3 +46,6 @@ config/
 /deploy4j-cli/dependency-reduced-pom.xml
 /trace.log
 /out/
+
+/deploy4j-core/.deploy4j/secrets
+/deploy4j-maven-plugin/.deploy4j/secrets

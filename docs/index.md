@@ -51,8 +51,8 @@ layout: default
             </div>
             
             <div class="feature-card">
-                <h3>⚙️ Simple Configuration</h3>
-                <p>Single YAML file configuration. Define servers, images, and environment variables in one place.</p>
+                <h3>☕ Spring Boot Integration</h3>
+                <p>First-class support for Spring Boot applications with access to Actuator endpoints for health checks, metrics, and management.</p>
             </div>
             
             <div class="feature-card">
@@ -71,8 +71,8 @@ layout: default
             </div>
             
             <div class="feature-card">
-                <h3>🔄 Rolling Restarts</h3>
-                <p>Update your application across multiple servers with automatic health checks and rollback support.</p>
+                <h3>⚙️ Simple Configuration</h3>
+                <p>Single YAML file configuration. Define servers, images, and environment variables in one place.</p>
             </div>
         </div>
     </div>
