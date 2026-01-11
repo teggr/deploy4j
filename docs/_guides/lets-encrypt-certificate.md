@@ -65,7 +65,7 @@ traefik:
     publish:
       - "443:443"
     volume:
-      - "letsencrypt/acme.json:/letsencrypt/acme.json"
+      - "/etc/deploy4j/letsencrypt:/letsencrypt"
   args:
     entryPoints.web.address: ":80"
     entryPoints.websecure.address: ":443"
@@ -88,7 +88,7 @@ traefik:
 #### Traefik Configuration
 
 * `publish: "443:443"` - Expose HTTPS port 443
-* `volume: "letsencrypt/acme.json:/letsencrypt/acme.json"` - Persist Let's Encrypt certificates within the deploy4j data directory
+* `volume: "/etc/deploy4j/letsencrypt:/letsencrypt"` - Persist Let's Encrypt certificates within the deploy4j data directory
 * `entryPoints.web.address: ":80"` - Define HTTP entry point (required for HTTP challenge)
 * `entryPoints.websecure.address: ":443"` - Define HTTPS entry point
 * `entryPoints.web.http.redirections.*` - Automatically redirect HTTP to HTTPS
@@ -144,7 +144,7 @@ traefik:
     publish:
       - "443:443"
     volume:
-      - "letsencrypt/acme.json:/letsencrypt/acme.json"
+      - "/etc/deploy4j/letsencrypt:/letsencrypt"
   args:
     entryPoints.web.address: ":80"
     entryPoints.websecure.address: ":443"
@@ -225,7 +225,7 @@ traefik:
     publish:
       - "443:443"
     volume:
-      - "letsencrypt/acme.json:/letsencrypt/acme.json"
+      - "/etc/deploy4j/letsencrypt:/letsencrypt"
   args:
     entryPoints.web.address: ":80"
     entryPoints.websecure.address: ":443"
@@ -296,7 +296,7 @@ traefik:
     publish:
       - "443:443"
     volume:
-      - "letsencrypt/acme.json:/letsencrypt/acme.json"
+      - "/etc/deploy4j/letsencrypt:/letsencrypt"
   env:
     clear:
       CLOUDFLARE_EMAIL: "your-email@example.com"
