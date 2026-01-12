@@ -19,10 +19,10 @@ GitHub Actions is a powerful CI/CD platform that allows you to automate your sof
 Before setting up GitHub Actions with deploy4j, ensure you have:
 
 1. **A GitHub repository** with your application code
-2. **A deploy4j configuration** (`config/deploy.yml` and `.deploy4j/secrets` set up locally)
+2. **A deploy4j configuration** (`config/deploy.yml` set up in your repository)
 3. **Docker Hub account** (or another container registry)
 4. **SSH access to your deployment server** with a private key
-5. **deploy4j tested locally** to ensure your deployment configuration works
+5. **deploy4j tested locally** to ensure your deployment configuration works (optional - YOLO)
 
 ## GitHub Secrets Configuration
 
@@ -44,7 +44,7 @@ To add secrets to your repository:
 
 ## Complete GitHub Actions Workflow
 
-Create a file named `.github/workflows/deploy.yml` in your repository with the following content:
+Create a file named `.github/workflows/release-and-deploy.yml` in your repository with the following content:
 
 ```yaml
 name: Release and deploy

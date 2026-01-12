@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Spring Boot
+title: deploy4j spring_boot
 ---
 ```shell
 Spring Boot management commands
