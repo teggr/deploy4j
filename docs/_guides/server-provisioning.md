@@ -106,6 +106,8 @@ Hetzner offers competitive pricing with excellent performance, especially for Eu
 
 ### Using the CLI (hcloud)
 
+https://github.com/hetznercloud/cli/blob/main/docs/tutorials/setup-hcloud-cli.md
+
 First, install and authenticate `hcloud`:
 
 ```bash
@@ -170,6 +172,8 @@ AWS EC2 provides a wide range of instance types and global availability zones.
 - **Authentication**: SSH key pair
 
 ### Using the CLI (aws-cli)
+
+https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 
 First, install and authenticate AWS CLI:
 
