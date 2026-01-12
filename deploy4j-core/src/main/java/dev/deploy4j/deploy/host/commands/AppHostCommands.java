@@ -4,7 +4,7 @@ import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.configuration.Role;
 import dev.rebelcraft.cmd.Cmd;
 import dev.rebelcraft.cmd.pkgs.Echo;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;

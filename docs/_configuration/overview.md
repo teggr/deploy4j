@@ -155,4 +155,10 @@ healthcheck:
 # Docker logging configuration, see deploy4j docs logging
 logging:
   ...
+
+# Spring Boot
+#
+# Spring Boot specific configuration, see deploy4j docs spring-boot
+spring_boot:
+  ...
 ```

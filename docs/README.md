@@ -16,7 +16,7 @@ cd docs
 docker run --rm --volume="%CD%:/srv/jekyll:Z" --volume="%CD%\vendor\bundle:/usr/local/bundle:Z" --publish [::1]:4000:4000 jekyll/jekyll jekyll serve --force-polling
 ```
 
-Available: http://localhost:4000/deploy4j/
+Available: http://localhost:4000/
 
 # References
 

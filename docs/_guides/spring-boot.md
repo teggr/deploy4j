@@ -23,7 +23,7 @@ graph TD
 - `deploy4j` installed (see [installation guide]({{ '/installation' | relative_url }}))
 - Working Spring Boot application codebase that can be [built into a Docker image](https://fabric8io.github.io/docker-maven-plugin/#build-configuration).
 - A built Docker image that can optionally be pushed to a Docker registry. Make a note of the image name and tag.
-- A ready server with Digital Ocean, Hetzner, or similar provider. Ensure you have SSH access to the server. You can also test using a local [droplet clone](https://github.com/teggr/deploy4j-docker-droplet).
+- A ready server with Digital Ocean, Hetzner, or similar provider (see [server provisioning guide]({{ '/guides/server-provisioning' | relative_url }})). Ensure you have SSH access to the server. You can also test using a local [droplet clone](https://github.com/teggr/deploy4j-docker-droplet).
 
 For this tutorial, we are using a Digital Ocean droplet with the following configuration:
 

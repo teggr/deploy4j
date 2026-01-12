@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import static dev.rebelcraft.cmd.CmdUtils.optionize;
+import static dev.rebelcraft.cmd.CmdUtils.optionizeFlexible;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.in;
 
@@ -71,6 +72,116 @@ class CmdUtilsTest {
 
     }
 
+  }
+
+  @Nested
+  class OptionizeFlexible {
+
+    @Test
+    void shouldHandleSingleStringValues() {
+      Map<String, Object> input = Map.of("publish", "8080", "detach", "true");
+      
+      List<String> options = optionizeFlexible(input);
+
+      assertThat(options)
+        .containsOnlyOnce("--publish", "\"8080\"", "--detach");
+    }
+
+    @Test
+    void shouldHandleListValues() {
+      Map<String, Object> input = Map.of(
+        "publish", List.of("443:443", "80:80"),
+        "volume", List.of("/etc/letsencrypt/acme.json:/etc/letsencrypt/acme.json")
+      );
+      
+      List<String> options = optionizeFlexible(input);
+
+      assertThat(options)
+        .contains("--publish", "\"443:443\"", "--publish", "\"80:80\"")
+        .contains("--volume", "\"/etc/letsencrypt/acme.json:/etc/letsencrypt/acme.json\"");
+    }
+
+    @Test
+    void shouldHandleMixedStringAndListValues() {
+      Map<String, Object> input = Map.of(
+        "publish", List.of("443:443", "80:80"),
+        "name", "traefik",
+        "detach", "true"
+      );
+      
+      List<String> options = optionizeFlexible(input);
+
+      assertThat(options)
+        .contains("--publish", "\"443:443\"", "--publish", "\"80:80\"")
+        .contains("--name", "\"traefik\"")
+        .contains("--detach");
+    }
+
+    @Test
+    void shouldHandleWithJoiningChar() {
+      Map<String, Object> input = Map.of(
+        "publish", List.of("443:443", "80:80"),
+        "name", "traefik"
+      );
+      
+      List<String> options = optionizeFlexible(input, "=");
+
+      assertThat(options)
+        .contains("--publish=\"443:443\"", "--publish=\"80:80\"")
+        .contains("--name=\"traefik\"");
+    }
+
+    @Test
+    void shouldSkipNullValues() {
+      Map<String, Object> input = new HashMap<>();
+      input.put("publish", "8080");
+      input.put("detach", null);
+      
+      List<String> options = optionizeFlexible(input);
+
+      assertThat(options)
+        .containsOnly("--publish", "\"8080\"");
+    }
+
+    @Test
+    void shouldSkipNullItemsInList() {
+      Map<String, Object> input = new HashMap<>();
+      List<String> publishList = new java.util.ArrayList<>();
+      publishList.add("443:443");
+      publishList.add(null);
+      publishList.add("80:80");
+      input.put("publish", publishList);
+      
+      List<String> options = optionizeFlexible(input);
+
+      assertThat(options)
+        .containsExactly("--publish", "\"443:443\"", "--publish", "\"80:80\"");
+    }
+
+    @Test
+    void shouldHandleEmptyList() {
+      Map<String, Object> input = Map.of(
+        "publish", List.of()
+      );
+      
+      List<String> options = optionizeFlexible(input);
+
+      assertThat(options).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyForNullInput() {
+      List<String> options = optionizeFlexible(null);
+
+      assertThat(options).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyForEmptyInput() {
+      List<String> options = optionizeFlexible(Map.of());
+
+      assertThat(options).isEmpty();
+    }
   }
 
 }

@@ -8,7 +8,7 @@ import dev.deploy4j.deploy.configuration.raw.DeployConfigYamlReader;
 import dev.deploy4j.deploy.configuration.raw.EnvironmentConfig;
 import dev.deploy4j.deploy.utils.RandomHex;
 import dev.deploy4j.deploy.utils.file.File;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Paths;
 import java.util.*;
@@ -55,6 +55,7 @@ public class Configuration {
   private final Ssh ssh;
   private final Registry registry;
   private final Secrets secrets;
+  private final SpringBoot springBoot;
 
   private String declaredVersion;
   private String runId;
@@ -87,6 +88,7 @@ public class Configuration {
     this.logging = new Logging(rawConfig.logging(), null);
     this.traefik = new Traefik(this);
     this.ssh = new Ssh(this, secrets);
+    this.springBoot = new SpringBoot(rawConfig.springBoot(), this);
 
     ensureDestinationIfRequired();
     ensureRequiredKeysPresent();
@@ -121,7 +123,7 @@ public class Configuration {
       if (version().contains("_")) {
         return version();
       } else {
-        return version().substring(0, 7);
+        return version().substring(0, Math.min(version().length(), 7));
       }
     }
     return null;
@@ -464,6 +466,10 @@ public class Configuration {
 
   public Registry registry() {
     return registry;
+  }
+
+  public SpringBoot springBoot() {
+    return springBoot;
   }
 
   // delegates

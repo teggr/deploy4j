@@ -1,7 +1,7 @@
 package dev.deploy4j.deploy;
 
 import dev.deploy4j.deploy.env.Dotenv;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.Arrays;

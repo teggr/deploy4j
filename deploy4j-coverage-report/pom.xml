@@ -6,10 +6,11 @@
     <parent>
         <groupId>dev.deploy4j</groupId>
         <artifactId>deploy4j-parent</artifactId>
-        <version>main-SNAPSHOT</version>
+        <version>0.0.7-SNAPSHOT</version>
     </parent>
 
     <artifactId>deploy4j-coverage-report</artifactId>
+    <name>deploy4j-coverage-report</name>
 
     <dependencies>
 

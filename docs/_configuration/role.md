@@ -50,4 +50,7 @@ servers:
       my-label: workers
     env:
       ...
+    spring_boot:
+      actuator_port: 8081
+      actuator_base_path: /custom/actuator
 ```

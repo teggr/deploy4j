@@ -72,4 +72,35 @@ class InitializerTest {
       System.setProperty("user.dir", originalUserDir);
     }
   }
+
+  @Test
+  @DisplayName("should create deploy.yml with deploy configuration and secrets file with environment variables")
+  void shouldCreateFilesWithCorrectContent() throws Exception {
+    // This test verifies that the templates have the expected content
+    // by reading them directly from resources, ensuring deploy.yml gets deploy config
+    // and secrets file gets environment variables template
+    
+    // Arrange & Act
+    var deployYmlStream = getClass().getClassLoader().getResourceAsStream("templates/deploy.yml");
+    var secretsStream = getClass().getClassLoader().getResourceAsStream("templates/secrets");
+    
+    // Assert - deploy.yml template should contain deploy configuration
+    assertThat(deployYmlStream).isNotNull();
+    String deployContent = new String(deployYmlStream.readAllBytes());
+    assertThat(deployContent).contains("service: deploy4j-demo");
+    assertThat(deployContent).contains("image: teggr/deploy4j-demo");
+    assertThat(deployContent).contains("servers:");
+    // Ensure it's not the secrets content
+    assertThat(deployContent).doesNotContain("DOCKER_PASSWORD=");
+    
+    // Assert - secrets template should contain environment variables
+    assertThat(secretsStream).isNotNull();
+    String secretsContent = new String(secretsStream.readAllBytes());
+    assertThat(secretsContent).contains("DOCKER_PASSWORD=");
+    assertThat(secretsContent).contains("DOCKER_USERNAME=");
+    assertThat(secretsContent).contains("PRIVATE_KEY=");
+    assertThat(secretsContent).contains("PRIVATE_KEY_PASSPHRASE=");
+    // Ensure it's not the deploy config
+    assertThat(secretsContent).doesNotContain("service: deploy4j-demo");
+  }
 }

@@ -9,8 +9,10 @@ aside:
 If you have JBang installed, you can install `deploy4j` as an application.
 
 ```shell
-jbang app install --name deploy4j --force --fresh --repos jitpack=https://jitpack.io com.github.teggr.deploy4j:deploy4j-cli:0.0.2
+jbang app install --name deploy4j --force --fresh  dev.deploy4j:deploy4j-cli:0.0.6
 ```
+
+## Configuration
 
 Then, inside your app directory, run `deploy4j init`. Now edit the new file config/deploy.yml. It could look as simple as this:
 
@@ -55,3 +57,8 @@ This will:
 9. Prune unused images and stopped containers to ensure servers don’t fill up.
 
 Voila! All the servers are now serving the app on port 80. If you’re just running a single server, you’re ready to go. If you’re running multiple servers, you need to put a load balancer in front of them. For subsequent deploys, or if your servers already have Docker and curl installed, you can just run `deploy4j deploy`.
+## Next Steps
+
+- [Server Provisioning Guide]({{ '/guides/server-provisioning' | relative_url }}) - Learn how to provision servers on Digital Ocean, Hetzner, or AWS EC2
+- [Spring Boot Guide]({{ '/guides/spring-boot' | relative_url }}) - Deploy a Spring Boot application
+- [Configuration Overview]({{ '/configuration/overview' | relative_url }}) - Learn about deploy4j configuration options

@@ -25,7 +25,7 @@ class TraefikConfigTest {
     void shouldCreateTraefikConfigWithAllFields() {
         Map<String, String> labels = Map.of("app", "traefik");
         Map<String, String> args = Map.of("log.level", "INFO");
-        Map<String, String> options = Map.of("memory", "256m");
+        Map<String, FlexibleValue> options = Map.of("memory", FlexibleValue.from("256m"));
         EnvironmentConfig env = new EnvironmentConfig();
         
         TraefikConfig config = new TraefikConfig(
