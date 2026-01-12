@@ -309,8 +309,10 @@ The `deploy4j setup` command will:
 
 ## Comparison Table
 
-| Provider | Instance Type | vCPUs | RAM | Storage | Monthly Cost | Best For |
-|----------|--------------|-------|-----|---------|--------------|----------|
+> **Note**: Prices are approximate and subject to change. Check provider websites for current pricing.
+
+| Provider | Instance Type | vCPUs | RAM | Storage | Monthly Cost (approx.) | Best For |
+|----------|--------------|-------|-----|---------|----------------------|----------|
 | **Digital Ocean** | s-2vcpu-4gb | 2 | 4GB | 80GB SSD | $24 | Simple setup, good documentation |
 | **Hetzner** | CPX21 | 3 | 4GB | 80GB SSD | ~$9 | Best price/performance, Europe |
 | **AWS EC2** | t3.medium | 2 | 4GB | Variable | ~$30 | Enterprise features, global reach |

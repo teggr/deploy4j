@@ -326,6 +326,11 @@ h1, h2, h3, h4, h5, h6 {
     text-decoration: underline;
 }
 
+.content strong {
+    color: var(--color-accent);
+    font-weight: 700;
+}
+
 .content code {
     background-color: var(--color-bg-medium);
     color: var(--color-accent);
