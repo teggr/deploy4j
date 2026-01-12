@@ -35,30 +35,11 @@ Digital Ocean offers "Droplets" - virtual machines that can be provisioned quick
 
 - **Region**: Choose closest to your users (e.g., lon1, nyc1, sfo3)
 - **OS**: Ubuntu 24.04 LTS x64
-- **Size**: s-2vcpu-4gb (2 vCPUs, 4GB RAM, 80GB SSD) - $24/month
 - **Authentication**: SSH keys
 
-### Using the Console (Web UI)
-
-1. Log into your Digital Ocean account
-2. Click **Create** → **Droplets**
-3. **Choose Region**: Select your preferred datacenter region
-4. **Choose Image**: 
-   - Distribution: Ubuntu 24.04 LTS x64
-5. **Choose Size**: 
-   - Droplet Type: Basic
-   - CPU Options: Regular (2 vCPU, 4GB RAM, 80GB SSD - $24/mo)
-6. **Authentication**: 
-   - Select "SSH keys"
-   - Add your SSH public key if not already added
-7. **Finalize Details**:
-   - Hostname: Choose a meaningful name (e.g., `my-app-prod-01`)
-   - Tags: Optional, for organization
-8. Click **Create Droplet**
-
-Wait 30-60 seconds for the droplet to be created. Note the assigned IP address.
-
 ### Using the CLI (doctl)
+
+https://docs.digitalocean.com/reference/doctl/
 
 First, install and authenticate `doctl`:
 
@@ -96,8 +77,8 @@ doctl compute ssh-key list
 # Create the droplet
 doctl compute droplet create my-app-prod-01 \
   --image ubuntu-24-04-x64 \
-  --size s-2vcpu-4gb \
-  --region nyc1 \
+  --size s-1vcpu-1gb \
+  --region lon1 \
   --ssh-keys <your-ssh-key-id> \
   --wait
 
@@ -121,28 +102,11 @@ Hetzner offers competitive pricing with excellent performance, especially for Eu
 
 - **Location**: Choose closest to your users (e.g., fsn1, nbg1, hel1)
 - **OS**: Ubuntu 24.04
-- **Type**: CPX21 (3 vCPUs, 4GB RAM, 80GB SSD) - €8.46/month (~$9/month)
 - **Authentication**: SSH keys
 
-### Using the Console (Web UI)
-
-1. Log into your Hetzner Cloud Console
-2. Select your project or create a new one
-3. Click **Add Server**
-4. **Location**: Select your preferred datacenter (e.g., Falkenstein, Nuremberg, Helsinki)
-5. **Image**: 
-   - Type: Standard
-   - Ubuntu 24.04
-6. **Type**: 
-   - Shared vCPU: CPX21 (3 vCPUs, 4GB RAM, 80GB SSD)
-7. **SSH keys**: 
-   - Add your SSH public key if not already added
-8. **Name**: Choose a meaningful name (e.g., `my-app-prod-01`)
-9. Click **Create & Buy now**
-
-Wait 30-60 seconds for the server to be created. Note the assigned IP address.
-
 ### Using the CLI (hcloud)
+
+https://github.com/hetznercloud/cli/blob/main/docs/tutorials/setup-hcloud-cli.md
 
 First, install and authenticate `hcloud`:
 
@@ -205,40 +169,11 @@ AWS EC2 provides a wide range of instance types and global availability zones.
 
 - **Region**: Choose closest to your users (e.g., us-east-1, eu-west-1)
 - **AMI**: Ubuntu 24.04 LTS
-- **Instance Type**: t3.medium (2 vCPUs, 4GB RAM) - ~$30/month
 - **Authentication**: SSH key pair
 
-### Using the Console (Web UI)
-
-1. Log into AWS Management Console
-2. Navigate to **EC2** service
-3. Click **Launch Instance**
-4. **Name**: Enter a meaningful name (e.g., `my-app-prod-01`)
-5. **Application and OS Images (AMI)**:
-   - Quick Start: Ubuntu
-   - Amazon Machine Image: Ubuntu Server 24.04 LTS
-   - Architecture: 64-bit (x86)
-6. **Instance Type**: 
-   - t3.medium (2 vCPU, 4 GiB RAM)
-7. **Key pair (login)**:
-   - Select existing key pair or click "Create new key pair"
-   - If creating new: 
-     - Name: my-key-pair
-     - Key pair type: RSA
-     - Private key file format: .pem
-     - Click "Create key pair" (download and save the .pem file)
-8. **Network Settings**:
-   - Create security group or select existing
-   - Allow SSH traffic from: 0.0.0.0/0 (or restrict to your IP)
-   - Allow HTTP traffic from the internet (for web apps)
-   - Allow HTTPS traffic from the internet (for web apps)
-9. **Configure Storage**: 
-   - Default (8 GiB) or increase to 20-30 GiB gp3
-10. Click **Launch Instance**
-
-Wait 1-2 minutes for the instance to initialize. Note the assigned public IP address.
-
 ### Using the CLI (aws-cli)
+
+https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 
 First, install and authenticate AWS CLI:
 
@@ -309,7 +244,7 @@ Get the Ubuntu 24.04 AMI ID for your region:
 # Find Ubuntu 24.04 LTS AMI
 aws ec2 describe-images \
   --owners 099720109477 \
-  --filters "Name=name,Values=ubuntu/images/hvm-ssd/ubuntu-noble-24.04-amd64-server-*" \
+  --filters "Name=name,Values=*ubuntu-noble-24.04-amd64-server-*" \
   --query 'Images[*].[ImageId,CreationDate,Name]' \
   --output table \
   --region us-east-1 | head -5
@@ -339,102 +274,13 @@ aws ec2 describe-instances \
 
 ### Verify SSH Connection
 
-For AWS, you need to use the downloaded .pem file:
+**Important**: AWS Ubuntu instances use the `ubuntu` user by default, not `root`.
 
 ```bash
-# Set proper permissions on the key file
-chmod 400 ~/path/to/my-key-pair.pem
-
-# Connect via SSH (note: ubuntu is the default user, not root)
-ssh -i ~/path/to/my-key-pair.pem ubuntu@<instance-ip-address>
-
-# Optional: Switch to root or configure root SSH access
-sudo su -
+ssh ubuntu@<server-ip-address>
 ```
 
-**Important**: AWS Ubuntu instances use the `ubuntu` user by default, not `root`. To enable root SSH access (if required by deploy4j):
-
-```bash
-# Connect as ubuntu user
-ssh -i ~/path/to/my-key-pair.pem ubuntu@<instance-ip-address>
-
-# Copy authorized_keys to root
-sudo cp /home/ubuntu/.ssh/authorized_keys /root/.ssh/
-sudo chown root:root /root/.ssh/authorized_keys
-
-# Edit SSH config to permit root login (optional, not recommended for production)
-sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
-sudo systemctl restart sshd
-
-# Exit and reconnect as root
-exit
-ssh -i ~/path/to/my-key-pair.pem root@<instance-ip-address>
-```
-
-**Alternative**: Configure deploy4j to use the `ubuntu` user instead of root (recommended approach).
-
-## Post-Provisioning Steps
-
-After provisioning your server on any platform, verify the basics:
-
-### 1. Verify SSH Connection
-
-```bash
-# Test connection (adjust user as needed)
-ssh root@<server-ip-address>  # Digital Ocean, Hetzner
-# or
-ssh -i ~/path/to/key.pem ubuntu@<server-ip-address>  # AWS
-```
-
-### 2. Update System Packages
-
-```bash
-# Update package lists and upgrade
-sudo apt update
-sudo apt upgrade -y
-```
-
-### 3. Configure SSH Known Hosts (Local Machine)
-
-Add the server to your known hosts file to avoid warnings:
-
-```bash
-ssh-keyscan -H <server-ip-address> >> ~/.ssh/known_hosts
-```
-
-### 4. Verify Server Resources
-
-```bash
-# Check CPU and memory
-lscpu
-free -h
-
-# Check disk space
-df -h
-
-# Check OS version
-cat /etc/os-release
-```
-
-### 5. Configure Firewall (Optional but Recommended)
-
-```bash
-# Install and configure UFW (if not already installed)
-sudo apt install -y ufw
-
-# Allow SSH (important - don't lock yourself out!)
-sudo ufw allow 22/tcp
-
-# Allow HTTP and HTTPS
-sudo ufw allow 80/tcp
-sudo ufw allow 443/tcp
-
-# Enable firewall
-sudo ufw --force enable
-
-# Check status
-sudo ufw status
-```
+If successful, you're connected to your server. Type `exit` to disconnect.
 
 ## Deploy with deploy4j
 
