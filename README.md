@@ -42,7 +42,7 @@ Install via JBang:
 `deploy4j` is currently available via JitPack.
 
 ```shell
-jbang app install --name deploy4j --force --fresh dev.deploy4j:deploy4j-cli:0.0.5
+jbang app install --name deploy4j --force --fresh dev.deploy4j:deploy4j-cli:0.0.6
 ```
 
 ```shell
@@ -151,19 +151,24 @@ docker exec -it deploy4j-droplet /bin/bash
 The project uses [jreleaser](https://jreleaser.org/) for releases. Based on the [foojay article](https://foojay.io/today/how-to-publish-a-java-maven-project-to-maven-central-using-jreleaser-and-github-actions-2025-guide/).
 
 ```shell
+# clean the local project
+.\mvnw clean
+
 # set the version for all modules
-mvn versions:set -DnewVersion=0.0.1
+.\mvnw versions:set -DremoveSnapshot
+
+# update other references to the version
 
 # create staging directory
-mvn -Ppublication clean deploy -DaltDeploymentRepository=local::file:./target/staging-deploy
+.\mvnw -Ppublication deploy -DaltDeploymentRepository=local::file:./target/staging-deploy
 
 # release via jreleaser
-export JRELEASER_PROJECT_VERSION=0.0.1
+export JRELEASER_PROJECT_VERSION=0.0.6
 jreleaser full-release
 
 # set the next snapshot version for all modules
-mvn versions:set -DnextSnapshot
-mvn versions:commit
+.\mvnw versions:set -DnextSnapshot
+.\mvnw versions:commit
 ```
 
 ## Notes on the Kamal Port

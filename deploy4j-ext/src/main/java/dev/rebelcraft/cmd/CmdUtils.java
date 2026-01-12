@@ -13,7 +13,7 @@ public class CmdUtils {
     Pattern.compile("\\$(?!\\{[^}]*\\})");
 
   /**
-   * Builds a list of shell options that can handle flexible values (String or List<String>).
+   * Builds a list of shell options that can handle flexible values (String or List of strings).
    * When a value is a list, the option is repeated for each item in the list.
    *
    * Example:
@@ -25,7 +25,7 @@ public class CmdUtils {
   }
 
   /**
-   * Builds a list of shell options that can handle flexible values (String or List<String>).
+   * Builds a list of shell options that can handle flexible values (String or List of strings).
    * When a value is a list, the option is repeated for each item in the list.
    *
    * Example:

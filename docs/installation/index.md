@@ -9,7 +9,7 @@ aside:
 If you have JBang installed, you can install `deploy4j` as an application.
 
 ```shell
-jbang app install --name deploy4j --force --fresh  dev.deploy4j:deploy4j-cli:0.0.5
+jbang app install --name deploy4j --force --fresh  dev.deploy4j:deploy4j-cli:0.0.6
 ```
 
 Then, inside your app directory, run `deploy4j init`. Now edit the new file config/deploy.yml. It could look as simple as this:
