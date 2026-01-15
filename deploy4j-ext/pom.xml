@@ -6,10 +6,11 @@
     <parent>
         <groupId>dev.deploy4j</groupId>
         <artifactId>deploy4j-parent</artifactId>
-        <version>main-SNAPSHOT</version>
+        <version>0.0.7-SNAPSHOT</version>
     </parent>
 
     <artifactId>deploy4j-ext</artifactId>
+    <name>deploy4j-ext</name>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -22,19 +23,19 @@
         <dependency>
             <groupId>com.github.mwiede</groupId>
            <artifactId>jsch</artifactId>
-            <version>2.27.2</version>
+            <version>2.27.7</version>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.9</version>
+            <version>2.0.17</version>
         </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.19.0</version>
+            <version>2.21.0</version>
         </dependency>
 
 

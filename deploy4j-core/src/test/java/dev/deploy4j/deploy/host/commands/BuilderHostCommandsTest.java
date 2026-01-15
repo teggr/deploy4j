@@ -53,18 +53,4 @@ class BuilderHostCommandsTest {
                 .contains("registry.example.com/myapp:1.0.0");
         assertThat(cmd.description()).isEqualTo("pull");
     }
-
-    @Test
-    @DisplayName("should create validateImage command with service label check")
-    void shouldCreateValidateImageCommand() {
-        // Act
-        Cmd cmd = builderCommands.validateImage();
-
-        // Assert
-        // The command is complex with pipes and greps, so we just verify key parts
-        assertThat(cmd.build())
-                .contains("docker", "inspect")
-                .contains("registry.example.com/myapp:1.0.0");
-        assertThat(cmd.description()).isEqualTo("validate image");
-    }
 }

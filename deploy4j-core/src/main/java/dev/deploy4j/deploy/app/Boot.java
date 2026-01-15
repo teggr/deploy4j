@@ -9,7 +9,7 @@ import dev.deploy4j.deploy.host.commands.AppHostCommands;
 import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.configuration.Role;
 import dev.deploy4j.deploy.host.ssh.SshHost;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

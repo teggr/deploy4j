@@ -32,6 +32,7 @@ public class DeployConfig {
   private final BootConfig boot;
   private final HealthCheckConfig healthCheck;
   private final LoggingConfig logging;
+  private final SpringBootConfig springBoot;
 
   @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
   public DeployConfig(
@@ -56,7 +57,8 @@ public class DeployConfig {
     @JsonProperty("traefik") TraefikConfig traefik,
     @JsonProperty("boot") BootConfig boot,
     @JsonProperty("healthcheck") HealthCheckConfig healthCheck,
-    @JsonProperty("logging") LoggingConfig logging
+    @JsonProperty("logging") LoggingConfig logging,
+    @JsonProperty("spring_boot") SpringBootConfig springBoot
   ) {
     this.service = service;
     this.image = image;
@@ -80,6 +82,7 @@ public class DeployConfig {
     this.boot = boot;
     this.healthCheck = healthCheck;
     this.logging = logging;
+    this.springBoot = springBoot;
   }
 
   public String service() {
@@ -168,5 +171,9 @@ public class DeployConfig {
 
   public LoggingConfig logging() {
     return logging;
+  }
+
+  public SpringBootConfig springBoot() {
+    return springBoot;
   }
 }

@@ -282,4 +282,78 @@ class DeployConfigYamlReaderTest {
     assertThat(config.healthCheck().path()).isEqualTo("/some/url");
   }
 
+  @Test
+  @DisplayName("should handle traefik options as lists")
+  void shouldHandleTraefikOptionsAsLists() throws IOException {
+    // Arrange
+    String yaml = """
+            service: test-service
+            image: test/image
+            traefik:
+              options:
+                publish:
+                  - "443:443"
+                  - "80:80"
+                volume:
+                  - "/etc/letsencrypt/acme.json:/etc/letsencrypt/acme.json"
+                  - "/var/log:/var/log"
+                name: "traefik"
+            """;
+
+    // Act
+    DeployConfig config = DeployConfigYamlReader.readYamlFromString(yaml);
+
+    // Assert
+    assertThat(config.traefik()).isNotNull();
+    assertThat(config.traefik().options()).isNotNull();
+    assertThat(config.traefik().options()).hasSize(3);
+    
+    FlexibleValue publish = config.traefik().options().get("publish");
+    assertThat(publish).isNotNull();
+    assertThat(publish.asList()).containsExactly("443:443", "80:80");
+    
+    FlexibleValue volume = config.traefik().options().get("volume");
+    assertThat(volume).isNotNull();
+    assertThat(volume.asList()).containsExactly(
+        "/etc/letsencrypt/acme.json:/etc/letsencrypt/acme.json",
+        "/var/log:/var/log"
+    );
+    
+    FlexibleValue name = config.traefik().options().get("name");
+    assertThat(name).isNotNull();
+    assertThat(name.asSingleValue()).isEqualTo("traefik");
+  }
+
+  @Test
+  @DisplayName("should handle traefik options as single strings")
+  void shouldHandleTraefikOptionsAsSingleStrings() throws IOException {
+    // Arrange
+    String yaml = """
+            service: test-service
+            image: test/image
+            traefik:
+              options:
+                publish: "443:443"
+                volume: "/etc/letsencrypt/acme.json:/etc/letsencrypt/acme.json"
+            """;
+
+    // Act
+    DeployConfig config = DeployConfigYamlReader.readYamlFromString(yaml);
+
+    // Assert
+    assertThat(config.traefik()).isNotNull();
+    assertThat(config.traefik().options()).isNotNull();
+    assertThat(config.traefik().options()).hasSize(2);
+    
+    FlexibleValue publish = config.traefik().options().get("publish");
+    assertThat(publish).isNotNull();
+    assertThat(publish.asSingleValue()).isEqualTo("443:443");
+    assertThat(publish.isList()).isFalse();
+    
+    FlexibleValue volume = config.traefik().options().get("volume");
+    assertThat(volume).isNotNull();
+    assertThat(volume.asSingleValue()).isEqualTo("/etc/letsencrypt/acme.json:/etc/letsencrypt/acme.json");
+    assertThat(volume.isList()).isFalse();
+  }
+
 }

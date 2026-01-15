@@ -12,6 +12,77 @@ public class CmdUtils {
   static final Pattern DOLLAR_SIGN_WITHOUT_SHELL_EXPANSION =
     Pattern.compile("\\$(?!\\{[^}]*\\})");
 
+  /**
+   * Builds a list of shell options that can handle flexible values (String or List of strings).
+   * When a value is a list, the option is repeated for each item in the list.
+   *
+   * Example:
+   * optionizeFlexible(Map.of("publish", List.of("443:443", "80:80"), "name", "myapp"))
+   * => ["--publish", "443:443", "--publish", "80:80", "--name", "myapp"]
+   */
+  public static List<String> optionizeFlexible(Map<String, ?> args) {
+    return optionizeFlexible(args, null);
+  }
+
+  /**
+   * Builds a list of shell options that can handle flexible values (String or List of strings).
+   * When a value is a list, the option is repeated for each item in the list.
+   *
+   * Example:
+   * optionizeFlexible(Map.of("publish", List.of("443:443", "80:80")), "=")
+   * => ["--publish=443:443", "--publish=80:80"]
+   */
+  public static List<String> optionizeFlexible(Map<String, ?> args, String with) {
+    if (args == null || args.isEmpty()) {
+      return List.of();
+    }
+
+    List<String> options = new ArrayList<>();
+
+    for (Map.Entry<String, ?> entry : args.entrySet()) {
+      String key = entry.getKey();
+      Object value = entry.getValue();
+
+      if (value == null) {
+        // null values are skipped
+        continue;
+      }
+
+      List<String> values = new ArrayList<>();
+      
+      if (value instanceof List<?>) {
+        // Handle list of values
+        for (Object item : (List<?>) value) {
+          if (item != null) {
+            values.add(item.toString());
+          }
+        }
+      } else {
+        // Handle single value
+        values.add(value.toString());
+      }
+
+      // Process each value
+      for (String val : values) {
+        if ("true".equalsIgnoreCase(val)) {
+          // treat as flag
+          options.add("--" + key);
+        } else if (!val.isEmpty()) {
+          if (with != null) {
+            // single token: --key=value
+            options.add("--" + key + with + escapeShellValue(val));
+          } else {
+            // two tokens: --key value
+            options.add("--" + key);
+            options.add(escapeShellValue(val));
+          }
+        }
+      }
+    }
+
+    return options;
+  }
+
   public static List<String> optionize(Map<String, String> args) {
     return optionize(args, null);
   }

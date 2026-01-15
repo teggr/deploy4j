@@ -1,6 +1,6 @@
 package dev.deploy4j.deploy.env;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.Map;
 import java.util.stream.Collectors;

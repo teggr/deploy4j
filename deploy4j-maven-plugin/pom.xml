@@ -6,10 +6,11 @@
     <parent>
         <groupId>dev.deploy4j</groupId>
         <artifactId>deploy4j-parent</artifactId>
-        <version>main-SNAPSHOT</version>
+        <version>0.0.7-SNAPSHOT</version>
     </parent>
 
     <artifactId>deploy4j-maven-plugin</artifactId>
+    <name>deploy4j-maven-plugin</name>
     <packaging>maven-plugin</packaging>
 
     <dependencies>
@@ -23,12 +24,12 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
-            <version>3.6.3</version>
+            <version>3.9.12</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
             <artifactId>maven-plugin-annotations</artifactId>
-            <version>3.6.0</version>
+            <version>3.15.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
