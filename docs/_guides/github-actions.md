@@ -10,7 +10,7 @@ Using GitHub Actions with deploy4j allows you to automate your deployment proces
 ## Prerequisites
 
 - A working deploy4j configuration in your repository (see [Spring Boot guide]({{ '/guides/spring-boot' | relative_url }}))
-- A Docker image of your application pushed to a registry (e.g., Docker Hub, GitHub Container Registry)
+- A Maven project to build your application, package into a Docker image, and push to a Docker registry.
 - SSH access to your deployment server
 - GitHub repository secrets configured for sensitive values
 
@@ -63,22 +63,23 @@ jobs:
       - name: Build with Maven
         run: mvn -B package -DskipTests
 
+      # deploy to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3.1.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+    
       - name: Build and push Docker image
-        run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          mvn -B docker:build docker:push -DskipTests
+        run: mvn -B docker:build docker:push -DskipTests
 
-      - name: Set up deploy4j secrets
-        run: |
-          mkdir -p .deploy4j
-          cat > .deploy4j/secrets << EOF
-          DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD=${{ secrets.DOCKER_PASSWORD }}
-          PRIVATE_KEY=/tmp/ssh_key
-          PRIVATE_KEY_PASSPHRASE=${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}
-          KNOWN_HOSTS_PATH=/tmp/known_hosts
-          EOF
-          chmod 600 .deploy4j/secrets
+      # setup JBang
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+
+      # configure java versions for jbang
+      - name: Configure java
+        run: jbang jdk install 21 ${{env.JAVA_HOME_21_X64}}
 
       - name: Set up SSH credentials
         run: |
@@ -86,16 +87,25 @@ jobs:
           chmod 600 /tmp/ssh_key
           echo "${{ secrets.SSH_KNOWN_HOSTS }}" > /tmp/known_hosts
 
-      - name: Install deploy4j
+      - name: Set up deploy4j secrets
         run: |
-          curl -sL https://github.com/teggr/deploy4j/releases/latest/download/deploy4j-cli.jar -o deploy4j-cli.jar
-          echo '#!/bin/bash' > deploy4j
-          echo 'java -jar '"$(pwd)"'/deploy4j-cli.jar "$@"' >> deploy4j
-          chmod +x deploy4j
-          sudo mv deploy4j /usr/local/bin/
+          mkdir -p .deploy4j
+          cat > .deploy4j/secrets << EOF
+          DOCKER_USERNAME=$DOCKER_USERNAME
+          DOCKER_PASSWORD=$DOCKER_PASSWORD
+          PRIVATE_KEY=/tmp/ssh_key
+          PRIVATE_KEY_PASSPHRASE=$PRIVATE_KEY_PASSPHRASE
+          KNOWN_HOSTS_PATH=/tmp/known_hosts
+          EOF
+          chmod 600 .deploy4j/secrets
 
-      - name: Deploy application
-        run: deploy4j deploy --version ${{ github.sha }}
+      # deploy application using deploy4j
+      - name: Deploy application with deploy4j via jbang
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          PRIVATE_KEY_PASSPHRASE: ${{ secrets.PRIVATE_KEY_PASSPHRASE }}
+        run: jbang --java 21 dev.deploy4j:deploy4j-cli:0.0.6 deploy --version ${{ steps.set_release_version.outputs.release_version }}
 ```
 
 ## Workflow Breakdown
