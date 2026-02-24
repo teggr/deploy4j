@@ -215,12 +215,15 @@ public class AccessoryCliCommand implements Callable<Integer> {
     @CommandLine.Option(names = "-f", description = "Follow logs on primary server (or specific host set by --hosts)", defaultValue = "false")
     private boolean follow;
 
+    @CommandLine.Option(names = "-T", description = "Skip appending timestamps to logging output", defaultValue = "false")
+    private boolean skipTimestamps;
+
     @CommandLine.Parameters(index = "0")
     private String name;
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.app().logs(deployApplicationContext.deployContext(), since,lines, grep, grepOptions, follow);
+      deployApplicationContext.accessory().logs(deployApplicationContext.deployContext(), since,lines, grep, grepOptions, follow, skipTimestamps, name);
     }
 
   }
