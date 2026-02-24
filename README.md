@@ -45,6 +45,14 @@ Install via JBang:
 jbang app install --name deploy4j --force --fresh dev.deploy4j:deploy4j-cli:0.0.6
 ```
 
+After installing, run `deploy4j init` to set up your project interactively:
+
+```shell
+deploy4j init
+```
+
+This will ask for your server address, any secret variable names, and optionally set up AI agent skills (GitHub Copilot or Claude) for your project.
+
 ```shell
 Usage: deploy4j [--help] [COMMAND]
 Deploy web apps anywhere. From bare metal to cloud VMs.
@@ -57,7 +65,7 @@ Commands:
   config     Show combined config (including secrets!)
   deploy     Deploy app to servers
   details    Show details about all containers
-  init       Create config stub in config/deploy.yml and env stub in .deploy4j/secrets
+  init       Interactively set up deploy4j configuration files for your project
   lock       Manage the deploy lock
   prune      Prune old application images and containers
   redeploy   Deploy app to servers without bootstrapping servers, starting
