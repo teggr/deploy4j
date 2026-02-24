@@ -17,6 +17,7 @@ import java.util.concurrent.Callable;
     DetailsCliCommand.class,
     InitCliCommand.class,
     LockCliCommand.class,
+    McpCliCommand.class,
     PruneCliCommand.class,
     RedeployCliCommand.class,
     RegistryCliCommand.class,
