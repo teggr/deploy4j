@@ -72,6 +72,8 @@ public class Initializer {
 
   }
 
+  private static final String AGENT_SKILLS_MARKER = "deploy4j Deployment";
+
   private void initAgentSkills(InitConfig.AgentType agentType) {
     if (agentType == InitConfig.AgentType.COPILOT) {
       File copilotFile = new File(".github/copilot-instructions.md");
@@ -80,7 +82,7 @@ public class Initializer {
         String skills = readTemplate("templates/copilot-skills.md");
         if (copilotFile.exists()) {
           String existing = FileUtils.readFileToString(copilotFile, StandardCharsets.UTF_8);
-          if (!existing.contains("deploy4j Deployment")) {
+          if (!existing.contains(AGENT_SKILLS_MARKER)) {
             FileUtils.writeStringToFile(copilotFile, existing + "\n" + skills, StandardCharsets.UTF_8);
             log.info("Added deploy4j skills to .github/copilot-instructions.md");
           } else {
@@ -99,7 +101,7 @@ public class Initializer {
         String skills = readTemplate("templates/claude-skills.md");
         if (claudeFile.exists()) {
           String existing = FileUtils.readFileToString(claudeFile, StandardCharsets.UTF_8);
-          if (!existing.contains("deploy4j Deployment")) {
+          if (!existing.contains(AGENT_SKILLS_MARKER)) {
             FileUtils.writeStringToFile(claudeFile, existing + "\n" + skills, StandardCharsets.UTF_8);
             log.info("Added deploy4j skills to CLAUDE.md");
           } else {
