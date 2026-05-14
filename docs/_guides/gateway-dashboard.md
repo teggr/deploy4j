@@ -6,9 +6,9 @@ title: Gateway Dashboard
 
 Deploy4j uses Gateway as a dynamic reverse-proxy. Gateway has a [beautiful dashboard](https://doc.gateway.io/gateway/reference/install-configuration/api-dashboard/#configuration-options) to visually display the configuration. Deploy4j is not configured to show the dashboard by default.
 
-Gateway dashboard can run in two modes - secure and insecure. Gateway recommends secure mode but this post wil cover how to enable both the modes.
+Gateway dashboard can run in two modes - secure and insecure. Gateway recommends secure mode but this post will cover how to enable both modes.
 
-First, let’s see the unsecure mode. Unsecure mode is very easy to configure. It is unsecure because it exposes Traefix API on the entrypoint . It means that after configuring the dashboard in unsecure mode, the dashboard will be available on the port 8080 of the host.
+First, let’s see the insecure mode. Insecure mode is very easy to configure. It is insecure because it exposes the Gateway API on the entrypoint. It means that after configuring the dashboard in insecure mode, the dashboard will be available on port 8080 of the host.
 
 Adding the following snippet in the config/deploy.yml file will enable the unsecure dashboard.
 
@@ -46,7 +46,7 @@ gateway:
 
 Add `Host(`gateway.example.com`) &&` to the `gateway.http.routers.dashboard.rule` to further restrict access to a specific host.
 
-Here, we have configured Gateway dynamically with help of Docker labels. First of we have created a router. Then we attached the router with the api@internal service because in the secure mode we have to do this manually. After that, we added the auth middleware to Trafeik. In the last, we conifgured this auth middleware to use HTTP Basic Authentication and provided it with the credentials. You can read more about the rules in the details on the Gateway docs .
+Here, we have configured Gateway dynamically with Docker labels. First, we created a router. Then we attached the router to the api@internal service because in secure mode we have to do this manually. After that, we added the auth middleware to Gateway. Finally, we configured this auth middleware to use HTTP Basic Authentication and provided credentials. You can read more about these rules in the Gateway docs.
 
 The credentials are in the “username:hashed_password” format. The credentials are generated with the htpasswd command. Let’s say you want to create a user with the username “admin” and the password “super_strong_password” then you can use the following command:
 
@@ -57,9 +57,8 @@ htpasswd -nb admin super_strong_password
 
 You will get the password hash in the output. Just copy paste the output with the username:password in the labels. The official Gateway docs mention that you need to escape the $ character but you don’t need if you are using Deploy4j but Deploy4j escapes the $ sign for these labels.
 
-That’s it! Don’t forget to reboot the Trafeik container with the `deploy4j gateway reboot` comamnd. After that, the dashboard should be accessible on the http://gateway.example.com/dashboard endpoint.
+That’s it! Don’t forget to reboot the Gateway container with the `deploy4j gateway reboot` command. After that, the dashboard should be accessible on the http://gateway.example.com/dashboard endpoint.
 
 ### References
 
-* Original source - https://www.kartikey.dev/2023/04/12/how-to-enable-gateway-dashboard-with-mrsk.html
 * Gateway Dashboard docs - https://doc.gateway.io/gateway/reference/install-configuration/api-dashboard/#configuration-options
