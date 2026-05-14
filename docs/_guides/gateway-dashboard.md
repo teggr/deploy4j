@@ -4,7 +4,7 @@ title: Gateway Dashboard
 ---
 ## Accessing Gateway Dashboard
 
-Deploy4j uses Gateway as a dynamic reverse-proxy. Gateway has a [beautiful dashboard](https://doc.gateway.io/gateway/reference/install-configuration/api-dashboard/#configuration-options) to visually display the configuration. Deploy4j is not configured to show the dashboard by default.
+Deploy4j uses Gateway as a dynamic reverse-proxy. Gateway has an actuator API that can be used to inspect and manage routes. Deploy4j is not configured to expose those endpoints by default.
 
 Gateway dashboard can run in two modes - secure and insecure. Gateway recommends secure mode but this post will cover how to enable both modes.
 
@@ -61,4 +61,4 @@ That’s it! Don’t forget to reboot the Gateway container with the `deploy4j g
 
 ### References
 
-* Gateway Dashboard docs - https://doc.gateway.io/gateway/reference/install-configuration/api-dashboard/#configuration-options
+* Spring Cloud Gateway actuator docs - https://docs.spring.io/spring-cloud-gateway/reference/spring-cloud-gateway-server-webflux/actuator-api.html

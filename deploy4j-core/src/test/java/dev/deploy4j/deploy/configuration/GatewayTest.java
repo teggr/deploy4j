@@ -29,7 +29,7 @@ class GatewayTest {
 
         // Assert
         assertThat(gateway.image()).isEqualTo("springcloud/spring-cloud-gateway:latest");
-        assertThat(gateway.hostPort()).isEqualTo(8080);
+        assertThat(gateway.hostPort()).isEqualTo(80);
         assertThat(gateway.publish()).isTrue();
         assertThat(gateway.options()).isEmpty();
     }
@@ -195,7 +195,7 @@ class GatewayTest {
         Gateway gateway = new Gateway(config);
 
         // Assert
-        assertThat(gateway.port()).isEqualTo("8080:8080");
+        assertThat(gateway.port()).isEqualTo("80:8080");
     }
 
     @Test

@@ -314,7 +314,7 @@ public class AppHostCommands extends BaseHostCommands {
 
   public Cmd upsertGatewayRoute(String version) {
     String routeId = routeId(version);
-    String payload = "{\"id\":\"" + routeId + "\",\"uri\":\"http://" + containerName(version) + "\",\"predicates\":[\"Path=/**\"]}";
+    String payload = "{\"id\":\"" + jsonEscape(routeId) + "\",\"uri\":\"http://" + jsonEscape(containerName(version)) + "\",\"predicates\":[\"Path=/**\"]}";
     String script = "curl -sS -X POST -H \"Content-Type: application/json\" " +
       "--data '" + payload + "' " + gatewayRoutesUrl() + "/" + routeId + " >/dev/null && " +
       "curl -sS -X POST " + gatewayRefreshUrl() + " >/dev/null";
@@ -392,5 +392,11 @@ public class AppHostCommands extends BaseHostCommands {
 
   private String gatewayRefreshUrl() {
     return gatewayBaseUrl() + "/refresh";
+  }
+
+  private String jsonEscape(String value) {
+    return value
+      .replace("\\", "\\\\")
+      .replace("\"", "\\\"");
   }
 }

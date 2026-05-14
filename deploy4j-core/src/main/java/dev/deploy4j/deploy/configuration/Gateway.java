@@ -10,6 +10,7 @@ import java.util.Map;
 public class Gateway {
 
   private static final String DEFAULT_IMAGE = "springcloud/spring-cloud-gateway:latest";
+  private static final Integer DEFAULT_HOST_PORT = 80;
   private static final Integer CONTAINER_PORT = 8080;
   private static final Map<String, String> DEFAULT_ARGS = Map.of(
     "management.endpoint.gateway.enabled", "true",
@@ -45,7 +46,7 @@ public class Gateway {
   public Integer hostPort() {
     return gatewayConfig().hostPort() != null ?
       gatewayConfig().hostPort() :
-      CONTAINER_PORT;
+      DEFAULT_HOST_PORT;
   }
 
   public Map<String, Object> options() {

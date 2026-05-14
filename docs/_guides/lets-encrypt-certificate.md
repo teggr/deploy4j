@@ -309,11 +309,11 @@ gateway:
     certificatesResolvers.letsencrypt.acme.dnsChallenge.resolvers: "1.1.1.1:53,8.8.8.8:53"
 ```
 
-This requires DNS provider API credentials. See [Gateway DNS Challenge documentation](https://doc.gateway.io/gateway/https/acme/#dnschallenge) for supported providers.
+This requires DNS provider API credentials. For Gateway-specific TLS configuration options, see Spring Cloud Gateway TLS docs.
 
 ## References
 
 * Inspired by: [Secure your Kamal app deployments with Let's Encrypt](https://dennmart.com/articles/secure-your-kamal-app-deployments-with-lets-encrypt/) by Dennis Martinez
-* [Gateway ACME Documentation](https://doc.gateway.io/gateway/reference/install-configuration/tls/certificate-resolvers/acme/)
+* [Spring Cloud Gateway TLS Configuration](https://docs.spring.io/spring-cloud-gateway/reference/spring-cloud-gateway-server-webflux/tls-and-ssl.html)
 * [Let's Encrypt Documentation](https://letsencrypt.org/docs/)
 * [Let's Encrypt Rate Limits](https://letsencrypt.org/docs/rate-limits/)

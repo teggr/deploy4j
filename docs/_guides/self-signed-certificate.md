@@ -138,5 +138,5 @@ gateway:
 ## References
 
 * Original blog post: [Kamal Deploy with a self signed certificate for SSL](https://dimitrikoenig.com/blog/kamal-deploy-with-a-self-signed-certificate-for-ssl) by Dimitri Koenig
-* [Gateway TLS Documentation](https://doc.gateway.io/gateway/routing/entrypoints/#tls)
+* [Spring Cloud Gateway TLS Configuration](https://docs.spring.io/spring-cloud-gateway/reference/spring-cloud-gateway-server-webflux/tls-and-ssl.html)
 * [Cloudflare SSL Modes](https://developers.cloudflare.com/ssl/origin-configuration/ssl-modes/)
