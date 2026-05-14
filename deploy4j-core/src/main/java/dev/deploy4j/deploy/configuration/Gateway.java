@@ -9,18 +9,11 @@ import java.util.Map;
 
 public class Gateway {
 
-  private static final String DEFAULT_IMAGE = "gateway:v3.6.2";
-  private static final Integer CONTAINER_PORT = 80;
+  private static final String DEFAULT_IMAGE = "springcloud/spring-cloud-gateway:latest";
+  private static final Integer CONTAINER_PORT = 8080;
   private static final Map<String, String> DEFAULT_ARGS = Map.of(
-    "log.level", "DEBUG"
-  );
-  private static final Map<String, String> DEFAULT_LABELS = Map.of(
-    // These ensure we serve a 502 rather than a 404 if no containers are available
-    "gateway.http.routers.catchall.entryPoints", "http",
-    "gateway.http.routers.catchall.rule", "PathPrefix(`/`)",
-    "gateway.http.routers.catchall.service", "unavailable",
-    "gateway.http.routers.catchall.priority", "1",
-    "gateway.http.services.unavailable.loadbalancer.server.port", "0"
+    "management.endpoint.gateway.enabled", "true",
+    "management.endpoints.web.exposure.include", "gateway,health,info"
   );
 
   private final Configuration config;
@@ -38,10 +31,7 @@ public class Gateway {
   }
 
   public Map<String, String> labels() {
-    Map<String, String> labels = new HashMap<>();
-    labels.putAll(DEFAULT_LABELS);
-    labels.putAll(gatewayConfig().labels() != null ? gatewayConfig().labels() : Map.of());
-    return labels;
+    return gatewayConfig().labels() != null ? gatewayConfig().labels() : Map.of();
   }
 
   public Env env() {

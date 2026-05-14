@@ -111,13 +111,24 @@ public class Boot {
 
     new Poller(deployContext).waitForHealthy(true, () -> sshHost().capture( app().status(version()) ) );
 
+    if (runningGateway()) {
+      sshHost().execute(app().upsertGatewayRoute(version()));
+    }
+
   }
 
   private void stopNewVersion() {
+    if (runningGateway()) {
+      sshHost().execute(app().removeGatewayRoute(version()), false);
+    }
     sshHost().execute(app().stop(version()), false);
   }
 
   private void stopOldVersion(String version) {
+
+    if (runningGateway()) {
+      sshHost().execute(app().removeGatewayRoute(version), false);
+    }
 
     if(usesCord()) {
       String cord = sshHost().capture(app().cord(version), false);

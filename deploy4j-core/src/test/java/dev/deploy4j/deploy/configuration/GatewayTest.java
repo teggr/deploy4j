@@ -28,8 +28,8 @@ class GatewayTest {
         Gateway gateway = new Gateway(config);
 
         // Assert
-        assertThat(gateway.image()).isEqualTo("gateway:v3.6.2");
-        assertThat(gateway.hostPort()).isEqualTo(80);
+        assertThat(gateway.image()).isEqualTo("springcloud/spring-cloud-gateway:latest");
+        assertThat(gateway.hostPort()).isEqualTo(8080);
         assertThat(gateway.publish()).isTrue();
         assertThat(gateway.options()).isEmpty();
     }
@@ -85,8 +85,8 @@ class GatewayTest {
     }
 
     @Test
-    @DisplayName("should include default labels in labels map")
-    void shouldIncludeDefaultLabelsInLabelsMap() {
+    @DisplayName("should default labels to empty map")
+    void shouldDefaultLabelsToEmptyMap() {
         // Arrange
         DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
         Configuration config = mock(Configuration.class);
@@ -98,17 +98,12 @@ class GatewayTest {
         Map<String, String> labels = gateway.labels();
 
         // Assert
-        assertThat(labels)
-                .containsEntry("gateway.http.routers.catchall.entryPoints", "http")
-                .containsEntry("gateway.http.routers.catchall.rule", "PathPrefix(`/`)")
-                .containsEntry("gateway.http.routers.catchall.service", "unavailable")
-                .containsEntry("gateway.http.routers.catchall.priority", "1")
-                .containsEntry("gateway.http.services.unavailable.loadbalancer.server.port", "0");
+        assertThat(labels).isEmpty();
     }
 
     @Test
-    @DisplayName("should merge custom labels with default labels")
-    void shouldMergeCustomLabelsWithDefaultLabels() {
+    @DisplayName("should return custom labels")
+    void shouldReturnCustomLabels() {
         // Arrange
         Map<String, String> customLabels = Map.of("custom.label", "value", "another.label", "another-value");
         GatewayConfig gatewayConfig = new GatewayConfig(null, null, null, customLabels, null, null, null);
@@ -125,8 +120,7 @@ class GatewayTest {
         // Assert
         assertThat(labels)
                 .containsEntry("custom.label", "value")
-                .containsEntry("another.label", "another-value")
-                .containsEntry("gateway.http.routers.catchall.entryPoints", "http");
+                .containsEntry("another.label", "another-value");
     }
 
     @Test
@@ -143,14 +137,16 @@ class GatewayTest {
         Map<String, String> args = gateway.args();
 
         // Assert
-        assertThat(args).containsEntry("log.level", "DEBUG");
+        assertThat(args)
+                .containsEntry("management.endpoint.gateway.enabled", "true")
+                .containsEntry("management.endpoints.web.exposure.include", "gateway,health,info");
     }
 
     @Test
     @DisplayName("should merge custom args with default args")
     void shouldMergeCustomArgsWithDefaultArgs() {
         // Arrange
-        Map<String, String> customArgs = Map.of("api.dashboard", "true", "entrypoints.web.address", ":80");
+        Map<String, String> customArgs = Map.of("server.port", "8080");
         GatewayConfig gatewayConfig = new GatewayConfig(null, null, null, null, customArgs, null, null);
 
         DeployConfig deployConfig = DeployConfigBuilder.minimal().gateway(gatewayConfig).build();
@@ -164,9 +160,8 @@ class GatewayTest {
 
         // Assert
         assertThat(args)
-                .containsEntry("api.dashboard", "true")
-                .containsEntry("entrypoints.web.address", ":80")
-                .containsEntry("log.level", "DEBUG");
+                .containsEntry("server.port", "8080")
+                .containsEntry("management.endpoint.gateway.enabled", "true");
     }
 
     @Test
@@ -184,7 +179,7 @@ class GatewayTest {
         Gateway gateway = new Gateway(config);
 
         // Assert
-        assertThat(gateway.port()).isEqualTo("8080:80");
+        assertThat(gateway.port()).isEqualTo("8080:8080");
     }
 
     @Test
@@ -200,7 +195,7 @@ class GatewayTest {
         Gateway gateway = new Gateway(config);
 
         // Assert
-        assertThat(gateway.port()).isEqualTo("80:80");
+        assertThat(gateway.port()).isEqualTo("8080:8080");
     }
 
     @Test

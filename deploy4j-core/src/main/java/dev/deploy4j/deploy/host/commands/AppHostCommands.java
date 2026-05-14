@@ -312,6 +312,22 @@ public class AppHostCommands extends BaseHostCommands {
       .args(filterArgs(List.of()));
   }
 
+  public Cmd upsertGatewayRoute(String version) {
+    String routeId = routeId(version);
+    String payload = "{\"id\":\"" + routeId + "\",\"uri\":\"http://" + containerName(version) + "\",\"predicates\":[\"Path=/**\"]}";
+    String script = "curl -sS -X POST -H \"Content-Type: application/json\" " +
+      "--data '" + payload + "' " + gatewayRoutesUrl() + "/" + routeId + " >/dev/null && " +
+      "curl -sS -X POST " + gatewayRefreshUrl() + " >/dev/null";
+    return Cmd.cmd("sh", "-lc", script).description("upsert gateway route");
+  }
+
+  public Cmd removeGatewayRoute(String version) {
+    String routeId = routeId(version);
+    String script = "curl -sS -X DELETE " + gatewayRoutesUrl() + "/" + routeId + " >/dev/null || true; " +
+      "curl -sS -X POST " + gatewayRefreshUrl() + " >/dev/null || true";
+    return Cmd.cmd("sh", "-lc", script).description("remove gateway route");
+  }
+
   public Cmd tagLatestImage() {
     return docker().tag()
       .args(config.absoluteImage())
@@ -360,5 +376,21 @@ public class AppHostCommands extends BaseHostCommands {
 
   public String host() {
     return host;
+  }
+
+  private String routeId(String version) {
+    return role.containerPrefix() + "-" + version;
+  }
+
+  private String gatewayBaseUrl() {
+    return "http://127.0.0.1:" + config().gateway().hostPort() + "/actuator/gateway";
+  }
+
+  private String gatewayRoutesUrl() {
+    return gatewayBaseUrl() + "/routes";
+  }
+
+  private String gatewayRefreshUrl() {
+    return gatewayBaseUrl() + "/refresh";
   }
 }

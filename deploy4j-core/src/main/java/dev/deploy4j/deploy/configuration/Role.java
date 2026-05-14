@@ -78,7 +78,6 @@ public class Role {
   public Map<String, String> labels() {
     Map<String, String> labels = new HashMap<>();
     labels.putAll(defaultLabels());
-    labels.putAll(gatewayLabels());
     labels.putAll(customLabels());
     return labels;
   }
@@ -283,27 +282,6 @@ public class Role {
     } else {
       return config().rawConfig().servers().roles().get(name()).customRole();
     }
-  }
-
-  private Map<String, String> gatewayLabels() {
-    if (runningGateway()) {
-      String gatewayService = gatewayService();
-      return Map.of(
-        // Setting a service property ensures that the generated service name will be consistent between versions
-        "gateway.http.services." + gatewayService + ".loadbalancer.server.scheme", "http",
-
-        "gateway.http.routers." + gatewayService + ".rule", "PathPrefix(`/`)",
-        "gateway.http.routers." + gatewayService + ".priority", "2",
-        "gateway.http.middlewares." + gatewayService + "-retry.retry.attempts", "5",
-        "gateway.http.middlewares." + gatewayService + "-retry.retry.initialinterval", "500ms",
-        "gateway.http.routers." + gatewayService + ".middlewares", "" + gatewayService + "-retry@docker"
-      );
-    }
-    return Map.of();
-  }
-
-  private String gatewayService() {
-    return containerPrefix();
   }
 
   private Map<String, String> customLabels() {

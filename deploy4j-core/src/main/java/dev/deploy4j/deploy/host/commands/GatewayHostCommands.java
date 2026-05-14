@@ -31,13 +31,11 @@ public class GatewayHostCommands extends BaseHostCommands {
       .args("--detach")
       .args("--restart", "unless-stopped")
       .args(publishArgs())
-      .args("--volume", "/var/run/docker.sock:/var/run/docker.sock")
       .args(envArgs())
       .args(config().loggingArgs())
       .args(labelArgs())
       .args(dockerOptionsArgs())
       .args(image())
-      .args("--providers.docker")
       .args(cmdOptionArgs())
       .description("run gateway");
   }
