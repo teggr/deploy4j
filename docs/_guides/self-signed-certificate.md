@@ -3,7 +3,7 @@ layout: page
 title: Self-Signed Certificate for SSL
 ---
 
-This guide demonstrates how to deploy your application using Traefik's built-in self-signed certificate feature for SSL/TLS encryption.
+This guide demonstrates how to deploy your application using Gateway's built-in self-signed certificate feature for SSL/TLS encryption.
 
 ## When to Use Self-Signed Certificates
 
@@ -17,7 +17,7 @@ Self-signed certificates are useful when:
 
 ## Configuration
 
-Traefik provides self-signed certificate support out of the box. To enable it, modify the `servers` and `traefik` sections of your `config/deploy.yml` file:
+Gateway provides self-signed certificate support out of the box. To enable it, modify the `servers` and `gateway` sections of your `config/deploy.yml` file:
 
 ```yaml
 # Service configuration
@@ -30,10 +30,10 @@ servers:
     hosts:
       - your-host-ip-or-domain
     labels:
-      traefik.http.routers.yourservice.entrypoints: websecure
+      gateway.http.routers.yourservice.entrypoints: websecure
 
-# Traefik configuration for HTTPS with self-signed certificate
-traefik:
+# Gateway configuration for HTTPS with self-signed certificate
+gateway:
   options:
     publish:
       - "443:443"
@@ -44,8 +44,8 @@ traefik:
 
 ### Configuration Breakdown
 
-* `traefik.http.routers.yourservice.entrypoints: websecure` - Configures the service router to use the secure HTTPS entry point
-* `publish: "443:443"` - Publishes port 443 (HTTPS) from the Traefik container to the host
+* `gateway.http.routers.yourservice.entrypoints: websecure` - Configures the service router to use the secure HTTPS entry point
+* `publish: "443:443"` - Publishes port 443 (HTTPS) from the Gateway container to the host
 * `entryPoints.websecure.address: ":443"` - Defines the websecure entry point on port 443
 * `entrypoints.websecure.http.tls: true` - Enables TLS on the websecure entry point, which automatically generates a self-signed certificate
 
@@ -58,11 +58,11 @@ After updating your `config/deploy.yml`, deploy or update your application:
 deploy4j setup --version <your-version>
 
 # For updates to existing deployment
-deploy4j traefik reboot
+deploy4j gateway reboot
 deploy4j deploy --version <your-version>
 ```
 
-The `deploy4j traefik reboot` command will restart Traefik with the new configuration, enabling HTTPS with a self-signed certificate.
+The `deploy4j gateway reboot` command will restart Gateway with the new configuration, enabling HTTPS with a self-signed certificate.
 
 ## Accessing Your Application
 
@@ -104,7 +104,7 @@ servers:
     hosts:
       - 203.0.113.10
     labels:
-      traefik.http.routers.my-spring-app.entrypoints: websecure
+      gateway.http.routers.my-spring-app.entrypoints: websecure
 
 registry:
   username:
@@ -126,7 +126,7 @@ ssh:
   known_hosts_path:
     - KNOWN_HOSTS_PATH
 
-traefik:
+gateway:
   options:
     publish:
       - "443:443"
@@ -138,5 +138,5 @@ traefik:
 ## References
 
 * Original blog post: [Kamal Deploy with a self signed certificate for SSL](https://dimitrikoenig.com/blog/kamal-deploy-with-a-self-signed-certificate-for-ssl) by Dimitri Koenig
-* [Traefik TLS Documentation](https://doc.traefik.io/traefik/routing/entrypoints/#tls)
+* [Gateway TLS Documentation](https://doc.gateway.io/gateway/routing/entrypoints/#tls)
 * [Cloudflare SSL Modes](https://developers.cloudflare.com/ssl/origin-configuration/ssl-modes/)

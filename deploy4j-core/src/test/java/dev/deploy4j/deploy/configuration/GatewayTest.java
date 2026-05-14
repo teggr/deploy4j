@@ -2,7 +2,7 @@ package dev.deploy4j.deploy.configuration;
 
 import dev.deploy4j.deploy.configuration.raw.DeployConfig;
 import dev.deploy4j.deploy.configuration.raw.FlexibleValue;
-import dev.deploy4j.deploy.configuration.raw.TraefikConfig;
+import dev.deploy4j.deploy.configuration.raw.GatewayConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -12,8 +12,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@DisplayName("Traefik")
-class TraefikTest {
+@DisplayName("Gateway")
+class GatewayTest {
 
     @Test
     @DisplayName("should use default values when config is null")
@@ -25,13 +25,13 @@ class TraefikTest {
         when(config.hostEnvDirectory()).thenReturn("/app/env");
 
         // Act
-        Traefik traefik = new Traefik(config);
+        Gateway gateway = new Gateway(config);
 
         // Assert
-        assertThat(traefik.image()).isEqualTo("traefik:v3.6.2");
-        assertThat(traefik.hostPort()).isEqualTo(80);
-        assertThat(traefik.publish()).isTrue();
-        assertThat(traefik.options()).isEmpty();
+        assertThat(gateway.image()).isEqualTo("gateway:v3.6.2");
+        assertThat(gateway.hostPort()).isEqualTo(80);
+        assertThat(gateway.publish()).isTrue();
+        assertThat(gateway.options()).isEmpty();
     }
 
     @Test
@@ -41,8 +41,8 @@ class TraefikTest {
         Map<String, String> labels = Map.of("custom.label", "value");
         Map<String, String> args = Map.of("api.insecure", "true");
         Map<String, FlexibleValue> options = Map.of("network", FlexibleValue.from("host"));
-        TraefikConfig traefikConfig = new TraefikConfig(
-                "traefik:v3.0",
+        GatewayConfig gatewayConfig = new GatewayConfig(
+                "gateway:v3.0",
                 8080,
                 false,
                 labels,
@@ -51,37 +51,37 @@ class TraefikTest {
                 null
         );
 
-        DeployConfig deployConfig = DeployConfigBuilder.minimal().traefik(traefikConfig).build();
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().gateway(gatewayConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.hostEnvDirectory()).thenReturn("/app/env");
 
         // Act
-        Traefik traefik = new Traefik(config);
+        Gateway gateway = new Gateway(config);
 
         // Assert
-        assertThat(traefik.image()).isEqualTo("traefik:v3.0");
-        assertThat(traefik.hostPort()).isEqualTo(8080);
-        assertThat(traefik.publish()).isFalse();
-        assertThat(traefik.options()).containsEntry("network", "host");
+        assertThat(gateway.image()).isEqualTo("gateway:v3.0");
+        assertThat(gateway.hostPort()).isEqualTo(8080);
+        assertThat(gateway.publish()).isFalse();
+        assertThat(gateway.options()).containsEntry("network", "host");
     }
 
     @Test
     @DisplayName("should default publish to true when not specified")
     void shouldDefaultPublishToTrueWhenNotSpecified() {
         // Arrange
-        TraefikConfig traefikConfig = new TraefikConfig(null, null, null, null, null, null, null);
+        GatewayConfig gatewayConfig = new GatewayConfig(null, null, null, null, null, null, null);
 
-        DeployConfig deployConfig = DeployConfigBuilder.minimal().traefik(traefikConfig).build();
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().gateway(gatewayConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.hostEnvDirectory()).thenReturn("/app/env");
 
         // Act
-        Traefik traefik = new Traefik(config);
+        Gateway gateway = new Gateway(config);
 
         // Assert
-        assertThat(traefik.publish()).isTrue();
+        assertThat(gateway.publish()).isTrue();
     }
 
     @Test
@@ -94,16 +94,16 @@ class TraefikTest {
         when(config.hostEnvDirectory()).thenReturn("/app/env");
 
         // Act
-        Traefik traefik = new Traefik(config);
-        Map<String, String> labels = traefik.labels();
+        Gateway gateway = new Gateway(config);
+        Map<String, String> labels = gateway.labels();
 
         // Assert
         assertThat(labels)
-                .containsEntry("traefik.http.routers.catchall.entryPoints", "http")
-                .containsEntry("traefik.http.routers.catchall.rule", "PathPrefix(`/`)")
-                .containsEntry("traefik.http.routers.catchall.service", "unavailable")
-                .containsEntry("traefik.http.routers.catchall.priority", "1")
-                .containsEntry("traefik.http.services.unavailable.loadbalancer.server.port", "0");
+                .containsEntry("gateway.http.routers.catchall.entryPoints", "http")
+                .containsEntry("gateway.http.routers.catchall.rule", "PathPrefix(`/`)")
+                .containsEntry("gateway.http.routers.catchall.service", "unavailable")
+                .containsEntry("gateway.http.routers.catchall.priority", "1")
+                .containsEntry("gateway.http.services.unavailable.loadbalancer.server.port", "0");
     }
 
     @Test
@@ -111,22 +111,22 @@ class TraefikTest {
     void shouldMergeCustomLabelsWithDefaultLabels() {
         // Arrange
         Map<String, String> customLabels = Map.of("custom.label", "value", "another.label", "another-value");
-        TraefikConfig traefikConfig = new TraefikConfig(null, null, null, customLabels, null, null, null);
+        GatewayConfig gatewayConfig = new GatewayConfig(null, null, null, customLabels, null, null, null);
 
-        DeployConfig deployConfig = DeployConfigBuilder.minimal().traefik(traefikConfig).build();
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().gateway(gatewayConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.hostEnvDirectory()).thenReturn("/app/env");
 
         // Act
-        Traefik traefik = new Traefik(config);
-        Map<String, String> labels = traefik.labels();
+        Gateway gateway = new Gateway(config);
+        Map<String, String> labels = gateway.labels();
 
         // Assert
         assertThat(labels)
                 .containsEntry("custom.label", "value")
                 .containsEntry("another.label", "another-value")
-                .containsEntry("traefik.http.routers.catchall.entryPoints", "http");
+                .containsEntry("gateway.http.routers.catchall.entryPoints", "http");
     }
 
     @Test
@@ -139,8 +139,8 @@ class TraefikTest {
         when(config.hostEnvDirectory()).thenReturn("/app/env");
 
         // Act
-        Traefik traefik = new Traefik(config);
-        Map<String, String> args = traefik.args();
+        Gateway gateway = new Gateway(config);
+        Map<String, String> args = gateway.args();
 
         // Assert
         assertThat(args).containsEntry("log.level", "DEBUG");
@@ -151,16 +151,16 @@ class TraefikTest {
     void shouldMergeCustomArgsWithDefaultArgs() {
         // Arrange
         Map<String, String> customArgs = Map.of("api.dashboard", "true", "entrypoints.web.address", ":80");
-        TraefikConfig traefikConfig = new TraefikConfig(null, null, null, null, customArgs, null, null);
+        GatewayConfig gatewayConfig = new GatewayConfig(null, null, null, null, customArgs, null, null);
 
-        DeployConfig deployConfig = DeployConfigBuilder.minimal().traefik(traefikConfig).build();
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().gateway(gatewayConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.hostEnvDirectory()).thenReturn("/app/env");
 
         // Act
-        Traefik traefik = new Traefik(config);
-        Map<String, String> args = traefik.args();
+        Gateway gateway = new Gateway(config);
+        Map<String, String> args = gateway.args();
 
         // Assert
         assertThat(args)
@@ -173,18 +173,18 @@ class TraefikTest {
     @DisplayName("should format port correctly")
     void shouldFormatPortCorrectly() {
         // Arrange
-        TraefikConfig traefikConfig = new TraefikConfig(null, 8080, null, null, null, null, null);
+        GatewayConfig gatewayConfig = new GatewayConfig(null, 8080, null, null, null, null, null);
 
-        DeployConfig deployConfig = DeployConfigBuilder.minimal().traefik(traefikConfig).build();
+        DeployConfig deployConfig = DeployConfigBuilder.minimal().gateway(gatewayConfig).build();
         Configuration config = mock(Configuration.class);
         when(config.rawConfig()).thenReturn(deployConfig);
         when(config.hostEnvDirectory()).thenReturn("/app/env");
 
         // Act
-        Traefik traefik = new Traefik(config);
+        Gateway gateway = new Gateway(config);
 
         // Assert
-        assertThat(traefik.port()).isEqualTo("8080:80");
+        assertThat(gateway.port()).isEqualTo("8080:80");
     }
 
     @Test
@@ -197,10 +197,10 @@ class TraefikTest {
         when(config.hostEnvDirectory()).thenReturn("/app/env");
 
         // Act
-        Traefik traefik = new Traefik(config);
+        Gateway gateway = new Gateway(config);
 
         // Assert
-        assertThat(traefik.port()).isEqualTo("80:80");
+        assertThat(gateway.port()).isEqualTo("80:80");
     }
 
     @Test
@@ -213,11 +213,11 @@ class TraefikTest {
         when(config.hostEnvDirectory()).thenReturn("/app/env");
 
         // Act
-        Traefik traefik = new Traefik(config);
-        Env env = traefik.env();
+        Gateway gateway = new Gateway(config);
+        Env env = gateway.env();
 
         // Assert
         assertThat(env).isNotNull();
-        assertThat(env.context()).isEqualTo("traefik/env");
+        assertThat(env.context()).isEqualTo("gateway/env");
     }
 }

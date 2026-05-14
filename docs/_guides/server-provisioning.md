@@ -303,7 +303,7 @@ deploy4j setup
 The `deploy4j setup` command will:
 1. Connect to your server via SSH
 2. Install Docker (if not present)
-3. Configure Traefik as a reverse proxy
+3. Configure Gateway as a reverse proxy
 4. Pull your application image
 5. Start your application
 
@@ -356,7 +356,7 @@ If you get "Permission denied" errors:
 If you can SSH but can't access your web application:
 - Check security group rules (AWS)
 - Check firewall settings on the server (`sudo ufw status`)
-- Verify Traefik is running: `docker ps | grep traefik`
+- Verify Gateway is running: `docker ps | grep gateway`
 
 ## Next Steps
 

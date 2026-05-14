@@ -78,7 +78,7 @@ public class Role {
   public Map<String, String> labels() {
     Map<String, String> labels = new HashMap<>();
     labels.putAll(defaultLabels());
-    labels.putAll(traefikLabels());
+    labels.putAll(gatewayLabels());
     labels.putAll(customLabels());
     return labels;
   }
@@ -139,7 +139,7 @@ public class Role {
 
   private List<String> healthCheckArgs(boolean cord) {
 
-//    if (runningTraefik() || healthcheck().setPortOrPath()) {
+//    if (runningGateway() || healthcheck().setPortOrPath()) {
     // we are going to only run healthchecks if port/path is set. spring boot applications don't use actuator out of the box
     if(healthcheck().setPortOrPath()) {
       if (cord && usesCord()) {
@@ -166,7 +166,7 @@ public class Role {
 
   public HealthCheck healthcheck() {
     if (healthCheck == null) {
-      if (runningTraefik()) {
+      if (runningGateway()) {
         return config().healthcheck().merge(specializedHealthCheck()); // merge specialised
       } else {
         healthCheck = specializedHealthCheck();
@@ -180,11 +180,11 @@ public class Role {
       .formatted(healthcheck().cmd(), cordContainerFile());
   }
 
-  public boolean runningTraefik() {
-    if (specializations().traefik() == null) {
+  public boolean runningGateway() {
+    if (specializations().gateway() == null) {
       return primary();
     } else {
-      return specializations().traefik();
+      return specializations().gateway();
     }
   }
 
@@ -193,7 +193,7 @@ public class Role {
   }
 
   public boolean usesCord() {
-    return runningTraefik() && cordVolume() != null && healthcheck().cmd() != null;
+    return runningGateway() && cordVolume() != null && healthcheck().cmd() != null;
   }
 
   public String cordHostDirectory() {
@@ -285,24 +285,24 @@ public class Role {
     }
   }
 
-  private Map<String, String> traefikLabels() {
-    if (runningTraefik()) {
-      String traefikService = traefikService();
+  private Map<String, String> gatewayLabels() {
+    if (runningGateway()) {
+      String gatewayService = gatewayService();
       return Map.of(
         // Setting a service property ensures that the generated service name will be consistent between versions
-        "traefik.http.services." + traefikService + ".loadbalancer.server.scheme", "http",
+        "gateway.http.services." + gatewayService + ".loadbalancer.server.scheme", "http",
 
-        "traefik.http.routers." + traefikService + ".rule", "PathPrefix(`/`)",
-        "traefik.http.routers." + traefikService + ".priority", "2",
-        "traefik.http.middlewares." + traefikService + "-retry.retry.attempts", "5",
-        "traefik.http.middlewares." + traefikService + "-retry.retry.initialinterval", "500ms",
-        "traefik.http.routers." + traefikService + ".middlewares", "" + traefikService + "-retry@docker"
+        "gateway.http.routers." + gatewayService + ".rule", "PathPrefix(`/`)",
+        "gateway.http.routers." + gatewayService + ".priority", "2",
+        "gateway.http.middlewares." + gatewayService + "-retry.retry.attempts", "5",
+        "gateway.http.middlewares." + gatewayService + "-retry.retry.initialinterval", "500ms",
+        "gateway.http.routers." + gatewayService + ".middlewares", "" + gatewayService + "-retry@docker"
       );
     }
     return Map.of();
   }
 
-  private String traefikService() {
+  private String gatewayService() {
     return containerPrefix();
   }
 

@@ -6,22 +6,22 @@ import picocli.CommandLine;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(
-  name = "traefik",
-  description = "Manage Traefik load balancer",
+  name = "gateway",
+  description = "Manage Gateway load balancer",
   subcommands = {
-    TraefikCliCommand.BootCliCommand.class,
-    TraefikCliCommand.RebootCliCommand.class,
-    TraefikCliCommand.StartCliCommand.class,
-    TraefikCliCommand.StopCliCommand.class,
-    TraefikCliCommand.RestartCliCommand.class,
-    TraefikCliCommand.DetailsCliCommand.class,
-    TraefikCliCommand.LogsCliCommand.class,
-    TraefikCliCommand.RemoveCliCommand.class,
-    TraefikCliCommand.RemoveContainerCliCommand.class,
-    TraefikCliCommand.RemoveImageCliCommand.class
+    GatewayCliCommand.BootCliCommand.class,
+    GatewayCliCommand.RebootCliCommand.class,
+    GatewayCliCommand.StartCliCommand.class,
+    GatewayCliCommand.StopCliCommand.class,
+    GatewayCliCommand.RestartCliCommand.class,
+    GatewayCliCommand.DetailsCliCommand.class,
+    GatewayCliCommand.LogsCliCommand.class,
+    GatewayCliCommand.RemoveCliCommand.class,
+    GatewayCliCommand.RemoveContainerCliCommand.class,
+    GatewayCliCommand.RemoveImageCliCommand.class
   }
 )
-public class TraefikCliCommand implements Callable<Integer> {
+public class GatewayCliCommand implements Callable<Integer> {
 
   @CommandLine.Mixin
   private HelpOptions helpOptions = new HelpOptions();
@@ -34,22 +34,22 @@ public class TraefikCliCommand implements Callable<Integer> {
 
   @CommandLine.Command(
     name = "boot",
-    description = "Boot Traefik on servers")
+    description = "Boot Gateway on servers")
   public static class BootCliCommand extends BaseCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().boot(deployApplicationContext.deployContext());
+      deployApplicationContext.gateway().boot(deployApplicationContext.deployContext());
     }
 
   }
 
   @CommandLine.Command(
     name = "reboot",
-    description = "Reboot Traefik on servers (stop container, remove container, start new container)")
+    description = "Reboot Gateway on servers (stop container, remove container, start new container)")
   public static class RebootCliCommand extends BaseCliCommand {
 
-    @CommandLine.Option(names = "--rolling", description = "Reboot traefik on hosts in sequence, rather than in parallel", defaultValue = "false")
+    @CommandLine.Option(names = "--rolling", description = "Reboot gateway on hosts in sequence, rather than in parallel", defaultValue = "false")
     private boolean rolling;
 
     @CommandLine.Option(names = "-y", description = "Proceed without confirmation question", defaultValue = "false")
@@ -58,62 +58,62 @@ public class TraefikCliCommand implements Callable<Integer> {
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
       // TODO: confirmation prompt
-      deployApplicationContext.traefik().reboot(deployApplicationContext.deployContext(), rolling);
+      deployApplicationContext.gateway().reboot(deployApplicationContext.deployContext(), rolling);
     }
 
   }
 
   @CommandLine.Command(
     name = "start",
-    description = "Start existing Traefik container on servers")
+    description = "Start existing Gateway container on servers")
   public static class StartCliCommand extends BaseCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().start(deployApplicationContext.deployContext());
+      deployApplicationContext.gateway().start(deployApplicationContext.deployContext());
     }
 
   }
 
   @CommandLine.Command(
     name = "stop",
-    description = "Stop existing Traefik container on servers")
+    description = "Stop existing Gateway container on servers")
   public static class StopCliCommand extends BaseCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().stop(deployApplicationContext.deployContext());
+      deployApplicationContext.gateway().stop(deployApplicationContext.deployContext());
     }
 
   }
 
   @CommandLine.Command(
     name = "restart",
-    description = "Restart existing Traefik container on servers")
+    description = "Restart existing Gateway container on servers")
   public static class RestartCliCommand extends BaseCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().restart(deployApplicationContext.deployContext());
+      deployApplicationContext.gateway().restart(deployApplicationContext.deployContext());
     }
 
   }
 
   @CommandLine.Command(
     name = "details",
-    description = "Show details about Traefik container from servers")
+    description = "Show details about Gateway container from servers")
   public static class DetailsCliCommand extends BaseCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().details(deployApplicationContext.deployContext());
+      deployApplicationContext.gateway().details(deployApplicationContext.deployContext());
     }
 
   }
 
   @CommandLine.Command(
     name = "logs",
-    description = "Show log lines from Traefik on servers")
+    description = "Show log lines from Gateway on servers")
   public static class LogsCliCommand extends BaseCliCommand {
 
     @CommandLine.Option(names = "-s", description = "Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)")
@@ -133,43 +133,43 @@ public class TraefikCliCommand implements Callable<Integer> {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().logs(deployApplicationContext.deployContext(), since,lines, grep, grepOptions, follow);
+      deployApplicationContext.gateway().logs(deployApplicationContext.deployContext(), since,lines, grep, grepOptions, follow);
     }
 
   }
 
   @CommandLine.Command(
     name = "remove",
-    description = "Remove Traefik container and image from servers")
+    description = "Remove Gateway container and image from servers")
   public static class RemoveCliCommand extends BaseCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().remove(deployApplicationContext.deployContext());
+      deployApplicationContext.gateway().remove(deployApplicationContext.deployContext());
     }
 
   }
 
   @CommandLine.Command(
     name = "remove_container",
-    description = "Remove Traefik container from servers")
+    description = "Remove Gateway container from servers")
   public static class RemoveContainerCliCommand extends BaseCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().removeContainer(deployApplicationContext.deployContext());
+      deployApplicationContext.gateway().removeContainer(deployApplicationContext.deployContext());
     }
 
   }
 
   @CommandLine.Command(
     name = "remove_image",
-    description = "Remove Traefik image from servers")
+    description = "Remove Gateway image from servers")
   public static class RemoveImageCliCommand extends BaseCliCommand {
 
     @Override
     protected void execute(DeployApplicationContext deployApplicationContext) {
-      deployApplicationContext.traefik().removeImage(deployApplicationContext.deployContext());
+      deployApplicationContext.gateway().removeImage(deployApplicationContext.deployContext());
     }
 
   }

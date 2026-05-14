@@ -63,9 +63,9 @@ public class Specifics {
     return appHosts;
   }
 
-  public List<String> traefikHosts() {
+  public List<String> gatewayHosts() {
     Set<String> list = new HashSet<>();
-    list.addAll(config().traefikHosts());
+    list.addAll(config().gatewayHosts());
     list.addAll(specifiedHosts());
     return list.stream().toList();
   }

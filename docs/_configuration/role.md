@@ -28,7 +28,7 @@ servers:
   #
   # When there are other options to set, the list of hosts goes under the `hosts` key
   #
-  # By default only the primary role uses Traefik, but you can set `traefik` to change
+  # By default only the primary role uses Gateway, but you can set `gateway` to change
   # it.
   #
   # You can also set a custom cmd to run in the container, and overwrite other settings
@@ -37,7 +37,7 @@ servers:
     hosts:
       - 172.1.0.3
       - 172.1.0.4: experiment1
-    traefik: true
+    gateway: true
     cmd: "bin/jobs"
     options:
       memory: 2g

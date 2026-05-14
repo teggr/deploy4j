@@ -18,15 +18,15 @@ import static dev.rebelcraft.cmd.Cmds.*;
 import static dev.rebelcraft.cmd.Cmds.any;
 import static dev.rebelcraft.cmd.pkgs.Docker.docker;
 
-public class TraefikHostCommands extends BaseHostCommands {
+public class GatewayHostCommands extends BaseHostCommands {
 
-  public TraefikHostCommands(Configuration config) {
+  public GatewayHostCommands(Configuration config) {
     super(config);
   }
 
   public Cmd run() {
     return docker().run()
-      .args("--name", "traefik")
+      .args("--name", "gateway")
       .args("--network", "deploy4j")
       .args("--detach")
       .args("--restart", "unless-stopped")
@@ -39,15 +39,15 @@ public class TraefikHostCommands extends BaseHostCommands {
       .args(image())
       .args("--providers.docker")
       .args(cmdOptionArgs())
-      .description("run traefik");
+      .description("run gateway");
   }
 
   public Cmd start() {
-    return docker().container().args("start", "traefik").description("start traefik");
+    return docker().container().args("start", "gateway").description("start gateway");
   }
 
   public Cmd stop() {
-    return docker().container().args("stop", "traefik").description("stop traefik");
+    return docker().container().args("stop", "gateway").description("stop gateway");
   }
 
   public Cmd startOrRun() {
@@ -58,12 +58,12 @@ public class TraefikHostCommands extends BaseHostCommands {
   }
 
   public Cmd info() {
-    return docker().ps().args("--filter", "name=^traefik$").description("info");
+    return docker().ps().args("--filter", "name=^gateway$").description("info");
   }
 
   public Cmd logs(String since, String lines, String grep, String grepOptions) {
     return pipe(
-      docker().logs().args("traefik", since != null ? "--since " + since : null, lines != null ? "--tail " + lines : null, "--timestamps", "2>&1"),
+      docker().logs().args("gateway", since != null ? "--since " + since : null, lines != null ? "--tail " + lines : null, "--timestamps", "2>&1"),
       grep != null ? Cmd.cmd("grep", "\"" + grep + "\"" + (grepOptions != null ? " " + grepOptions : "")) : null
     ).description("logs");
   }
@@ -74,11 +74,11 @@ public class TraefikHostCommands extends BaseHostCommands {
   }
 
   public Cmd removeContainer() {
-    return docker().container().args("prune", "--force", "--filter", "label=org.opencontainers.image.title=Traefik").description("remove traefik");
+    return docker().container().args("prune", "--force", "--filter", "label=org.opencontainers.image.title=Gateway").description("remove gateway");
   }
 
   public Cmd removeImage() {
-    return docker().image().args("prune", "--force", "--filter", "label=org.opencontainers.image.title=Traefik").description("remove traefik image");
+    return docker().image().args("prune", "--force", "--filter", "label=org.opencontainers.image.title=Gateway").description("remove gateway image");
   }
 
   public Cmd ensureEnvDirectory() {
@@ -107,7 +107,7 @@ public class TraefikHostCommands extends BaseHostCommands {
   }
 
   public String envDirectory() {
-    return File.join( config().envDirectory(), "traefik" );
+    return File.join( config().envDirectory(), "gateway" );
   }
 
   public String secretsIO() {
@@ -115,7 +115,7 @@ public class TraefikHostCommands extends BaseHostCommands {
   }
 
   public String secretsPath() {
-    return File.join( config().envDirectory(), "traefik", "traefik.env" );
+    return File.join( config().envDirectory(), "gateway", "gateway.env" );
   }
 
   private List<String> dockerOptionsArgs() {
@@ -129,31 +129,31 @@ public class TraefikHostCommands extends BaseHostCommands {
   // delegate
 
   public String port() {
-    return config.traefik().port();
+    return config.gateway().port();
   }
 
   public boolean publish() {
-    return config.traefik().publish();
+    return config.gateway().publish();
   }
 
   public Map<String, String> labels() {
-    return config.traefik().labels();
+    return config.gateway().labels();
   }
 
   public Env env() {
-    return config.traefik().env();
+    return config.gateway().env();
   }
 
   public String image() {
-    return config.traefik().image();
+    return config.gateway().image();
   }
 
   public Map<String, Object> options() {
-    return config.traefik().options();
+    return config.gateway().options();
   }
 
   public Map<String, String> args() {
-    return config.traefik().args();
+    return config.gateway().args();
   }
 
 }

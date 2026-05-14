@@ -22,10 +22,10 @@ public class Deploy extends Base {
   private final Registry registry;
   private final Build build;
   private final Prune prune;
-  private final Traefik traefik;
+  private final Gateway gateway;
   private final AppHostCommandsFactory apps;
 
-  public Deploy(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, App app, Server server, Accessory accessory, Registry registry, Build build, Prune prune, Traefik traefik, AppHostCommandsFactory apps) {
+  public Deploy(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, App app, Server server, Accessory accessory, Registry registry, Build build, Prune prune, Gateway gateway, AppHostCommandsFactory apps) {
     super(sshHosts, hooks, localHost);
     this.lockManager = lockManager;
     this.app = app;
@@ -34,7 +34,7 @@ public class Deploy extends Base {
     this.registry = registry;
     this.build = build;
     this.prune = prune;
-    this.traefik = traefik;
+    this.gateway = gateway;
     this.apps = apps;
   }
 
@@ -73,8 +73,8 @@ public class Deploy extends Base {
 
       runHook(deployContext, "pre-deploy");
 
-      log.info("Ensure Traefik is running...");
-      traefik.boot(deployContext);
+      log.info("Ensure Gateway is running...");
+      gateway.boot(deployContext);
 
       if (bootAccessories) {
         accessory.boot(deployContext, "all", true);
@@ -95,7 +95,7 @@ public class Deploy extends Base {
   }
 
   /**
-   * Deploy app to servers without bootstrapping servers, starting Traefik, pruning, and registry login
+   * Deploy app to servers without bootstrapping servers, starting Gateway, pruning, and registry login
    *
    * @param skipPull Skip image pull
    */
@@ -155,7 +155,7 @@ public class Deploy extends Base {
    * Show details about all containers
    */
   public void details(DeployContext deployContext) {
-    traefik.details(deployContext);
+    gateway.details(deployContext);
     app.details(deployContext);
     accessory.details(deployContext, "all", false);
   }
@@ -171,13 +171,13 @@ public class Deploy extends Base {
   }
 
   /**
-   * Remove Traefik, app, accessories, and registry session from servers
+   * Remove Gateway, app, accessories, and registry session from servers
    */
   public void remove(DeployContext deployContext) {
 
     lockManager.withLock(deployContext, () -> {
 
-      traefik.remove(deployContext);
+      gateway.remove(deployContext);
       app.remove(deployContext);
       accessory.remove(deployContext, "all");
       registry.logout(deployContext);

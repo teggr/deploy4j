@@ -23,13 +23,13 @@ Commands:
   lock       Manage the deploy lock
   prune      Prune old application images and containers
   redeploy   Deploy app to servers without bootstrapping servers, starting
-               Traefik, pruning, and registry login
+               Gateway, pruning, and registry login
   registry   Login and out of the image registry
-  remove     Remove Traefik, app, accessories, and registry session from servers
+  remove     Remove Gateway, app, accessories, and registry session from servers
   rollback   Rollback app to VERSION
   server     Boostrap servers with curl and Docker
   setup      Setup all accessories, push the env, and deploy app to servers
   test       Test connectivity to servers
-  traefik    Manage Traefik load balancer
+  gateway    Manage Gateway load balancer
   version    Show Deploy4j version
 ```

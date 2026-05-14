@@ -283,13 +283,13 @@ class DeployConfigYamlReaderTest {
   }
 
   @Test
-  @DisplayName("should handle traefik options as lists")
-  void shouldHandleTraefikOptionsAsLists() throws IOException {
+  @DisplayName("should handle gateway options as lists")
+  void shouldHandleGatewayOptionsAsLists() throws IOException {
     // Arrange
     String yaml = """
             service: test-service
             image: test/image
-            traefik:
+            gateway:
               options:
                 publish:
                   - "443:443"
@@ -297,41 +297,41 @@ class DeployConfigYamlReaderTest {
                 volume:
                   - "/etc/letsencrypt/acme.json:/etc/letsencrypt/acme.json"
                   - "/var/log:/var/log"
-                name: "traefik"
+                name: "gateway"
             """;
 
     // Act
     DeployConfig config = DeployConfigYamlReader.readYamlFromString(yaml);
 
     // Assert
-    assertThat(config.traefik()).isNotNull();
-    assertThat(config.traefik().options()).isNotNull();
-    assertThat(config.traefik().options()).hasSize(3);
+    assertThat(config.gateway()).isNotNull();
+    assertThat(config.gateway().options()).isNotNull();
+    assertThat(config.gateway().options()).hasSize(3);
     
-    FlexibleValue publish = config.traefik().options().get("publish");
+    FlexibleValue publish = config.gateway().options().get("publish");
     assertThat(publish).isNotNull();
     assertThat(publish.asList()).containsExactly("443:443", "80:80");
     
-    FlexibleValue volume = config.traefik().options().get("volume");
+    FlexibleValue volume = config.gateway().options().get("volume");
     assertThat(volume).isNotNull();
     assertThat(volume.asList()).containsExactly(
         "/etc/letsencrypt/acme.json:/etc/letsencrypt/acme.json",
         "/var/log:/var/log"
     );
     
-    FlexibleValue name = config.traefik().options().get("name");
+    FlexibleValue name = config.gateway().options().get("name");
     assertThat(name).isNotNull();
-    assertThat(name.asSingleValue()).isEqualTo("traefik");
+    assertThat(name.asSingleValue()).isEqualTo("gateway");
   }
 
   @Test
-  @DisplayName("should handle traefik options as single strings")
-  void shouldHandleTraefikOptionsAsSingleStrings() throws IOException {
+  @DisplayName("should handle gateway options as single strings")
+  void shouldHandleGatewayOptionsAsSingleStrings() throws IOException {
     // Arrange
     String yaml = """
             service: test-service
             image: test/image
-            traefik:
+            gateway:
               options:
                 publish: "443:443"
                 volume: "/etc/letsencrypt/acme.json:/etc/letsencrypt/acme.json"
@@ -341,16 +341,16 @@ class DeployConfigYamlReaderTest {
     DeployConfig config = DeployConfigYamlReader.readYamlFromString(yaml);
 
     // Assert
-    assertThat(config.traefik()).isNotNull();
-    assertThat(config.traefik().options()).isNotNull();
-    assertThat(config.traefik().options()).hasSize(2);
+    assertThat(config.gateway()).isNotNull();
+    assertThat(config.gateway().options()).isNotNull();
+    assertThat(config.gateway().options()).hasSize(2);
     
-    FlexibleValue publish = config.traefik().options().get("publish");
+    FlexibleValue publish = config.gateway().options().get("publish");
     assertThat(publish).isNotNull();
     assertThat(publish.asSingleValue()).isEqualTo("443:443");
     assertThat(publish.isList()).isFalse();
     
-    FlexibleValue volume = config.traefik().options().get("volume");
+    FlexibleValue volume = config.gateway().options().get("volume");
     assertThat(volume).isNotNull();
     assertThat(volume.asSingleValue()).isEqualTo("/etc/letsencrypt/acme.json:/etc/letsencrypt/acme.json");
     assertThat(volume.isList()).isFalse();

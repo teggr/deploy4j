@@ -28,7 +28,7 @@ public class DeployConfig {
   private final String runDirectory;
   private final SshConfig ssh;
   private final Map<String, AccessoryConfig> accessories;
-  private final TraefikConfig traefik;
+  private final GatewayConfig gateway;
   private final BootConfig boot;
   private final HealthCheckConfig healthCheck;
   private final LoggingConfig logging;
@@ -54,7 +54,7 @@ public class DeployConfig {
     @JsonProperty("run_directory") String runDirectory,
     @JsonProperty("ssh") SshConfig ssh,
     @JsonProperty("accessories") Map<String, AccessoryConfig> accessories,
-    @JsonProperty("traefik") TraefikConfig traefik,
+    @JsonProperty("gateway") GatewayConfig gateway,
     @JsonProperty("boot") BootConfig boot,
     @JsonProperty("healthcheck") HealthCheckConfig healthCheck,
     @JsonProperty("logging") LoggingConfig logging,
@@ -78,7 +78,7 @@ public class DeployConfig {
     this.runDirectory = runDirectory;
     this.ssh = ssh;
     this.accessories = accessories;
-    this.traefik = traefik;
+    this.gateway = gateway;
     this.boot = boot;
     this.healthCheck = healthCheck;
     this.logging = logging;
@@ -157,8 +157,8 @@ public class DeployConfig {
     return accessories;
   }
 
-  public TraefikConfig traefik() {
-    return traefik;
+  public GatewayConfig gateway() {
+    return gateway;
   }
 
   public BootConfig boot() {

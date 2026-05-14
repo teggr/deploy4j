@@ -112,7 +112,7 @@ class ServersTest {
            hosts:
              - 172.1.0.3
              - 172.1.0.4: experiment1
-           traefik: true
+           gateway: true
            cmd: "bin/jobs"
            options:
              memory: 2g
@@ -140,7 +140,7 @@ class ServersTest {
     assertEquals("172.1.0.4", customRoleConfig.hosts().get(1).host());
     assertEquals(List.of("experiment1"), customRoleConfig.hosts().get(1).tags());
 
-    assertTrue(customRoleConfig.traefik() );
+    assertTrue(customRoleConfig.gateway() );
     assertEquals("bin/jobs", customRoleConfig.cmd() );
   }
 

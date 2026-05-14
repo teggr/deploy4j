@@ -82,8 +82,8 @@ servers:
       - 138.68.182.132
     options:
       "network": "my-network"
-# traefik options
-traefik:
+# gateway options
+gateway:
   options:
     "network": "my-network"
 # Environment variables for the Spring Boot application.

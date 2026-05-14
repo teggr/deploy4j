@@ -50,7 +50,7 @@ public class Configuration {
   private final Env env;
   private final HealthCheck healthcheck;
   private final Logging logging;
-  private final Traefik traefik;
+  private final Gateway gateway;
   private final Servers servers;
   private final Ssh ssh;
   private final Registry registry;
@@ -86,7 +86,7 @@ public class Configuration {
 
     this.healthcheck = new HealthCheck(rawConfig.healthCheck(), null);
     this.logging = new Logging(rawConfig.logging(), null);
-    this.traefik = new Traefik(this);
+    this.gateway = new Gateway(this);
     this.ssh = new Ssh(this, secrets);
     this.springBoot = new SpringBoot(rawConfig.springBoot(), this);
 
@@ -191,20 +191,20 @@ public class Configuration {
       rawConfig().allowEmptyRoles() : false;
   }
 
-  private List<Role> traefikRoles() {
+  private List<Role> gatewayRoles() {
     return roles().stream()
-      .filter(Role::runningTraefik)
+      .filter(Role::runningGateway)
       .toList();
   }
 
-  private List<String> traefikRoleNames() {
-    return traefikRoles().stream()
+  private List<String> gatewayRoleNames() {
+    return gatewayRoles().stream()
       .map(Role::name)
       .toList();
   }
 
-  public List<String> traefikHosts() {
-    return traefikRoles().stream()
+  public List<String> gatewayHosts() {
+    return gatewayRoles().stream()
       .flatMap(r -> r.hosts().stream())
       .distinct()
       .toList();
@@ -452,8 +452,8 @@ public class Configuration {
     return logging;
   }
 
-  public Traefik traefik() {
-    return traefik;
+  public Gateway gateway() {
+    return gateway;
   }
 
   public Servers servers() {

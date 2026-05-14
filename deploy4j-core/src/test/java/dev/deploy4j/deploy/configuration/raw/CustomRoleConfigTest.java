@@ -14,7 +14,7 @@ class CustomRoleConfigTest {
         CustomRoleConfig config = new CustomRoleConfig();
         
         assertThat(config.hosts()).isEmpty();
-        assertThat(config.traefik()).isNull();
+        assertThat(config.gateway()).isNull();
         assertThat(config.cmd()).isNull();
         assertThat(config.env()).isNull();
         assertThat(config.logging()).isNull();
@@ -44,7 +44,7 @@ class CustomRoleConfigTest {
         
         assertThat(config.hosts()).hasSize(2);
         assertThat(config.hosts().get(0).host()).isEqualTo("192.168.1.10");
-        assertThat(config.traefik()).isTrue();
+        assertThat(config.gateway()).isTrue();
         assertThat(config.cmd()).isEqualTo("java -jar app.jar");
         assertThat(config.env()).isEqualTo(env);
         assertThat(config.logging()).isEqualTo(logging);
@@ -92,7 +92,7 @@ class CustomRoleConfigTest {
         );
         
         assertThat(config.hosts()).hasSize(1);
-        assertThat(config.traefik()).isNull();
+        assertThat(config.gateway()).isNull();
         assertThat(config.cmd()).isNull();
         assertThat(config.env()).isNull();
         assertThat(config.logging()).isNull();
@@ -102,7 +102,7 @@ class CustomRoleConfigTest {
     }
 
     @Test
-    void shouldSetTraefikFlagToFalse() {
+    void shouldSetGatewayFlagToFalse() {
         CustomRoleConfig config = new CustomRoleConfig(
             List.of("192.168.1.10"),
             false,
@@ -114,6 +114,6 @@ class CustomRoleConfigTest {
             null
         );
         
-        assertThat(config.traefik()).isFalse();
+        assertThat(config.gateway()).isFalse();
     }
 }

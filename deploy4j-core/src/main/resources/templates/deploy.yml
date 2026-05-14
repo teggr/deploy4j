@@ -62,12 +62,12 @@ ssh:
 #     directories:
 #       - data:/data
 
-# Configure custom arguments for Traefik. Be sure to reboot traefik when you modify it.
-# traefik:
+# Configure custom arguments for Gateway. Be sure to reboot gateway when you modify it.
+# gateway:
 #   args:
 #     accesslog: true
 #     accesslog.format: json
-#traefik:
+#gateway:
 #  publish: true
 #  args:
 #    api.dashboard: true

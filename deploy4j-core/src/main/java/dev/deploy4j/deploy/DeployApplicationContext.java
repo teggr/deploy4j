@@ -12,7 +12,7 @@ public class DeployApplicationContext {
   private final Server server;
   private final Registry registry;
   private final Build build;
-  private final Traefik traefik;
+  private final Gateway gateway;
   private final App app;
   private final Prune prune;
   private final Accessory accessory;
@@ -40,7 +40,7 @@ public class DeployApplicationContext {
 
     ServerHostCommands server = new ServerHostCommands(deployContext.config());
 
-    TraefikHostCommands traefik = new TraefikHostCommands(deployContext.config());
+    GatewayHostCommands gateway = new GatewayHostCommands(deployContext.config());
 
     AuditorHostCommands audit = new AuditorHostCommands(deployContext.config(), Map.of());
 
@@ -57,12 +57,12 @@ public class DeployApplicationContext {
     this.registry = new Registry(sshHosts, hooks, localHost, registry);
     this.build = new Build(sshHosts, hooks, localHost, builder, audit);
     this.prune = new Prune(sshHosts, hooks, localHost, lockManager, prune, audit);
-    this.traefik = new Traefik(sshHosts, hooks, localHost, lockManager, registry, traefik, audit, docker);
+    this.gateway = new Gateway(sshHosts, hooks, localHost, lockManager, registry, gateway, audit, docker);
     this.lock = new Lock(sshHosts, hooks, localHost, lockManager, server, lock);
 
     this.audit = new Audit(sshHosts, hooks, localHost, audit);
     this.springBootManage = new SpringBootManage(sshHosts, hooks, localHost, springBootFactory, apps);
-    this.deploy = new Deploy(sshHosts, hooks, localHost, lockManager, this.app, this.server, this.accessory, this.registry, build, this.prune, this.traefik, apps);
+    this.deploy = new Deploy(sshHosts, hooks, localHost, lockManager, this.app, this.server, this.accessory, this.registry, build, this.prune, this.gateway, apps);
 
   }
 
@@ -82,8 +82,8 @@ public class DeployApplicationContext {
     return deploy;
   }
 
-  public Traefik traefik() {
-    return traefik;
+  public Gateway gateway() {
+    return gateway;
   }
 
   public App app() {

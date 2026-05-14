@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
 
 @JsonIgnoreProperties
-public class TraefikConfig {
+public class GatewayConfig {
 
   private final String image;
   private final Integer hostPort;
@@ -18,7 +18,7 @@ public class TraefikConfig {
   private final EnvironmentConfig env;
 
   @JsonCreator
-  public TraefikConfig(
+  public GatewayConfig(
     @JsonProperty("image") String image,
     @JsonProperty("host_port") Integer hostPort,
     @JsonProperty("publish") Boolean publish,
@@ -36,7 +36,7 @@ public class TraefikConfig {
     this.env = env;
   }
 
-  public TraefikConfig() {
+  public GatewayConfig() {
     this.image = null;
     this.hostPort = null;
     this.publish = null;

@@ -4,13 +4,13 @@ title: deploy4j deploy
 ---
 Deploy your app to all servers.
 
-Deploy4j will use the Traefik proxy to seamlessly move requests from the old version of the app to new without downtime.
+Deploy4j will use the Gateway proxy to seamlessly move requests from the old version of the app to new without downtime.
 
 The deployment process is:
 
 1. Login into the Docker registry on all servers
 2. Pull the app version onto the servers
-3. Ensure Traefik is booted
+3. Ensure Gateway is booted
 4. Check the image boots on one server
 5. Detect and stop any stale containers
 6. Boot the new container and stop the old one

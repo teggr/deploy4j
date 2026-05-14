@@ -132,10 +132,10 @@ ssh:
 accessories:
   ...
 
-# Traefik
+# Gateway
 #
-# The Traefik proxy is used for zero-downtime deployments, see deploy4j docs traefik
-traefik:
+# The Gateway proxy is used for zero-downtime deployments, see deploy4j docs gateway
+gateway:
   ...
 
 # Boot options

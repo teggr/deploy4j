@@ -27,7 +27,7 @@ import java.util.concurrent.Callable;
     SetupCliCommand.class,
     SpringBootCliCommand.class,
     TestCliCommand.class,
-    TraefikCliCommand.class,
+    GatewayCliCommand.class,
     VersionCliCommand.class
   }
 )

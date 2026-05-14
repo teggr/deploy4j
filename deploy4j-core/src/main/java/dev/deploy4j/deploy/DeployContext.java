@@ -132,8 +132,8 @@ public class DeployContext implements LockContext {
     return specifics.rolesOn(host);
   }
 
-  public List<String> traefikHosts() {
-    return specifics.traefikHosts();
+  public List<String> gatewayHosts() {
+    return specifics.gatewayHosts();
   }
 
   public List<String> accessoryHosts() {

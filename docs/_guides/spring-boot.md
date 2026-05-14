@@ -109,9 +109,9 @@ accessories:
         POSTGRES_DB: testdb
     directories:
       - data:/var/lib/postgresql/18/docker
-# Traefik configuration for load balancing and routing.
+# Gateway configuration for load balancing and routing.
 # We are enabling the dashboard for monitoring.
-traefik:
+gateway:
   publish: true
   args:
     api.dashboard: true
@@ -134,7 +134,7 @@ We are now ready to deploy our Spring Boot application!
 
 ## Deployment
 
-The first time we deploy with deploy4j, we need to run the `setup` command. This will bootstrap the server, install Docker, setup Traefik, create the Postgres accessory, and deploy the application.
+The first time we deploy with deploy4j, we need to run the `setup` command. This will bootstrap the server, install Docker, setup Gateway, create the Postgres accessory, and deploy the application.
 
 ```shell
 deploy4j setup --version 0.0.2-SNAPSHOT
@@ -145,7 +145,7 @@ Missing Docker on 138.68.182.132. Installing...
 Boot accessories...
 Log into image registry...
 Pull app image...
-Ensure Traefik is running...
+Ensure Gateway is running...
 Detect stale containers...
 Get most recent version available as an image...
 Start container with version 0.0.2-SNAPSHOT using a nulls readiness delay (or reboot if already running)...
@@ -161,7 +161,7 @@ Finished all in  in 66 seconds
 Now we can visit our Spring Boot application:
 
 * Running application in the browser at `http://138.68.182.132/`
-* Traefik dashboard at `http://138.68.182.132:8080/dashboard/#/`
+* Gateway dashboard at `http://138.68.182.132:8080/dashboard/#/`
 
 ```mermaid
 architecture-beta
@@ -169,10 +169,10 @@ architecture-beta
     
     service db(database)[DB] in api
     service disk1(disk)[Storage] in api
-    service traefik(server)[Traefik] in api
+    service gateway(server)[Gateway] in api
     service app(server)[Application] in api
     
-    traefik:R -- L:app
+    gateway:R -- L:app
     app:R -- L:db
     disk1:T -- B:db
 ```
@@ -187,7 +187,7 @@ We can use `deploy4j details` to see the running containers on the server.
 deploy4j details
 
 CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS          PORTS                                                                              NAMES
-60746d132cae   traefik:v2.11   "/entrypoint.sh --pr…"   37 minutes ago   Up 37 minutes   0.0.0.0:80->80/tcp, [::]:80->80/tcp, 0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp   traefik
+60746d132cae   gateway:v2.11   "/entrypoint.sh --pr…"   37 minutes ago   Up 37 minutes   0.0.0.0:80->80/tcp, [::]:80->80/tcp, 0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp   gateway
 
 CONTAINER ID   IMAGE                                COMMAND                  CREATED          STATUS          PORTS      NAMES
 7437bfeb9019   teggr/deploy4j-demo:0.0.2-SNAPSHOT   "java -jar /app/app.…"   27 minutes ago   Up 27 minutes   8080/tcp   deploy4j-demo-web-0.0.2-SNAPSHOT

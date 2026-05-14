@@ -5,7 +5,7 @@ import picocli.CommandLine;
 
 @CommandLine.Command(
   name = "remove",
-  description = "Remove Traefik, app, accessories, and registry session from servers")
+  description = "Remove Gateway, app, accessories, and registry session from servers")
 public class RemoveCliCommand extends BaseCliCommand {
 
   @Override

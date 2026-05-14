@@ -34,7 +34,7 @@ public class DeployConfigBuilder {
     private String runDirectory;
     private SshConfig ssh;
     private Map<String, AccessoryConfig> accessories;
-    private TraefikConfig traefik;
+    private GatewayConfig gateway;
     private BootConfig boot;
     private HealthCheckConfig healthCheck;
     private LoggingConfig logging;
@@ -72,7 +72,7 @@ public class DeployConfigBuilder {
     public DeployConfigBuilder runDirectory(String runDirectory) { this.runDirectory = runDirectory; return this; }
     public DeployConfigBuilder ssh(SshConfig ssh) { this.ssh = ssh; return this; }
     public DeployConfigBuilder accessories(Map<String, AccessoryConfig> accessories) { this.accessories = accessories; return this; }
-    public DeployConfigBuilder traefik(TraefikConfig traefik) { this.traefik = traefik; return this; }
+    public DeployConfigBuilder gateway(GatewayConfig gateway) { this.gateway = gateway; return this; }
     public DeployConfigBuilder boot(BootConfig boot) { this.boot = boot; return this; }
     public DeployConfigBuilder healthCheck(HealthCheckConfig healthCheck) { this.healthCheck = healthCheck; return this; }
     public DeployConfigBuilder logging(LoggingConfig logging) { this.logging = logging; return this; }
@@ -98,7 +98,7 @@ public class DeployConfigBuilder {
             runDirectory,
             ssh,
             accessories,
-            traefik,
+            gateway,
             boot,
             healthCheck,
             logging,
@@ -163,7 +163,7 @@ public class DeployConfigBuilder {
 
     public static class CustomRoleBuilder {
         private final List<String> hosts = new ArrayList<>();
-        private Boolean traefik;
+        private Boolean gateway;
         private String cmd;
         private EnvironmentConfig env;
         private LoggingConfig logging;
@@ -172,14 +172,14 @@ public class DeployConfigBuilder {
         private Map<String, String> labels;
 
         public CustomRoleBuilder addHost(String host) { hosts.add(host); return this; }
-        public CustomRoleBuilder traefik(Boolean t) { this.traefik = t; return this; }
+        public CustomRoleBuilder gateway(Boolean t) { this.gateway = t; return this; }
         public CustomRoleBuilder cmd(String c) { this.cmd = c; return this; }
         public CustomRoleBuilder env(EnvironmentConfig e) { this.env = e; return this; }
         public CustomRoleBuilder logging(LoggingConfig l) { this.logging = l; return this; }
         public CustomRoleBuilder healthcheck(HealthCheckConfig h) { this.healthcheck = h; return this; }
         public CustomRoleBuilder options(Map<String, String> o) { this.options = o; return this; }
         public CustomRoleBuilder labels(Map<String, String> l) { this.labels = l; return this; }
-        public CustomRoleConfig build() { return new CustomRoleConfig(new ArrayList<>(hosts), traefik, cmd, env, logging, healthcheck, options, labels); }
+        public CustomRoleConfig build() { return new CustomRoleConfig(new ArrayList<>(hosts), gateway, cmd, env, logging, healthcheck, options, labels); }
     }
 
     public static class HealthCheckBuilder {

@@ -2,7 +2,7 @@ package dev.deploy4j.deploy.host.commands;
 
 import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.configuration.Env;
-import dev.deploy4j.deploy.configuration.Traefik;
+import dev.deploy4j.deploy.configuration.Gateway;
 import dev.rebelcraft.cmd.Cmd;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,69 +15,69 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class TraefikHostCommandsTest {
+class GatewayHostCommandsTest {
 
     private Configuration mockConfig;
-    private Traefik mockTraefik;
+    private Gateway mockGateway;
     private Env mockEnv;
-    private TraefikHostCommands traefikCommands;
+    private GatewayHostCommands gatewayCommands;
 
     @BeforeEach
     void setUp() {
         mockConfig = mock(Configuration.class);
-        mockTraefik = mock(Traefik.class);
+        mockGateway = mock(Gateway.class);
         mockEnv = mock(Env.class);
         
-        when(mockConfig.traefik()).thenReturn(mockTraefik);
-        when(mockTraefik.port()).thenReturn("80:80");
-        when(mockTraefik.publish()).thenReturn(true);
-        when(mockTraefik.image()).thenReturn("traefik:v2.10");
-        when(mockTraefik.labels()).thenReturn(Map.of());
-        when(mockTraefik.env()).thenReturn(mockEnv);
-        when(mockTraefik.options()).thenReturn(Map.of());
-        when(mockTraefik.args()).thenReturn(Map.of());
+        when(mockConfig.gateway()).thenReturn(mockGateway);
+        when(mockGateway.port()).thenReturn("80:80");
+        when(mockGateway.publish()).thenReturn(true);
+        when(mockGateway.image()).thenReturn("gateway:v2.10");
+        when(mockGateway.labels()).thenReturn(Map.of());
+        when(mockGateway.env()).thenReturn(mockEnv);
+        when(mockGateway.options()).thenReturn(Map.of());
+        when(mockGateway.args()).thenReturn(Map.of());
         when(mockEnv.clearArgs()).thenReturn(List.of());
         when(mockConfig.loggingArgs()).thenReturn(new String[]{});
         
-        traefikCommands = new TraefikHostCommands(mockConfig);
+        gatewayCommands = new GatewayHostCommands(mockConfig);
     }
 
     @Test
     void shouldGenerateRunCommand() {
-        Cmd cmd = traefikCommands.run();
+        Cmd cmd = gatewayCommands.run();
         
         assertThat(cmd).isNotNull();
         assertThat(cmd.build()).contains("docker");
         assertThat(String.join(" ", cmd.build())).contains("run");
-        assertThat(String.join(" ", cmd.build())).contains("traefik");
-        assertThat(cmd.description()).isEqualTo("run traefik");
+        assertThat(String.join(" ", cmd.build())).contains("gateway");
+        assertThat(cmd.description()).isEqualTo("run gateway");
     }
 
     @Test
     void shouldGenerateStartCommand() {
-        Cmd cmd = traefikCommands.start();
+        Cmd cmd = gatewayCommands.start();
         
         assertThat(cmd).isNotNull();
         assertThat(cmd.build()).contains("docker");
         assertThat(String.join(" ", cmd.build())).contains("start");
-        assertThat(String.join(" ", cmd.build())).contains("traefik");
-        assertThat(cmd.description()).isEqualTo("start traefik");
+        assertThat(String.join(" ", cmd.build())).contains("gateway");
+        assertThat(cmd.description()).isEqualTo("start gateway");
     }
 
     @Test
     void shouldGenerateStopCommand() {
-        Cmd cmd = traefikCommands.stop();
+        Cmd cmd = gatewayCommands.stop();
         
         assertThat(cmd).isNotNull();
         assertThat(cmd.build()).contains("docker");
         assertThat(String.join(" ", cmd.build())).contains("stop");
-        assertThat(String.join(" ", cmd.build())).contains("traefik");
-        assertThat(cmd.description()).isEqualTo("stop traefik");
+        assertThat(String.join(" ", cmd.build())).contains("gateway");
+        assertThat(cmd.description()).isEqualTo("stop gateway");
     }
 
     @Test
     void shouldGenerateStartOrRunCommand() {
-        Cmd cmd = traefikCommands.startOrRun();
+        Cmd cmd = gatewayCommands.startOrRun();
         
         assertThat(cmd).isNotNull();
         assertThat(cmd.description()).isEqualTo("start or run");
@@ -85,18 +85,18 @@ class TraefikHostCommandsTest {
 
     @Test
     void shouldGenerateInfoCommand() {
-        Cmd cmd = traefikCommands.info();
+        Cmd cmd = gatewayCommands.info();
         
         assertThat(cmd).isNotNull();
         assertThat(cmd.build()).contains("docker");
         assertThat(String.join(" ", cmd.build())).contains("ps");
-        assertThat(String.join(" ", cmd.build())).contains("traefik");
+        assertThat(String.join(" ", cmd.build())).contains("gateway");
         assertThat(cmd.description()).isEqualTo("info");
     }
 
     @Test
     void shouldGenerateLogsCommand() {
-        Cmd cmd = traefikCommands.logs(null, null, null, null);
+        Cmd cmd = gatewayCommands.logs(null, null, null, null);
         
         assertThat(cmd).isNotNull();
         assertThat(cmd.build()).contains("docker");
@@ -106,7 +106,7 @@ class TraefikHostCommandsTest {
 
     @Test
     void shouldGenerateLogsCommandWithParameters() {
-        Cmd cmd = traefikCommands.logs("10m", "100", "error", "-i");
+        Cmd cmd = gatewayCommands.logs("10m", "100", "error", "-i");
         
         assertThat(cmd).isNotNull();
         assertThat(String.join(" ", cmd.build())).contains("logs");
@@ -116,45 +116,45 @@ class TraefikHostCommandsTest {
 
     @Test
     void shouldThrowUnsupportedOperationForFollowLogs() {
-        assertThatThrownBy(() -> traefikCommands.followLogs())
+        assertThatThrownBy(() -> gatewayCommands.followLogs())
             .isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test
     void shouldGenerateRemoveContainerCommand() {
-        Cmd cmd = traefikCommands.removeContainer();
+        Cmd cmd = gatewayCommands.removeContainer();
         
         assertThat(cmd).isNotNull();
         assertThat(cmd.build()).contains("docker");
         assertThat(String.join(" ", cmd.build())).contains("prune");
-        assertThat(cmd.description()).isEqualTo("remove traefik");
+        assertThat(cmd.description()).isEqualTo("remove gateway");
     }
 
     @Test
     void shouldGenerateRemoveImageCommand() {
-        Cmd cmd = traefikCommands.removeImage();
+        Cmd cmd = gatewayCommands.removeImage();
         
         assertThat(cmd).isNotNull();
         assertThat(cmd.build()).contains("docker");
         assertThat(String.join(" ", cmd.build())).contains("prune");
-        assertThat(cmd.description()).isEqualTo("remove traefik image");
+        assertThat(cmd.description()).isEqualTo("remove gateway image");
     }
 
 //    @Test
 //    void shouldGenerateMakeEnvDirectoryCommand() {
 //
-//        Cmd cmd = traefikCommands.ensureEnvDirectory();
+//        Cmd cmd = gatewayCommands.ensureEnvDirectory();
 //
 //        assertThat(cmd).isNotNull();
 //        assertThat(cmd.build()).contains("mkdir");
-//        assertThat(cmd.build()).contains("/opt/traefik/env");
+//        assertThat(cmd.build()).contains("/opt/gateway/env");
 //    }
 
     @Test
-    void shouldDelegateToTraefikConfig() {
-        assertThat(traefikCommands.port()).isEqualTo("80:80");
-        assertThat(traefikCommands.publish()).isTrue();
-        assertThat(traefikCommands.image()).isEqualTo("traefik:v2.10");
-        assertThat(traefikCommands.env()).isEqualTo(mockEnv);
+    void shouldDelegateToGatewayConfig() {
+        assertThat(gatewayCommands.port()).isEqualTo("80:80");
+        assertThat(gatewayCommands.publish()).isTrue();
+        assertThat(gatewayCommands.image()).isEqualTo("gateway:v2.10");
+        assertThat(gatewayCommands.env()).isEqualTo(mockEnv);
     }
 }

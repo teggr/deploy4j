@@ -129,17 +129,17 @@ class ConfigurationTest {
         }
 
         @Test
-        @DisplayName("should return traefik hosts")
-        void shouldReturnTraefikHosts() {
+        @DisplayName("should return gateway hosts")
+        void shouldReturnGatewayHosts() {
             // Arrange
             DeployConfig deployConfig = DeployConfigBuilder.minimal().build();
             Configuration configuration = new Configuration(deployConfig, "prod", "1.0.0");
 
             // Act
-            List<String> traefikHosts = configuration.traefikHosts();
+            List<String> gatewayHosts = configuration.gatewayHosts();
 
             // Assert
-            assertThat(traefikHosts).isNotNull();
+            assertThat(gatewayHosts).isNotNull();
         }
     }
 

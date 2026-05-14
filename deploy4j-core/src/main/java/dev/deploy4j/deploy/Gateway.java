@@ -3,48 +3,48 @@ package dev.deploy4j.deploy;
 import dev.deploy4j.deploy.host.commands.AuditorHostCommands;
 import dev.deploy4j.deploy.host.commands.DockerHostCommands;
 import dev.deploy4j.deploy.host.commands.RegistryHostCommands;
-import dev.deploy4j.deploy.host.commands.TraefikHostCommands;
+import dev.deploy4j.deploy.host.commands.GatewayHostCommands;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 import dev.deploy4j.deploy.local.LocalHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Traefik extends Base {
+public class Gateway extends Base {
 
-  private static final Logger log = LoggerFactory.getLogger(Traefik.class);
+  private static final Logger log = LoggerFactory.getLogger(Gateway.class);
 
   private final LockManager lockManager;
   private final RegistryHostCommands registry;
-  private final TraefikHostCommands traefik;
+  private final GatewayHostCommands gateway;
   private final AuditorHostCommands audit;
   private final DockerHostCommands docker;
 
-  public Traefik(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, RegistryHostCommands registry, TraefikHostCommands traefik, AuditorHostCommands audit, DockerHostCommands docker) {
+  public Gateway(SshHosts sshHosts, Hooks hooks, LocalHost localHost, LockManager lockManager, RegistryHostCommands registry, GatewayHostCommands gateway, AuditorHostCommands audit, DockerHostCommands docker) {
     super(sshHosts, hooks, localHost);
     this.lockManager = lockManager;
     this.registry = registry;
-    this.traefik = traefik;
+    this.gateway = gateway;
     this.audit = audit;
     this.docker = docker;
   }
 
   /**
-   * Boot Traefik on servers
+   * Boot Gateway on servers
    */
   public void boot(DeployContext deployContext) {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext, deployContext.traefikHosts(), host -> {
+      on(deployContext, deployContext.gatewayHosts(), host -> {
         host.execute(docker.createNetwork());
       });
 
-      on(deployContext, deployContext.traefikHosts(), host -> {
+      on(deployContext, deployContext.gatewayHosts(), host -> {
 
         host.execute(registry.login());
-        host.execute(traefik.ensureEnvDirectory());
-        host.upload( traefik.secretsIO(), traefik.secretsPath(), 600 );
-        host.execute(traefik.startOrRun());
+        host.execute(gateway.ensureEnvDirectory());
+        host.upload( gateway.secretsIO(), gateway.secretsPath(), 600 );
+        host.execute(gateway.startOrRun());
 
       });
 
@@ -55,46 +55,46 @@ public class Traefik extends Base {
 
 
   /**
-   * Reboot Traefik on servers (stop container, remove container, start new container)
+   * Reboot Gateway on servers (stop container, remove container, start new container)
    *
-   * @param rolling Reboot traefik on hosts in sequence, rather than in parallel
+   * @param rolling Reboot gateway on hosts in sequence, rather than in parallel
    */
   public void reboot(DeployContext deployContext, boolean rolling) {
 
     lockManager.withLock(deployContext, () -> {
 
-      runHook(deployContext, "pre-traefik-reboot");
+      runHook(deployContext, "pre-gateway-reboot");
 
-      on(deployContext, deployContext.traefikHosts(), host -> {
+      on(deployContext, deployContext.gatewayHosts(), host -> {
 
 
-        host.execute(audit.record("Rebooted traefik"));
+        host.execute(audit.record("Rebooted gateway"));
         host.execute(registry.login());
-        host.execute(traefik.stop(), false);
-        host.execute(traefik.removeContainer());
-        host.execute(traefik.ensureEnvDirectory());
-        host.upload( traefik.secretsIO(), traefik.secretsPath(), 600 );
-        host.execute(traefik.run());
+        host.execute(gateway.stop(), false);
+        host.execute(gateway.removeContainer());
+        host.execute(gateway.ensureEnvDirectory());
+        host.upload( gateway.secretsIO(), gateway.secretsPath(), 600 );
+        host.execute(gateway.run());
 
       });
 
-      runHook(deployContext, "post-traefik-reboot");
+      runHook(deployContext, "post-gateway-reboot");
 
     });
 
   }
 
   /**
-   * Start existing Traefik container on servers
+   * Start existing Gateway container on servers
    */
   public void start(DeployContext deployContext) {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext, deployContext.traefikHosts(), host -> {
+      on(deployContext, deployContext.gatewayHosts(), host -> {
 
-        host.execute(audit.record("Started traefik"));
-        host.execute(traefik.start());
+        host.execute(audit.record("Started gateway"));
+        host.execute(gateway.start());
 
 
       });
@@ -104,16 +104,16 @@ public class Traefik extends Base {
   }
 
   /**
-   * Stop existing Traefik container on servers
+   * Stop existing Gateway container on servers
    */
   public void stop(DeployContext deployContext) {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext, deployContext.traefikHosts(), host -> {
+      on(deployContext, deployContext.gatewayHosts(), host -> {
 
-        host.execute(audit.record("Stopped traefik"));
-        host.execute(traefik.stop(), false);
+        host.execute(audit.record("Stopped gateway"));
+        host.execute(gateway.stop(), false);
 
 
       });
@@ -123,7 +123,7 @@ public class Traefik extends Base {
   }
 
   /**
-   * Restart existing Traefik container on servers
+   * Restart existing Gateway container on servers
    */
   public void restart(DeployContext deployContext) {
 
@@ -137,20 +137,20 @@ public class Traefik extends Base {
   }
 
   /**
-   * Show details about Traefik container from servers
+   * Show details about Gateway container from servers
    */
   public void details(DeployContext deployContext) {
 
-    on(deployContext, deployContext.traefikHosts(), host -> {
+    on(deployContext, deployContext.gatewayHosts(), host -> {
 
-      log.info(host.capture(traefik.info()));
+      log.info(host.capture(gateway.info()));
 
     });
 
   }
 
   /**
-   * Show log lines from Traefik on servers
+   * Show log lines from Gateway on servers
    *
    * @param since       Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)
    * @param lines       Number of log lines to pull from each server
@@ -174,16 +174,16 @@ public class Traefik extends Base {
 //      lines = 100;
 //    }
 
-    on(deployContext, deployContext.traefikHosts(), host -> {
+    on(deployContext, deployContext.gatewayHosts(), host -> {
 
-      log.info(host.capture(traefik.logs(since, lines != null ? lines.toString() : null, grep, grepOptions)));
+      log.info(host.capture(gateway.logs(since, lines != null ? lines.toString() : null, grep, grepOptions)));
 
     });
 
   }
 
   /**
-   * Remove Traefik container and image from servers
+   * Remove Gateway container and image from servers
    */
   public void remove(DeployContext deployContext) {
 
@@ -199,16 +199,16 @@ public class Traefik extends Base {
 
 
   /**
-   * Remove Traefik container from servers
+   * Remove Gateway container from servers
    */
   public void removeContainer(DeployContext deployContext) {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext, deployContext.traefikHosts(), host -> {
+      on(deployContext, deployContext.gatewayHosts(), host -> {
 
-        host.execute(audit.record("Removed traefik container"));
-        host.execute(traefik.removeContainer());
+        host.execute(audit.record("Removed gateway container"));
+        host.execute(gateway.removeContainer());
 
       });
 
@@ -217,16 +217,16 @@ public class Traefik extends Base {
   }
 
   /**
-   * Remove Traefik image from servers
+   * Remove Gateway image from servers
    */
   public void removeImage(DeployContext deployContext) {
 
     lockManager.withLock(deployContext, () -> {
 
-      on(deployContext, deployContext.traefikHosts(), host -> {
+      on(deployContext, deployContext.gatewayHosts(), host -> {
 
-        host.execute(audit.record("Removed traefik image"));
-        host.execute(traefik.removeImage());
+        host.execute(audit.record("Removed gateway image"));
+        host.execute(gateway.removeImage());
 
       });
 

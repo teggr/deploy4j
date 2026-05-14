@@ -50,7 +50,7 @@ This will:
 2. Install Docker and curl on any server that might be missing it (using get.docker.com): root access is needed via ssh for this.
 3. Log into the registry remotely.
 4. Pull the image from the registry onto the servers.
-5. Ensure Traefik is running and accepting traffic on port 80.
+5. Ensure Gateway is running and accepting traffic on port 80.
 6. Ensure your app responds with 200 OK to GET /up (you must have curl installed inside your app image!). 
 7. Start a new container with the version of the app that matches the current Git version hash. 
 8. Stop the old container running the previous version of the app. 

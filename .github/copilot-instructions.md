@@ -17,7 +17,7 @@ deploy4j is a deployment tool for Java web applications, inspired by MRSK, desig
 - **Build Tool**: Maven
 - **Containerization**: Docker
 - **SSH**: For remote server connections
-- **Proxy**: Traefik for routing
+- **Proxy**: Gateway for routing
 
 ## Development Guidelines
 
@@ -64,7 +64,7 @@ module-name/
 2. Installs Docker if not present
 3. Pushes JAR file and Dockerfile to server
 4. Builds Docker image
-5. Starts Traefik proxy
+5. Starts Gateway proxy
 6. Starts the service container
 
 ### Configuration
@@ -142,7 +142,7 @@ Add dependencies to the module's `pom.xml` file. Common dependencies are managed
 - The project requires Java 21 or higher
 - Maven 3.9+ is recommended
 - SSH key-based authentication is used for server access
-- Traefik is used as a reverse proxy for deployed services
+- Gateway is used as a reverse proxy for deployed services
 - The project targets low-cost deployment scenarios ($6/month VMs)
 
 ## Future Development

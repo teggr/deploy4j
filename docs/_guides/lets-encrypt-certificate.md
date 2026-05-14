@@ -3,7 +3,7 @@ layout: page
 title: Let's Encrypt Certificate for SSL
 ---
 
-This guide demonstrates how to deploy your application with free, automatically-renewed SSL/TLS certificates from Let's Encrypt using Traefik's built-in ACME (Automatic Certificate Management Environment) support.
+This guide demonstrates how to deploy your application with free, automatically-renewed SSL/TLS certificates from Let's Encrypt using Gateway's built-in ACME (Automatic Certificate Management Environment) support.
 
 ## When to Use Let's Encrypt
 
@@ -37,7 +37,7 @@ dig yourdomain.com +short
 
 ## Configuration
 
-Traefik provides comprehensive Let's Encrypt support through ACME certificate resolvers. To enable it, modify your `config/deploy.yml` file:
+Gateway provides comprehensive Let's Encrypt support through ACME certificate resolvers. To enable it, modify your `config/deploy.yml` file:
 
 ### Basic HTTP Challenge Configuration
 
@@ -54,13 +54,13 @@ servers:
     hosts:
       - your-server-ip
     labels:
-      traefik.http.routers.yourservice.entrypoints: websecure
-      traefik.http.routers.yourservice.rule: Host(`yourdomain.com`)
-      traefik.http.routers.yourservice.tls: true
-      traefik.http.routers.yourservice.tls.certresolver: letsencrypt
+      gateway.http.routers.yourservice.entrypoints: websecure
+      gateway.http.routers.yourservice.rule: Host(`yourdomain.com`)
+      gateway.http.routers.yourservice.tls: true
+      gateway.http.routers.yourservice.tls.certresolver: letsencrypt
 
-# Traefik configuration for HTTPS with Let's Encrypt
-traefik:
+# Gateway configuration for HTTPS with Let's Encrypt
+gateway:
   options:
     publish:
       - "443:443"
@@ -80,12 +80,12 @@ traefik:
 
 #### Service Labels
 
-* `traefik.http.routers.yourservice.entrypoints: websecure` - Use the HTTPS entry point (port 443)
-* `traefik.http.routers.yourservice.rule: Host(\`yourdomain.com\`)` - Route traffic for your domain
-* `traefik.http.routers.yourservice.tls: true` - Enable TLS for this router
-* `traefik.http.routers.yourservice.tls.certresolver: letsencrypt` - Use the Let's Encrypt certificate resolver
+* `gateway.http.routers.yourservice.entrypoints: websecure` - Use the HTTPS entry point (port 443)
+* `gateway.http.routers.yourservice.rule: Host(\`yourdomain.com\`)` - Route traffic for your domain
+* `gateway.http.routers.yourservice.tls: true` - Enable TLS for this router
+* `gateway.http.routers.yourservice.tls.certresolver: letsencrypt` - Use the Let's Encrypt certificate resolver
 
-#### Traefik Configuration
+#### Gateway Configuration
 
 * `publish: "443:443"` - Expose HTTPS port 443
 * `volume: "/etc/deploy4j/letsencrypt:/letsencrypt"` - Persist Let's Encrypt certificates within the deploy4j data directory
@@ -105,12 +105,12 @@ After updating your `config/deploy.yml` and preparing the server, deploy your ap
 deploy4j setup --version <your-version>
 
 # For updates to existing deployment
-deploy4j traefik reboot
+deploy4j gateway reboot
 deploy4j deploy --version <your-version>
 ```
 
 The first deployment will:
-1. Start Traefik with Let's Encrypt configuration
+1. Start Gateway with Let's Encrypt configuration
 2. Request a certificate from Let's Encrypt for your domain
 3. Install the certificate and begin serving HTTPS traffic
 4. Set up automatic renewal (certificates renew automatically before expiration)
@@ -127,9 +127,9 @@ Browsers will show a secure padlock icon, and the certificate will be trusted wi
 
 ## Certificate Renewal
 
-Let's Encrypt certificates are valid for 90 days. Traefik automatically handles renewal:
+Let's Encrypt certificates are valid for 90 days. Gateway automatically handles renewal:
 
-* Traefik checks for certificate expiration
+* Gateway checks for certificate expiration
 * Certificates are automatically renewed ~30 days before expiration
 * No manual intervention required
 * Renewal notifications are sent to the email you configured
@@ -139,7 +139,7 @@ Let's Encrypt certificates are valid for 90 days. Traefik automatically handles 
 When first setting up Let's Encrypt, it's recommended to test with the staging environment to avoid hitting rate limits:
 
 ```yaml
-traefik:
+gateway:
   options:
     publish:
       - "443:443"
@@ -169,18 +169,18 @@ servers:
       - your-server-ip
     labels:
       # Main domain
-      traefik.http.routers.yourservice.entrypoints: websecure
-      traefik.http.routers.yourservice.rule: Host(`yourdomain.com`)
-      traefik.http.routers.yourservice.tls: true
-      traefik.http.routers.yourservice.tls.certresolver: letsencrypt
+      gateway.http.routers.yourservice.entrypoints: websecure
+      gateway.http.routers.yourservice.rule: Host(`yourdomain.com`)
+      gateway.http.routers.yourservice.tls: true
+      gateway.http.routers.yourservice.tls.certresolver: letsencrypt
       # Additional domain
-      traefik.http.routers.yourservice-www.entrypoints: websecure
-      traefik.http.routers.yourservice-www.rule: Host(`www.yourdomain.com`)
-      traefik.http.routers.yourservice-www.tls: true
-      traefik.http.routers.yourservice-www.tls.certresolver: letsencrypt
+      gateway.http.routers.yourservice-www.entrypoints: websecure
+      gateway.http.routers.yourservice-www.rule: Host(`www.yourdomain.com`)
+      gateway.http.routers.yourservice-www.tls: true
+      gateway.http.routers.yourservice-www.tls.certresolver: letsencrypt
 ```
 
-Traefik will automatically request and manage separate certificates for each domain.
+Gateway will automatically request and manage separate certificates for each domain.
 
 ## Complete Example
 
@@ -195,10 +195,10 @@ servers:
     hosts:
       - 203.0.113.10
     labels:
-      traefik.http.routers.my-spring-app.entrypoints: websecure
-      traefik.http.routers.my-spring-app.rule: Host(`app.example.com`)
-      traefik.http.routers.my-spring-app.tls: true
-      traefik.http.routers.my-spring-app.tls.certresolver: letsencrypt
+      gateway.http.routers.my-spring-app.entrypoints: websecure
+      gateway.http.routers.my-spring-app.rule: Host(`app.example.com`)
+      gateway.http.routers.my-spring-app.tls: true
+      gateway.http.routers.my-spring-app.tls.certresolver: letsencrypt
 
 registry:
   username:
@@ -220,7 +220,7 @@ ssh:
   known_hosts_path:
     - KNOWN_HOSTS_PATH
 
-traefik:
+gateway:
   options:
     publish:
       - "443:443"
@@ -250,9 +250,9 @@ traefik:
    curl -I http://yourdomain.com
    ```
 
-3. **Check Traefik logs**: Look for ACME errors
+3. **Check Gateway logs**: Look for ACME errors
    ```shell
-   deploy4j traefik logs
+   deploy4j gateway logs
    ```
 
 4. **Verify acme.json permissions**: Must be 600
@@ -272,18 +272,18 @@ If you hit rate limits, use the staging environment for testing, or wait for the
 
 If your certificate expires (rare with auto-renewal):
 
-1. Check Traefik logs for renewal errors
+1. Check Gateway logs for renewal errors
 2. Ensure your server was online during renewal attempts
-3. Manually trigger renewal by restarting Traefik:
+3. Manually trigger renewal by restarting Gateway:
    ```shell
-   deploy4j traefik reboot
+   deploy4j gateway reboot
    ```
 
 ### HTTP Redirect Not Working
 
 If HTTP doesn't redirect to HTTPS, verify:
 1. Port 80 is published and accessible
-2. The redirection configuration is in the Traefik args
+2. The redirection configuration is in the Gateway args
 3. Both `web` and `websecure` entry points are configured
 
 ## DNS Challenge (Alternative)
@@ -291,7 +291,7 @@ If HTTP doesn't redirect to HTTPS, verify:
 For servers not publicly accessible on port 80, or for wildcard certificates, use DNS challenge:
 
 ```yaml
-traefik:
+gateway:
   options:
     publish:
       - "443:443"
@@ -309,11 +309,11 @@ traefik:
     certificatesResolvers.letsencrypt.acme.dnsChallenge.resolvers: "1.1.1.1:53,8.8.8.8:53"
 ```
 
-This requires DNS provider API credentials. See [Traefik DNS Challenge documentation](https://doc.traefik.io/traefik/https/acme/#dnschallenge) for supported providers.
+This requires DNS provider API credentials. See [Gateway DNS Challenge documentation](https://doc.gateway.io/gateway/https/acme/#dnschallenge) for supported providers.
 
 ## References
 
 * Inspired by: [Secure your Kamal app deployments with Let's Encrypt](https://dennmart.com/articles/secure-your-kamal-app-deployments-with-lets-encrypt/) by Dennis Martinez
-* [Traefik ACME Documentation](https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/acme/)
+* [Gateway ACME Documentation](https://doc.gateway.io/gateway/reference/install-configuration/tls/certificate-resolvers/acme/)
 * [Let's Encrypt Documentation](https://letsencrypt.org/docs/)
 * [Let's Encrypt Rate Limits](https://letsencrypt.org/docs/rate-limits/)

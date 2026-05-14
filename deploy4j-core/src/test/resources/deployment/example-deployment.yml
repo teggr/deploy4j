@@ -13,7 +13,7 @@ ssh:
   strictHostChecking: false
 env:
   DATABASE_HOST: "mysql-db"
-traefik:
+gateway:
   args:
     api.dashboard: true
     api.insecure: true

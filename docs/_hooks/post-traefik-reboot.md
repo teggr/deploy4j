@@ -1,5 +1,5 @@
 ---
 layout: page
-title: post-traefik-reboot
+title: post-gateway-reboot
 ---
-Runs after rebooting Traefik, see [pre-traefik-reboot hook]({{ 'hooks/pre-traefik-reboot' | relative_url }}) for details.
+Runs after rebooting Gateway, see [pre-gateway-reboot hook]({{ 'hooks/pre-gateway-reboot' | relative_url }}) for details.

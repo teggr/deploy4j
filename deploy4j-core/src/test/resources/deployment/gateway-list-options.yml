@@ -1,7 +1,7 @@
 service: test-service
 image: test/image
 
-traefik:
+gateway:
   options:
     publish:
       - "443:443"
@@ -9,4 +9,4 @@ traefik:
     volume:
       - "/etc/letsencrypt/acme.json:/etc/letsencrypt/acme.json"
       - "/var/log:/var/log"
-    name: "traefik"
+    name: "gateway"

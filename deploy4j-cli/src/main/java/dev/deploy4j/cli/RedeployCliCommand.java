@@ -5,7 +5,7 @@ import picocli.CommandLine;
 
 @CommandLine.Command(
   name = "redeploy",
-  description = "Deploy app to servers without bootstrapping servers, starting Traefik, pruning, and registry login")
+  description = "Deploy app to servers without bootstrapping servers, starting Gateway, pruning, and registry login")
 public class RedeployCliCommand extends BaseCliCommand {
 
   @CommandLine.Option(names = "-P", description = "Skip image pull", defaultValue = "false")

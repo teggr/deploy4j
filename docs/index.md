@@ -61,8 +61,8 @@ layout: default
             </div>
             
             <div class="feature-card">
-                <h3>🌐 Traefik Integration</h3>
-                <p>Automatic reverse proxy setup with Traefik for routing and load balancing across your services.</p>
+                <h3>🌐 Gateway Integration</h3>
+                <p>Automatic reverse proxy setup with Gateway for routing and load balancing across your services.</p>
             </div>
             
             <div class="feature-card">

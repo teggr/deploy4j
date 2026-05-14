@@ -105,7 +105,7 @@ class CmdUtilsTest {
     void shouldHandleMixedStringAndListValues() {
       Map<String, Object> input = Map.of(
         "publish", List.of("443:443", "80:80"),
-        "name", "traefik",
+        "name", "gateway",
         "detach", "true"
       );
       
@@ -113,7 +113,7 @@ class CmdUtilsTest {
 
       assertThat(options)
         .contains("--publish", "\"443:443\"", "--publish", "\"80:80\"")
-        .contains("--name", "\"traefik\"")
+        .contains("--name", "\"gateway\"")
         .contains("--detach");
     }
 
@@ -121,14 +121,14 @@ class CmdUtilsTest {
     void shouldHandleWithJoiningChar() {
       Map<String, Object> input = Map.of(
         "publish", List.of("443:443", "80:80"),
-        "name", "traefik"
+        "name", "gateway"
       );
       
       List<String> options = optionizeFlexible(input, "=");
 
       assertThat(options)
         .contains("--publish=\"443:443\"", "--publish=\"80:80\"")
-        .contains("--name=\"traefik\"");
+        .contains("--name=\"gateway\"");
     }
 
     @Test

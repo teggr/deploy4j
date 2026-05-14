@@ -34,8 +34,8 @@ The available hooks are:
 * [post-deploy]({{ 'hooks/post-deploy' | relative_url }})
 * [pre-app-boot]({{ 'hooks/pre-app-boot' | relative_url }})
 * [post-app-deploy]({{ 'hooks/post-app-boot' | relative_url }})
-* [pre-traefik-reboot]({{ 'hooks/pre-traefik-reboot' | relative_url }})
-* [post-traefik-reboot]({{ 'hooks/post-traefik-reboot' | relative_url }})
+* [pre-gateway-reboot]({{ 'hooks/pre-gateway-reboot' | relative_url }})
+* [post-gateway-reboot]({{ 'hooks/post-gateway-reboot' | relative_url }})
 
 You can pass `--skip_hooks` to avoid running the hooks.
 

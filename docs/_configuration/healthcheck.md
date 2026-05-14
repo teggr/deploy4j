@@ -4,7 +4,7 @@ title: Healthcheck configuration
 ---
 By default, no healthcheck is made when launching an application. We wait for the container to reach a running state and then pause for the readiness delay.
 
-On roles that are running Traefik and supply a healthcheck, deploy4j will supply the healthcheck to the `docker run` command.
+On roles that are running Gateway and supply a healthcheck, deploy4j will supply the healthcheck to the `docker run` command.
 
 The default healthcheck is `curl -f http://localhost:<port>/<path>`, with a backup of `wget`.
 
@@ -17,7 +17,7 @@ healthcheck:
 
   # Command
   #
-  # The command to run, defaults to `curl -f http://localhost:<port>/<path>` on roles running Traefik
+  # The command to run, defaults to `curl -f http://localhost:<port>/<path>` on roles running Gateway
   cmd: "curl -f http://localhost"
 
   # Interval
@@ -45,7 +45,7 @@ healthcheck:
   #
   # The cord file is used for zero-downtime deployments. The healthcheck is augmented with a check
   # for the existance of the file. This allows us to delete the file and force the container to
-  # become unhealthy, causing Traefik to stop routing traffic to it.
+  # become unhealthy, causing Gateway to stop routing traffic to it.
   #
   # deploy4j mounts a volume at this location and creates the file before starting the container.
   # You can set the value to `false` to disable the cord file, but this loses the zero-downtime

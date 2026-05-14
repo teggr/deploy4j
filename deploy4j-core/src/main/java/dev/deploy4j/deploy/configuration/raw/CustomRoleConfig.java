@@ -11,7 +11,7 @@ import java.util.Map;
 public class CustomRoleConfig {
 
   private final List<ServerConfig> hosts;
-  private final Boolean traefik;
+  private final Boolean gateway;
   private final String cmd;
   private final EnvironmentConfig env;
   private final LoggingConfig logging;
@@ -22,7 +22,7 @@ public class CustomRoleConfig {
   @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
   public CustomRoleConfig(
     @JsonProperty("hosts") List<?> hosts,
-    @JsonProperty("traefik") Boolean traefik,
+    @JsonProperty("gateway") Boolean gateway,
     @JsonProperty("cmd") String cmd,
     @JsonProperty("env") EnvironmentConfig env,
     @JsonProperty("logging") LoggingConfig logging,
@@ -39,7 +39,7 @@ public class CustomRoleConfig {
         throw new IllegalArgumentException("Invalid server entry: " + o);
       }
     }).toList();
-    this.traefik = traefik;
+    this.gateway = gateway;
     this.cmd = cmd;
     this.env = env;
     this.logging = logging;
@@ -50,7 +50,7 @@ public class CustomRoleConfig {
 
   public CustomRoleConfig() {
     this.hosts = List.of();
-    this.traefik = null;
+    this.gateway = null;
     this.cmd = null;
     this.env = null;
     this.logging = null;
@@ -63,8 +63,8 @@ public class CustomRoleConfig {
     return hosts;
   }
 
-  public Boolean traefik() {
-    return traefik;
+  public Boolean gateway() {
+    return gateway;
   }
 
   public String cmd() {

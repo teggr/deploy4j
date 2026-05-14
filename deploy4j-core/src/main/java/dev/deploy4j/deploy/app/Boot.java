@@ -212,8 +212,8 @@ public class Boot {
     return role().usesCord();
   }
 
-  public boolean runningTraefik() {
-    return role().runningTraefik();
+  public boolean runningGateway() {
+    return role().runningGateway();
   }
 
 }
