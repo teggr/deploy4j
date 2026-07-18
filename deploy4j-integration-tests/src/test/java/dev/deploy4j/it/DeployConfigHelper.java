@@ -30,11 +30,11 @@ final class DeployConfigHelper {
   static TestDeployment create(DropletContainer droplet, Path privateKeyPath, String version) throws Exception {
     Path projectDirectory = Files.createTempDirectory("deploy4j-it-project");
     Path configDirectory = Files.createDirectories(projectDirectory.resolve("config"));
-    String serviceName = "deploy4j-it-" + UUID.randomUUID().toString().substring(0, 8);
+    String testServiceName = "deploy4j-it-" + UUID.randomUUID().toString().substring(0, 8);
     buildTestImage(projectDirectory.resolve("test-app"));
     Files.createDirectories(projectDirectory.resolve(".deploy4j"));
     Files.writeString(projectDirectory.resolve(".deploy4j/secrets"), "");
-    Files.writeString(configDirectory.resolve("deploy.yml"), configYaml(serviceName, droplet, privateKeyPath));
+    Files.writeString(configDirectory.resolve("deploy.yml"), configYaml(testServiceName, droplet, privateKeyPath));
 
     String originalUserDir = System.getProperty("user.dir");
     System.setProperty("user.dir", projectDirectory.toString());
