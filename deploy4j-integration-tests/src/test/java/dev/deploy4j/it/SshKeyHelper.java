@@ -31,7 +31,7 @@ final class SshKeyHelper {
     Path authorizedKeysPath = directory.resolve("authorized_keys");
 
     Files.writeString(privateKeyPath, toPem(keyPair), StandardCharsets.US_ASCII);
-    Files.writeString(authorizedKeysPath, toAuthorizedKey(keyPair) + System.lineSeparator(), StandardCharsets.US_ASCII);
+    Files.writeString(authorizedKeysPath, authorizedKeysFileContent(keyPair), StandardCharsets.US_ASCII);
     restrictPermissions(privateKeyPath);
 
     return new GeneratedKeyPair(directory, privateKeyPath, authorizedKeysPath);
@@ -56,6 +56,11 @@ final class SshKeyHelper {
     writeSshBytes(output, publicKey.getModulus().toByteArray());
 
     return "ssh-rsa %s deploy4j-it".formatted(Base64.getEncoder().encodeToString(output.toByteArray()));
+  }
+
+  private static String authorizedKeysFileContent(KeyPair keyPair) throws IOException {
+    // OpenSSH expects authorized_keys entries to end with a trailing newline.
+    return toAuthorizedKey(keyPair) + System.lineSeparator();
   }
 
   private static void writeSshBytes(ByteArrayOutputStream output, byte[] value) throws IOException {

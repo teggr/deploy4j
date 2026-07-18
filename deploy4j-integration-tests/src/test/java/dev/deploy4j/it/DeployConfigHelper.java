@@ -125,7 +125,7 @@ final class DeployConfigHelper {
     String output = new String(process.getInputStream().readAllBytes());
     int exitCode = process.waitFor();
     if (exitCode != 0) {
-      throw new IllegalStateException("Failed to build local test image:%n%s".formatted(output));
+      throw new IllegalStateException("Failed to build local test image:\n%s".formatted(output));
     }
   }
 
