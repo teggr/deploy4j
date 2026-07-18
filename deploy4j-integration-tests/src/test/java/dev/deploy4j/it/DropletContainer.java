@@ -17,6 +17,7 @@ final class DropletContainer extends GenericContainer<DropletContainer> {
   DropletContainer(Path authorizedKeysPath) {
     super("teggr/deploy4j-docker-droplet:latest");
     withCopyFileToContainer(MountableFile.forHostPath(authorizedKeysPath), "/tmp/authorized_keys");
+    withFileSystemBind("/usr/bin/docker", "/usr/bin/docker", BindMode.READ_ONLY);
     withFileSystemBind("/var/run/docker.sock", "/var/run/docker.sock", BindMode.READ_WRITE);
     withExposedPorts(SSH_PORT, HTTP_PORT);
     withEnv("DOCKER_TLS_CERTDIR", "");
@@ -25,7 +26,7 @@ final class DropletContainer extends GenericContainer<DropletContainer> {
       command.withPrivileged(true);
       command.getHostConfig().withDns("8.8.8.8", "1.1.1.1");
     });
-    waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(2)));
+    waitingFor(Wait.forListeningPorts(SSH_PORT).withStartupTimeout(Duration.ofMinutes(2)));
   }
 
   int sshPort() {

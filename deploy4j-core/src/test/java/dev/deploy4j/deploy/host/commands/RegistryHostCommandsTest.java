@@ -25,6 +25,7 @@ class RegistryHostCommandsTest {
         when(mockRegistry.server()).thenReturn("docker.io");
         when(mockRegistry.username()).thenReturn("testuser");
         when(mockRegistry.password()).thenReturn("testpass");
+        when(mockRegistry.credentialsConfigured()).thenReturn(true);
         
         registryCommands = new RegistryHostCommands(mockConfig);
     }
@@ -69,5 +70,25 @@ class RegistryHostCommandsTest {
         
         assertThat(cmd).isNotNull();
         assertThat(cmd.build()).contains("docker");
+    }
+
+    @Test
+    void shouldSkipLoginWhenCredentialsAreMissing() {
+        when(mockRegistry.credentialsConfigured()).thenReturn(false);
+
+        Cmd cmd = registryCommands.login();
+
+        assertThat(cmd.build()).containsExactly("true");
+        assertThat(cmd.description()).isEqualTo("skip login");
+    }
+
+    @Test
+    void shouldSkipLogoutWhenCredentialsAreMissing() {
+        when(mockRegistry.credentialsConfigured()).thenReturn(false);
+
+        Cmd cmd = registryCommands.logout();
+
+        assertThat(cmd.build()).containsExactly("true");
+        assertThat(cmd.description()).isEqualTo("skip logout");
     }
 }

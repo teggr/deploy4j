@@ -1,6 +1,5 @@
 package dev.deploy4j.it;
 
-import dev.deploy4j.init.Initializer;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
@@ -10,10 +9,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
@@ -25,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class Deploy4jSmokeIT {
 
   private static final String APP_VERSION = "latest";
-  private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
   private static final SshKeyHelper.GeneratedKeyPair SSH_KEY_PAIR = createKeyPair();
 
   @Container
@@ -42,31 +36,37 @@ class Deploy4jSmokeIT {
   @Test
   @DisplayName("init creates deploy config and secrets stubs")
   void initCreatesDeployFiles() throws Exception {
-    Initializer initializer = new Initializer();
-    String originalUserDir = System.getProperty("user.dir");
-    System.setProperty("user.dir", tempDir.toString());
+    Process process = new ProcessBuilder()
+      .directory(tempDir.toFile())
+      .command(
+        Path.of(System.getProperty("java.home"), "bin", "java").toString(),
+        "-cp",
+        System.getProperty("java.class.path"),
+        InitializerRunner.class.getName()
+      )
+      .redirectErrorStream(true)
+      .start();
 
-    try {
-      initializer.init(false);
+    String output = new String(process.getInputStream().readAllBytes());
+    int exitCode = process.waitFor();
 
-      assertThat(tempDir.resolve("config/deploy.yml")).exists();
-      assertThat(tempDir.resolve(".deploy4j/secrets")).exists();
-      assertThat(Files.readString(tempDir.resolve("config/deploy.yml"))).contains("service: deploy4j-demo");
-      assertThat(Files.readString(tempDir.resolve(".deploy4j/secrets"))).contains("DOCKER_USERNAME=");
-    } finally {
-      System.setProperty("user.dir", originalUserDir);
-    }
+    assertThat(exitCode).describedAs(output).isZero();
+    assertThat(tempDir.resolve("config/deploy.yml")).exists();
+    assertThat(tempDir.resolve(".deploy4j/secrets")).exists();
+    assertThat(Files.readString(tempDir.resolve("config/deploy.yml"))).contains("service: deploy4j-demo");
+    assertThat(Files.readString(tempDir.resolve(".deploy4j/secrets"))).contains("DOCKER_USERNAME=");
   }
 
   @Test
   @DisplayName("setup deploys and manages a Spring Boot application")
   void setupDeploysAndExercisesLifecycle() throws Exception {
     try (DeployConfigHelper.TestDeployment deployment = DeployConfigHelper.create(DROPLET, SSH_KEY_PAIR.privateKeyPath(), APP_VERSION)) {
-      deployment.applicationContext().deploy().setup(deployment.deployContext());
+      deployment.applicationContext().server().bootstrap(deployment.deployContext());
+      deployment.applicationContext().deploy().deploy(deployment.deployContext(), true, false);
 
-      awaitHealth(deployment.actuatorUri());
+      awaitHealth(deployment);
 
-      assertThat(deployment.capture(deployment.appCommands().listContainers()))
+      assertThat(deployment.capture("docker ps --format '{{.Names}}'"))
         .contains(deployment.role().containerName(APP_VERSION));
 
       deployment.applicationContext().app().stop(deployment.deployContext());
@@ -77,35 +77,29 @@ class Deploy4jSmokeIT {
         .untilAsserted(() -> assertThat(deployment.capture(deployment.appCommands().currentRunningContainerId()).trim()).isEmpty());
 
       deployment.applicationContext().app().start(deployment.deployContext());
-      awaitHealth(deployment.actuatorUri());
+      awaitHealth(deployment);
 
       String logs = deployment.capture(deployment.appCommands().logs(null, false, null, "200", null, null));
       assertThat(logs).isNotBlank();
-      assertThat(logs).contains("Started");
+      assertThat(logs).contains("Started Deploy4jIntegrationApp");
 
-      HttpResponse<String> response = get(deployment.actuatorUri());
-      assertThat(response.statusCode()).isEqualTo(200);
-      assertThat(response.body()).contains("\"status\":\"UP\"");
+      String health = actuatorHealth(deployment);
+      assertThat(health).contains("\"status\":\"UP\"");
     }
   }
 
-  private static void awaitHealth(URI actuatorUri) {
+  private static void awaitHealth(DeployConfigHelper.TestDeployment deployment) {
     Awaitility.await()
       .atMost(Duration.ofMinutes(3))
       .pollInterval(Duration.ofSeconds(5))
-      .untilAsserted(() -> {
-        HttpResponse<String> response = get(actuatorUri);
-        assertThat(response.statusCode()).isEqualTo(200);
-        assertThat(response.body()).contains("\"status\":\"UP\"");
-      });
+      .untilAsserted(() -> assertThat(actuatorHealth(deployment)).contains("\"status\":\"UP\""));
   }
 
-  private static HttpResponse<String> get(URI uri) throws IOException, InterruptedException {
-    HttpRequest request = HttpRequest.newBuilder(uri)
-      .timeout(Duration.ofSeconds(10))
-      .GET()
-      .build();
-    return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+  private static String actuatorHealth(DeployConfigHelper.TestDeployment deployment) {
+    return deployment.capture(
+      "docker run --rm --network deploy4j curlimages/curl -s http://%s:8080/actuator/health"
+        .formatted(deployment.containerIp())
+    );
   }
 
   private static SshKeyHelper.GeneratedKeyPair createKeyPair() {

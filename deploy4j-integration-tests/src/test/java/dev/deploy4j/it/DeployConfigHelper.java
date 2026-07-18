@@ -7,18 +7,22 @@ import dev.deploy4j.deploy.configuration.Configuration;
 import dev.deploy4j.deploy.configuration.Role;
 import dev.deploy4j.deploy.host.commands.AppHostCommands;
 import dev.deploy4j.deploy.host.commands.AppHostCommandsFactory;
+import dev.deploy4j.deploy.host.commands.SpringBootHostCommands;
+import dev.deploy4j.deploy.host.commands.SpringBootHostCommandsFactory;
 import dev.deploy4j.deploy.host.ssh.SshHost;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 import dev.deploy4j.deploy.local.LocalHost;
 import dev.rebelcraft.cmd.Cmd;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.UUID;
 
 final class DeployConfigHelper {
+
+  private static final String TEST_IMAGE = "deploy4j-it-app";
 
   private DeployConfigHelper() {
   }
@@ -26,9 +30,11 @@ final class DeployConfigHelper {
   static TestDeployment create(DropletContainer droplet, Path privateKeyPath, String version) throws Exception {
     Path projectDirectory = Files.createTempDirectory("deploy4j-it-project");
     Path configDirectory = Files.createDirectories(projectDirectory.resolve("config"));
+    String serviceName = "deploy4j-it-" + UUID.randomUUID().toString().substring(0, 8);
+    buildTestImage(projectDirectory.resolve("test-app"));
     Files.createDirectories(projectDirectory.resolve(".deploy4j"));
     Files.writeString(projectDirectory.resolve(".deploy4j/secrets"), "");
-    Files.writeString(configDirectory.resolve("deploy.yml"), configYaml(droplet, privateKeyPath));
+    Files.writeString(configDirectory.resolve("deploy.yml"), configYaml(serviceName, droplet, privateKeyPath));
 
     String originalUserDir = System.getProperty("user.dir");
     System.setProperty("user.dir", projectDirectory.toString());
@@ -48,10 +54,10 @@ final class DeployConfigHelper {
     }
   }
 
-  private static String configYaml(DropletContainer droplet, Path privateKeyPath) {
+  private static String configYaml(String serviceName, DropletContainer droplet, Path privateKeyPath) {
     return """
-      service: deploy4j-demo
-      image: teggr/deploy4j-demo
+      service: %s
+      image: %s
       registry: {}
       servers:
         - "%s"
@@ -69,7 +75,58 @@ final class DeployConfigHelper {
         clear:
           MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
           MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: "always"
-      """.formatted(droplet.getHost(), droplet.sshPort(), privateKeyPath);
+      """.formatted(serviceName, TEST_IMAGE, droplet.getHost(), droplet.sshPort(), privateKeyPath);
+  }
+
+  private static void buildTestImage(Path buildDirectory) throws IOException, InterruptedException {
+    Files.createDirectories(buildDirectory);
+    Files.writeString(buildDirectory.resolve("ActuatorApp.java"), """
+      import com.sun.net.httpserver.HttpServer;
+      import java.net.InetSocketAddress;
+      import java.nio.charset.StandardCharsets;
+
+      public class ActuatorApp {
+        public static void main(String[] args) throws Exception {
+          HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+          server.createContext("/", exchange -> respond(exchange, 200, "text/plain", "ok"));
+          server.createContext("/actuator/health", exchange -> respond(exchange, 200, "application/json", "{\\"status\\":\\"UP\\"}"));
+          server.start();
+          System.out.println("Started Deploy4jIntegrationApp");
+          Thread.currentThread().join();
+        }
+
+        private static void respond(com.sun.net.httpserver.HttpExchange exchange, int status, String contentType, String body) throws java.io.IOException {
+          byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+          exchange.getResponseHeaders().add("Content-Type", contentType);
+          exchange.sendResponseHeaders(status, bytes.length);
+          try (var output = exchange.getResponseBody()) {
+            output.write(bytes);
+          }
+        }
+      }
+      """);
+    Files.writeString(buildDirectory.resolve("Dockerfile"), """
+      FROM eclipse-temurin:21-jdk
+      RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+      WORKDIR /app
+      COPY ActuatorApp.java /app/ActuatorApp.java
+      RUN javac ActuatorApp.java
+      EXPOSE 8080
+      CMD ["java", "ActuatorApp"]
+      """);
+
+    Process process = new ProcessBuilder(
+      "docker", "build", "-t", TEST_IMAGE + ":latest", "."
+    )
+      .directory(buildDirectory.toFile())
+      .redirectErrorStream(true)
+      .start();
+
+    String output = new String(process.getInputStream().readAllBytes());
+    int exitCode = process.waitFor();
+    if (exitCode != 0) {
+      throw new IllegalStateException("Failed to build local test image:%n%s".formatted(output));
+    }
   }
 
   private static void deleteRecursively(Path root) throws IOException {
@@ -128,12 +185,12 @@ final class DeployConfigHelper {
       return deployContext;
     }
 
-    URI actuatorUri() {
-      return droplet.actuatorUri();
-    }
-
     AppHostCommands appCommands() {
       return new AppHostCommandsFactory(configuration).app(role(), primaryHost());
+    }
+
+    SpringBootHostCommands springBootCommands() {
+      return new SpringBootHostCommandsFactory(configuration).forContainer(role().containerName(configuration.version()));
     }
 
     String primaryHost() {
@@ -150,6 +207,14 @@ final class DeployConfigHelper {
 
     String capture(Cmd cmd) {
       return sshHost().capture(cmd, false);
+    }
+
+    String capture(String command) {
+      return sshHost().capture(command, false);
+    }
+
+    String containerIp() {
+      return capture("docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' " + role().containerName(configuration.version())).trim();
     }
 
     @Override
