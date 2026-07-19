@@ -25,7 +25,7 @@
     <dependencies>
         <dependency>
             <groupId>dev.deploy4j</groupId>
-            <artifactId>deploy4j-core</artifactId>
+            <artifactId>deploy4j-cli</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

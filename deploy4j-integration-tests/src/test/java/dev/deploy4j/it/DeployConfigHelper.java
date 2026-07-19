@@ -1,20 +1,11 @@
 package dev.deploy4j.it;
 
-import dev.deploy4j.deploy.DeployApplicationContext;
-import dev.deploy4j.deploy.DeployContext;
-import dev.deploy4j.deploy.Hooks;
-import dev.deploy4j.deploy.configuration.Configuration;
-import dev.deploy4j.deploy.configuration.Role;
-import dev.deploy4j.deploy.host.commands.AppHostCommands;
-import dev.deploy4j.deploy.host.commands.AppHostCommandsFactory;
-import dev.deploy4j.deploy.host.commands.SpringBootHostCommands;
-import dev.deploy4j.deploy.host.commands.SpringBootHostCommandsFactory;
-import dev.deploy4j.deploy.host.ssh.SshHost;
-import dev.deploy4j.deploy.host.ssh.SshHosts;
-import dev.deploy4j.deploy.local.LocalHost;
-import dev.rebelcraft.cmd.Cmd;
+import dev.deploy4j.cli.Deploy4jApplicationCommand;
+import picocli.CommandLine;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -27,7 +18,7 @@ final class DeployConfigHelper {
   private DeployConfigHelper() {
   }
 
-  static TestDeployment create(DropletContainer droplet, Path privateKeyPath, String version) throws Exception {
+  static TestDeployment create(DropletContainer droplet, Path privateKeyPath) throws Exception {
     Path projectDirectory = Files.createTempDirectory("deploy4j-it-project");
     Path configDirectory = Files.createDirectories(projectDirectory.resolve("config"));
     String testServiceName = "deploy4j-it-" + UUID.randomUUID().toString().substring(0, 8);
@@ -35,23 +26,7 @@ final class DeployConfigHelper {
     Files.createDirectories(projectDirectory.resolve(".deploy4j"));
     Files.writeString(projectDirectory.resolve(".deploy4j/secrets"), "");
     Files.writeString(configDirectory.resolve("deploy.yml"), configYaml(testServiceName, droplet, privateKeyPath));
-
-    String originalUserDir = System.getProperty("user.dir");
-    System.setProperty("user.dir", projectDirectory.toString());
-
-    try {
-      Configuration configuration = Configuration.createFrom(configDirectory.resolve("deploy.yml").toString(), null, version);
-      DeployContext deployContext = new DeployContext(configuration, null, null, null);
-      LocalHost localHost = new LocalHost();
-      Hooks hooks = new Hooks(localHost, configuration, false);
-      SshHosts sshHosts = new SshHosts(configuration);
-      DeployApplicationContext applicationContext = new DeployApplicationContext(sshHosts, hooks, localHost, deployContext);
-      return new TestDeployment(projectDirectory, originalUserDir, droplet, configuration, deployContext, sshHosts, applicationContext);
-    } catch (Exception e) {
-      System.setProperty("user.dir", originalUserDir);
-      deleteRecursively(projectDirectory);
-      throw e;
-    }
+    return new TestDeployment(projectDirectory, droplet, privateKeyPath, testServiceName);
   }
 
   private static String configYaml(String serviceName, DropletContainer droplet, Path privateKeyPath) {
@@ -149,82 +124,101 @@ final class DeployConfigHelper {
     }
   }
 
+  static CliResult executeCli(Path workingDirectory, String... args) {
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    PrintStream printStream = new PrintStream(output, true);
+    PrintStream originalOut = System.out;
+    PrintStream originalErr = System.err;
+    String originalUserDir = System.getProperty("user.dir");
+
+    synchronized (DeployConfigHelper.class) {
+      try {
+        System.setOut(printStream);
+        System.setErr(printStream);
+        System.setProperty("user.dir", workingDirectory.toString());
+
+        CommandLine commandLine = new CommandLine(new Deploy4jApplicationCommand());
+        commandLine.setOut(new java.io.PrintWriter(printStream, true));
+        commandLine.setErr(new java.io.PrintWriter(printStream, true));
+
+        int exitCode = commandLine.execute(args);
+        printStream.flush();
+        return new CliResult(exitCode, output.toString());
+      } finally {
+        System.setOut(originalOut);
+        System.setErr(originalErr);
+        System.setProperty("user.dir", originalUserDir);
+      }
+    }
+  }
+
+  record CliResult(int exitCode, String output) {
+  }
+
   static final class TestDeployment implements AutoCloseable {
 
     private final Path projectDirectory;
-    private final String originalUserDir;
     private final DropletContainer droplet;
-    private final Configuration configuration;
-    private final DeployContext deployContext;
-    private final SshHosts sshHosts;
-    private final DeployApplicationContext applicationContext;
+    private final Path privateKeyPath;
+    private final String serviceName;
 
     private TestDeployment(
       Path projectDirectory,
-      String originalUserDir,
       DropletContainer droplet,
-      Configuration configuration,
-      DeployContext deployContext,
-      SshHosts sshHosts,
-      DeployApplicationContext applicationContext
+      Path privateKeyPath,
+      String serviceName
     ) {
       this.projectDirectory = projectDirectory;
-      this.originalUserDir = originalUserDir;
       this.droplet = droplet;
-      this.configuration = configuration;
-      this.deployContext = deployContext;
-      this.sshHosts = sshHosts;
-      this.applicationContext = applicationContext;
+      this.privateKeyPath = privateKeyPath;
+      this.serviceName = serviceName;
     }
 
-    DeployApplicationContext applicationContext() {
-      return applicationContext;
-    }
-
-    DeployContext deployContext() {
-      return deployContext;
-    }
-
-    AppHostCommands appCommands() {
-      return new AppHostCommandsFactory(configuration).app(role(), primaryHost());
-    }
-
-    SpringBootHostCommands springBootCommands() {
-      return new SpringBootHostCommandsFactory(configuration).forContainer(role().containerName(configuration.version()));
-    }
-
-    String primaryHost() {
-      return deployContext.primaryHost();
-    }
-
-    Role role() {
-      return deployContext.primaryRole();
-    }
-
-    SshHost sshHost() {
-      return sshHosts.host(primaryHost());
-    }
-
-    String capture(Cmd cmd) {
-      return sshHost().capture(cmd, false);
+    CliResult executeCli(String... args) {
+      return DeployConfigHelper.executeCli(projectDirectory, args);
     }
 
     String capture(String command) {
-      return sshHost().capture(command, false);
+      try {
+        Process process = new ProcessBuilder(
+          "ssh",
+          "-i", privateKeyPath.toString(),
+          "-o", "StrictHostKeyChecking=no",
+          "-o", "UserKnownHostsFile=/dev/null",
+          "-p", Integer.toString(droplet.sshPort()),
+          "root@" + droplet.getHost(),
+          command
+        )
+          .redirectErrorStream(true)
+          .start();
+
+        String output = new String(process.getInputStream().readAllBytes());
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+          throw new IllegalStateException("SSH command failed (%s):\n%s".formatted(command, output));
+        }
+        return output;
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new IllegalStateException("SSH command failed: " + command, e);
+      } catch (IOException e) {
+        throw new IllegalStateException("SSH command failed: " + command, e);
+      }
+    }
+
+    String runningContainerName() {
+      return capture("docker ps --format '{{.Names}}' | grep '^" + serviceName + "-' | head -n1 || true").trim();
     }
 
     String containerIp() {
-      return capture("docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' " + role().containerName(configuration.version())).trim();
+      return capture(
+        "docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' " + runningContainerName()
+      ).trim();
     }
 
     @Override
     public void close() throws Exception {
-      try {
-        sshHosts.close();
-      } finally {
-        System.setProperty("user.dir", originalUserDir);
-        deleteRecursively(projectDirectory);
-      }
+      deleteRecursively(projectDirectory);
     }
   }
 }

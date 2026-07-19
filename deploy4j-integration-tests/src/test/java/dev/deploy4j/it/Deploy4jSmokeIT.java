@@ -19,7 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Testcontainers
 class Deploy4jSmokeIT {
 
-  private static final String APP_VERSION = "latest";
   private static final SshKeyHelper.GeneratedKeyPair SSH_KEY_PAIR = createKeyPair();
 
   @Container
@@ -36,21 +35,9 @@ class Deploy4jSmokeIT {
   @Test
   @DisplayName("init creates deploy config and secrets stubs")
   void initCreatesDeployFiles() throws Exception {
-    Process process = new ProcessBuilder()
-      .directory(tempDir.toFile())
-      .command(
-        Path.of(System.getProperty("java.home"), "bin", "java").toString(),
-        "-cp",
-        System.getProperty("java.class.path"),
-        InitializerRunner.class.getName()
-      )
-      .redirectErrorStream(true)
-      .start();
+    DeployConfigHelper.CliResult result = DeployConfigHelper.executeCli(tempDir, "init");
 
-    String output = new String(process.getInputStream().readAllBytes());
-    int exitCode = process.waitFor();
-
-    assertThat(exitCode).describedAs(output).isZero();
+    assertThat(result.exitCode()).describedAs(result.output()).isZero();
     assertThat(tempDir.resolve("config/deploy.yml")).exists();
     assertThat(tempDir.resolve(".deploy4j/secrets")).exists();
     assertThat(Files.readString(tempDir.resolve("config/deploy.yml"))).contains("service: deploy4j-demo");
@@ -60,26 +47,32 @@ class Deploy4jSmokeIT {
   @Test
   @DisplayName("setup deploys and manages a Spring Boot application")
   void setupDeploysAndExercisesLifecycle() throws Exception {
-    try (DeployConfigHelper.TestDeployment deployment = DeployConfigHelper.create(DROPLET, SSH_KEY_PAIR.privateKeyPath(), APP_VERSION)) {
-      deployment.applicationContext().server().bootstrap(deployment.deployContext());
-      deployment.applicationContext().deploy().deploy(deployment.deployContext(), true, false);
+    try (DeployConfigHelper.TestDeployment deployment = DeployConfigHelper.create(DROPLET, SSH_KEY_PAIR.privateKeyPath())) {
+      DeployConfigHelper.CliResult bootstrap = deployment.executeCli("server", "bootstrap");
+      assertThat(bootstrap.exitCode()).describedAs(bootstrap.output()).isZero();
+      DeployConfigHelper.CliResult deploy = deployment.executeCli("deploy", "-P");
+      assertThat(deploy.exitCode()).describedAs(deploy.output()).isZero();
 
       awaitHealth(deployment);
 
+      String runningContainerName = deployment.runningContainerName();
+      assertThat(runningContainerName).isNotBlank();
       assertThat(deployment.capture("docker ps --format '{{.Names}}'"))
-        .contains(deployment.role().containerName(APP_VERSION));
+        .contains(runningContainerName);
 
-      deployment.applicationContext().app().stop(deployment.deployContext());
+      DeployConfigHelper.CliResult stop = deployment.executeCli("app", "stop");
+      assertThat(stop.exitCode()).describedAs(stop.output()).isZero();
 
       Awaitility.await()
         .atMost(Duration.ofSeconds(30))
         .pollInterval(Duration.ofSeconds(2))
-        .untilAsserted(() -> assertThat(deployment.capture(deployment.appCommands().currentRunningContainerId()).trim()).isEmpty());
+        .untilAsserted(() -> assertThat(deployment.runningContainerName()).isBlank());
 
-      deployment.applicationContext().app().start(deployment.deployContext());
+      DeployConfigHelper.CliResult start = deployment.executeCli("app", "start");
+      assertThat(start.exitCode()).describedAs(start.output()).isZero();
       awaitHealth(deployment);
 
-      String logs = deployment.capture(deployment.appCommands().logs(null, false, null, "200", null, null));
+      String logs = deployment.capture("docker logs " + deployment.runningContainerName());
       assertThat(logs).isNotBlank();
       assertThat(logs).contains("Started Deploy4jIntegrationApp");
 
