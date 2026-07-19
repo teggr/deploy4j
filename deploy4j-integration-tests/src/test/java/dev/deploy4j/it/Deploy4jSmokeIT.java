@@ -74,7 +74,7 @@ class Deploy4jSmokeIT {
 
       String logs = deployment.capture("docker logs " + deployment.runningContainerName());
       assertThat(logs).isNotBlank();
-      assertThat(logs).contains("Started Deploy4jIntegrationApp");
+      assertThat(logs).contains("Started ActuatorApp");
 
       String health = actuatorHealth(deployment);
       assertThat(health).contains("\"status\":\"UP\"");

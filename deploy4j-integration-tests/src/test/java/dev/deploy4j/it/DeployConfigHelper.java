@@ -10,10 +10,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 
 final class DeployConfigHelper {
 
   private static final String TEST_IMAGE = "deploy4j-it-app";
+  private static final ReentrantLock CLI_LOCK = new ReentrantLock();
 
   private DeployConfigHelper() {
   }
@@ -66,7 +68,7 @@ final class DeployConfigHelper {
           server.createContext("/", exchange -> respond(exchange, 200, "text/plain", "ok"));
           server.createContext("/actuator/health", exchange -> respond(exchange, 200, "application/json", "{\\"status\\":\\"UP\\"}"));
           server.start();
-          System.out.println("Started Deploy4jIntegrationApp");
+          System.out.println("Started ActuatorApp");
           Thread.currentThread().join();
         }
 
@@ -131,24 +133,24 @@ final class DeployConfigHelper {
     PrintStream originalErr = System.err;
     String originalUserDir = System.getProperty("user.dir");
 
-    synchronized (DeployConfigHelper.class) {
-      try {
-        System.setOut(printStream);
-        System.setErr(printStream);
-        System.setProperty("user.dir", workingDirectory.toString());
+    CLI_LOCK.lock();
+    try {
+      System.setOut(printStream);
+      System.setErr(printStream);
+      System.setProperty("user.dir", workingDirectory.toString());
 
-        CommandLine commandLine = new CommandLine(new Deploy4jApplicationCommand());
-        commandLine.setOut(new java.io.PrintWriter(printStream, true));
-        commandLine.setErr(new java.io.PrintWriter(printStream, true));
+      CommandLine commandLine = new CommandLine(new Deploy4jApplicationCommand());
+      commandLine.setOut(new java.io.PrintWriter(printStream, true));
+      commandLine.setErr(new java.io.PrintWriter(printStream, true));
 
-        int exitCode = commandLine.execute(args);
-        printStream.flush();
-        return new CliResult(exitCode, output.toString());
-      } finally {
-        System.setOut(originalOut);
-        System.setErr(originalErr);
-        System.setProperty("user.dir", originalUserDir);
-      }
+      int exitCode = commandLine.execute(args);
+      printStream.flush();
+      return new CliResult(exitCode, output.toString());
+    } finally {
+      System.setOut(originalOut);
+      System.setErr(originalErr);
+      System.setProperty("user.dir", originalUserDir);
+      CLI_LOCK.unlock();
     }
   }
 
