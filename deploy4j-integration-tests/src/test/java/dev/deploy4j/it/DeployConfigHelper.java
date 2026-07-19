@@ -23,7 +23,7 @@ final class DeployConfigHelper {
   static TestDeployment create(DropletContainer droplet, Path privateKeyPath) throws Exception {
     Path projectDirectory = Files.createTempDirectory("deploy4j-it-project");
     Path configDirectory = Files.createDirectories(projectDirectory.resolve("config"));
-    String testServiceName = "deploy4j-it-" + UUID.randomUUID().toString().substring(0, 8);
+    String testServiceName = "deploy4j-it-" + UUID.randomUUID().toString().replace("-", "");
     buildTestImage(projectDirectory.resolve("test-app"));
     Files.createDirectories(projectDirectory.resolve(".deploy4j"));
     Files.writeString(projectDirectory.resolve(".deploy4j/secrets"), "");
@@ -157,6 +157,10 @@ final class DeployConfigHelper {
   record CliResult(int exitCode, String output) {
   }
 
+  private static String shellQuote(String value) {
+    return "'" + value.replace("'", "'\"'\"'") + "'";
+  }
+
   static final class TestDeployment implements AutoCloseable {
 
     private final Path projectDirectory;
@@ -209,12 +213,12 @@ final class DeployConfigHelper {
     }
 
     String runningContainerName() {
-      return capture("docker ps --format '{{.Names}}' | grep '^" + serviceName + "-' | head -n1 || true").trim();
+      return capture("docker ps --format '{{.Names}}' | grep " + shellQuote("^" + serviceName + "-") + " | head -n1 || true").trim();
     }
 
     String containerIp() {
       return capture(
-        "docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' " + runningContainerName()
+        "docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' " + shellQuote(runningContainerName())
       ).trim();
     }
 
