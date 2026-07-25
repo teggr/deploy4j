@@ -24,4 +24,4 @@ jobs:
           cache: maven
 
       - name: Run integration tests
-        run: ./mvnw -pl deploy4j-integration-tests -am verify
+        run: ./mvnw -pl deploy4j-demo,deploy4j-docker-droplet,deploy4j-integration-tests -am verify

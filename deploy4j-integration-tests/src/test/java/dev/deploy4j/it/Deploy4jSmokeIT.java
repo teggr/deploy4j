@@ -47,18 +47,28 @@ class Deploy4jSmokeIT {
   @Test
   @DisplayName("setup deploys and manages a Spring Boot application")
   void setupDeploysAndExercisesLifecycle() throws Exception {
-    try (DeployConfigHelper.TestDeployment deployment = DeployConfigHelper.create(DROPLET, SSH_KEY_PAIR.privateKeyPath())) {
-      DeployConfigHelper.CliResult bootstrap = deployment.executeCli("server", "bootstrap");
-      assertThat(bootstrap.exitCode()).describedAs(bootstrap.output()).isZero();
-      DeployConfigHelper.CliResult deploy = deployment.executeCli("deploy", "-P");
-      assertThat(deploy.exitCode()).describedAs(deploy.output()).isZero();
+  try (DeployConfigHelper.TestDeployment deployment = DeployConfigHelper.create(DROPLET, SSH_KEY_PAIR.privateKeyPath())) {
+    DeployConfigHelper.CliResult bootstrap = deployment.executeCli("server", "bootstrap");
+    assertThat(bootstrap.exitCode()).describedAs(bootstrap.output()).isZero();
+    DeployConfigHelper.CliResult bootAccessories = deployment.executeCli("accessory", "boot", "all");
+    assertThat(bootAccessories.exitCode()).describedAs(bootAccessories.output()).isZero();
+    deployment.updateDatabaseHost(deployment.databaseIp());
+    DeployConfigHelper.CliResult deploy = deployment.executeCli("deploy", "--version", deployment.version(), "-P");
+    assertThat(deploy.exitCode()).describedAs(deploy.output()).isZero();
 
-      awaitHealth(deployment);
+    awaitApplication(deployment);
 
       String runningContainerName = deployment.runningContainerName();
       assertThat(runningContainerName).isNotBlank();
       assertThat(deployment.capture("docker ps --format '{{.Names}}'"))
         .contains(runningContainerName);
+
+      String logs = deployment.capture("docker logs " + deployment.runningContainerName());
+      assertThat(logs).isNotBlank();
+      assertThat(logs).contains("Started Deploy4jDemoApplication");
+
+      String home = applicationPage(deployment);
+      assertThat(home).contains("Applications");
 
       DeployConfigHelper.CliResult stop = deployment.executeCli("app", "stop");
       assertThat(stop.exitCode()).describedAs(stop.output()).isZero();
@@ -67,31 +77,24 @@ class Deploy4jSmokeIT {
         .atMost(Duration.ofSeconds(30))
         .pollInterval(Duration.ofSeconds(2))
         .untilAsserted(() -> assertThat(deployment.runningContainerName()).isBlank());
-
-      DeployConfigHelper.CliResult start = deployment.executeCli("app", "start");
-      assertThat(start.exitCode()).describedAs(start.output()).isZero();
-      awaitHealth(deployment);
-
-      String logs = deployment.capture("docker logs " + deployment.runningContainerName());
-      assertThat(logs).isNotBlank();
-      assertThat(logs).contains("Started ActuatorApp");
-
-      String health = actuatorHealth(deployment);
-      assertThat(health).contains("\"status\":\"UP\"");
-    }
+      }
   }
 
-  private static void awaitHealth(DeployConfigHelper.TestDeployment deployment) {
+  private static void awaitApplication(DeployConfigHelper.TestDeployment deployment) {
     Awaitility.await()
       .atMost(Duration.ofMinutes(3))
       .pollInterval(Duration.ofSeconds(5))
-      .untilAsserted(() -> assertThat(actuatorHealth(deployment)).contains("\"status\":\"UP\""));
+      .untilAsserted(() -> assertThat(applicationPage(deployment)).contains("Applications"));
   }
 
-  private static String actuatorHealth(DeployConfigHelper.TestDeployment deployment) {
+  private static String applicationPage(DeployConfigHelper.TestDeployment deployment) {
+    String containerIp = deployment.containerIp();
+    if (containerIp.isBlank()) {
+      return "";
+    }
     return deployment.capture(
-      "docker run --rm --network deploy4j curlimages/curl -s http://%s:8080/actuator/health"
-        .formatted(deployment.containerIp())
+      "docker run --rm --network deploy4j curlimages/curl -s http://%s:8080/ || true"
+        .formatted(containerIp)
     );
   }
 

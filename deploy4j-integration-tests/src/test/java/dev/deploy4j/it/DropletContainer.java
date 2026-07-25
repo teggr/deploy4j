@@ -13,9 +13,13 @@ final class DropletContainer extends GenericContainer<DropletContainer> {
 
   private static final int SSH_PORT = 22;
   private static final int HTTP_PORT = 80;
+  private static final String IMAGE = System.getProperty(
+    "deploy4j.droplet.image",
+    "teggr/deploy4j-docker-droplet:latest"
+  );
 
   DropletContainer(Path authorizedKeysPath) {
-    super("teggr/deploy4j-docker-droplet:latest");
+    super(IMAGE);
     withCopyFileToContainer(MountableFile.forHostPath(authorizedKeysPath), "/tmp/authorized_keys");
     withFileSystemBind("/usr/bin/docker", "/usr/bin/docker", BindMode.READ_ONLY);
     withFileSystemBind("/var/run/docker.sock", "/var/run/docker.sock", BindMode.READ_WRITE);

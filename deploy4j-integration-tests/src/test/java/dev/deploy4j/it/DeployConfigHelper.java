@@ -1,20 +1,20 @@
 package dev.deploy4j.it;
 
-import dev.deploy4j.cli.Deploy4jApplicationCommand;
-import picocli.CommandLine;
-
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
 final class DeployConfigHelper {
 
-  private static final String TEST_IMAGE = "deploy4j-it-app";
+  private static final String DEMO_IMAGE = System.getProperty("deploy4j.demo.image", "teggr/deploy4j-demo");
+  private static final String DEMO_VERSION = System.getProperty("deploy4j.demo.version");
   private static final ReentrantLock CLI_LOCK = new ReentrantLock();
 
   private DeployConfigHelper() {
@@ -24,14 +24,13 @@ final class DeployConfigHelper {
     Path projectDirectory = Files.createTempDirectory("deploy4j-it-project");
     Path configDirectory = Files.createDirectories(projectDirectory.resolve("config"));
     String testServiceName = "deploy4j-it-" + UUID.randomUUID().toString().replace("-", "");
-    buildTestImage(projectDirectory.resolve("test-app"));
     Files.createDirectories(projectDirectory.resolve(".deploy4j"));
     Files.writeString(projectDirectory.resolve(".deploy4j/secrets"), "");
-    Files.writeString(configDirectory.resolve("deploy.yml"), configYaml(testServiceName, droplet, privateKeyPath));
-    return new TestDeployment(projectDirectory, droplet, privateKeyPath, testServiceName);
+    Files.writeString(configDirectory.resolve("deploy.yml"), configYaml(testServiceName, droplet, privateKeyPath, testServiceName + "-db"));
+    return new TestDeployment(projectDirectory, droplet, privateKeyPath, testServiceName, DEMO_VERSION);
   }
 
-  private static String configYaml(String serviceName, DropletContainer droplet, Path privateKeyPath) {
+  private static String configYaml(String serviceName, DropletContainer droplet, Path privateKeyPath, String databaseHost) {
     return """
       service: %s
       image: %s
@@ -44,66 +43,35 @@ final class DeployConfigHelper {
         key_path: "%s"
         strict_host_key_checking: false
       traefik:
-        host_port: 80
+       host_port: 80
       healthcheck:
-        port: 8080
-        path: /actuator/health
+       port: 8080
+       path: /
       env:
-        clear:
-          MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
-          MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: "always"
-      """.formatted(serviceName, TEST_IMAGE, droplet.getHost(), droplet.sshPort(), privateKeyPath);
-  }
-
-  private static void buildTestImage(Path buildDirectory) throws IOException, InterruptedException {
-    Files.createDirectories(buildDirectory);
-    Files.writeString(buildDirectory.resolve("ActuatorApp.java"), """
-      import com.sun.net.httpserver.HttpServer;
-      import java.net.InetSocketAddress;
-      import java.nio.charset.StandardCharsets;
-
-      public class ActuatorApp {
-        public static void main(String[] args) throws Exception {
-          HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
-          server.createContext("/", exchange -> respond(exchange, 200, "text/plain", "ok"));
-          server.createContext("/actuator/health", exchange -> respond(exchange, 200, "application/json", "{\\"status\\":\\"UP\\"}"));
-          server.start();
-          System.out.println("Started ActuatorApp");
-          Thread.currentThread().join();
-        }
-
-        private static void respond(com.sun.net.httpserver.HttpExchange exchange, int status, String contentType, String body) throws java.io.IOException {
-          byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
-          exchange.getResponseHeaders().add("Content-Type", contentType);
-          exchange.sendResponseHeaders(status, bytes.length);
-          try (var output = exchange.getResponseBody()) {
-            output.write(bytes);
-          }
-        }
-      }
-      """);
-    Files.writeString(buildDirectory.resolve("Dockerfile"), """
-      FROM eclipse-temurin:21-jdk
-      RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
-      WORKDIR /app
-      COPY ActuatorApp.java /app/ActuatorApp.java
-      RUN javac ActuatorApp.java
-      EXPOSE 8080
-      CMD ["java", "ActuatorApp"]
-      """);
-
-    Process process = new ProcessBuilder(
-      "docker", "build", "-t", TEST_IMAGE + ":latest", "."
-    )
-      .directory(buildDirectory.toFile())
-      .redirectErrorStream(true)
-      .start();
-
-    String output = new String(process.getInputStream().readAllBytes());
-    int exitCode = process.waitFor();
-    if (exitCode != 0) {
-      throw new IllegalStateException("Failed to build local test image:\n%s".formatted(output));
-    }
+       clear:
+         SPRING_DATASOURCE_URL: jdbc:postgresql://%s:5432/testdb
+         SPRING_DATASOURCE_USERNAME: testuser
+         SPRING_DATASOURCE_PASSWORD: testpass
+      accessories:
+       db:
+         image: postgres:18-alpine
+         host: %s
+         env:
+           clear:
+             POSTGRES_USER: testuser
+             POSTGRES_PASSWORD: testpass
+             POSTGRES_DB: testdb
+         directories:
+           - data:/var/lib/postgresql/18/docker
+      """.formatted(
+      serviceName,
+      DEMO_IMAGE,
+      droplet.getHost(),
+      droplet.sshPort(),
+      privateKeyPath,
+      databaseHost,
+      droplet.getHost()
+    );
   }
 
   private static void deleteRecursively(Path root) throws IOException {
@@ -127,29 +95,29 @@ final class DeployConfigHelper {
   }
 
   static CliResult executeCli(Path workingDirectory, String... args) {
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
-    PrintStream printStream = new PrintStream(output, true);
-    PrintStream originalOut = System.out;
-    PrintStream originalErr = System.err;
-    String originalUserDir = System.getProperty("user.dir");
-
     CLI_LOCK.lock();
     try {
-      System.setOut(printStream);
-      System.setErr(printStream);
-      System.setProperty("user.dir", workingDirectory.toString());
+      List<String> command = new ArrayList<>();
+      command.add(Path.of(System.getProperty("java.home"), "bin", "java").toString());
+      command.add("-cp");
+      command.add(System.getProperty("java.class.path"));
+      command.add("dev.deploy4j.cli.Deploy4jApplicationCommand");
+      command.addAll(Arrays.asList(args));
 
-      CommandLine commandLine = new CommandLine(new Deploy4jApplicationCommand());
-      commandLine.setOut(new java.io.PrintWriter(printStream, true));
-      commandLine.setErr(new java.io.PrintWriter(printStream, true));
+      Process process = new ProcessBuilder(command)
+        .directory(workingDirectory.toFile())
+        .redirectErrorStream(true)
+        .start();
 
-      int exitCode = commandLine.execute(args);
-      printStream.flush();
-      return new CliResult(exitCode, output.toString());
+      String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+      int exitCode = process.waitFor();
+      return new CliResult(exitCode, output);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new IllegalStateException("CLI command failed: " + String.join(" ", args), e);
+    } catch (IOException e) {
+      throw new IllegalStateException("CLI command failed: " + String.join(" ", args), e);
     } finally {
-      System.setOut(originalOut);
-      System.setErr(originalErr);
-      System.setProperty("user.dir", originalUserDir);
       CLI_LOCK.unlock();
     }
   }
@@ -167,21 +135,41 @@ final class DeployConfigHelper {
     private final DropletContainer droplet;
     private final Path privateKeyPath;
     private final String serviceName;
+    private final String version;
 
     private TestDeployment(
       Path projectDirectory,
       DropletContainer droplet,
       Path privateKeyPath,
-      String serviceName
+      String serviceName,
+      String version
     ) {
       this.projectDirectory = projectDirectory;
       this.droplet = droplet;
       this.privateKeyPath = privateKeyPath;
       this.serviceName = serviceName;
+      this.version = version;
     }
 
     CliResult executeCli(String... args) {
       return DeployConfigHelper.executeCli(projectDirectory, args);
+    }
+
+    String version() {
+      return version;
+    }
+
+    void updateDatabaseHost(String databaseHost) throws IOException {
+      Files.writeString(
+        projectDirectory.resolve("config/deploy.yml"),
+        configYaml(serviceName, droplet, privateKeyPath, databaseHost)
+      );
+    }
+
+    String databaseIp() {
+      return capture(
+        "docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' " + shellQuote(serviceName + "-db")
+      ).trim();
     }
 
     String capture(String command) {
@@ -191,6 +179,7 @@ final class DeployConfigHelper {
           "-i", privateKeyPath.toString(),
           "-o", "StrictHostKeyChecking=no",
           "-o", "UserKnownHostsFile=/dev/null",
+          "-o", "LogLevel=ERROR",
           "-p", Integer.toString(droplet.sshPort()),
           "root@" + droplet.getHost(),
           command
@@ -213,12 +202,16 @@ final class DeployConfigHelper {
     }
 
     String runningContainerName() {
-      return capture("docker ps --format '{{.Names}}' | grep " + shellQuote("^" + serviceName + "-") + " | head -n1 || true").trim();
+      return capture("docker ps --format '{{.Names}}' | grep " + shellQuote("^" + serviceName + "-web-") + " | head -n1 || true").trim();
     }
 
     String containerIp() {
+      String runningContainerName = runningContainerName();
+      if (runningContainerName.isBlank()) {
+        return "";
+      }
       return capture(
-        "docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' " + shellQuote(runningContainerName())
+        "docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' " + shellQuote(runningContainerName)
       ).trim();
     }
 
