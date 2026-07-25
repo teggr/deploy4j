@@ -67,8 +67,8 @@ class Deploy4jSmokeIT {
         assertThat(logs).isNotBlank();
         assertThat(logs).contains("Started Deploy4jDemoApplication");
 
-        String home = applicationPage(deployment);
-        assertThat(home).contains("Applications");
+        String health = actuatorHealth(deployment);
+        assertThat(health).contains("\"status\":\"UP\"");
 
       DeployConfigHelper.CliResult stop = deployment.executeCli("app", "stop");
       assertThat(stop.exitCode()).describedAs(stop.output()).isZero();
@@ -84,18 +84,13 @@ class Deploy4jSmokeIT {
     Awaitility.await()
       .atMost(Duration.ofMinutes(3))
       .pollInterval(Duration.ofSeconds(5))
-      .untilAsserted(() -> assertThat(applicationPage(deployment)).contains("Applications"));
+      .untilAsserted(() -> assertThat(actuatorHealth(deployment)).contains("\"status\":\"UP\""));
   }
 
-  private static String applicationPage(DeployConfigHelper.TestDeployment deployment) {
-    String containerIp = deployment.containerIp();
-    if (containerIp.isBlank()) {
-      return "";
-    }
-    return deployment.capture(
-      "docker run --rm --network deploy4j curlimages/curl -s http://%s:8080/ || true"
-        .formatted(containerIp)
-    );
+  private static String actuatorHealth(DeployConfigHelper.TestDeployment deployment) {
+    DeployConfigHelper.CliResult health = deployment.executeCli("spring_boot", "manage", "health");
+    assertThat(health.exitCode()).describedAs(health.output()).isZero();
+    return health.output().replace("\r\n", "\n");
   }
 
   private static SshKeyHelper.GeneratedKeyPair createKeyPair() {
