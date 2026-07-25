@@ -47,28 +47,28 @@ class Deploy4jSmokeIT {
   @Test
   @DisplayName("setup deploys and manages a Spring Boot application")
   void setupDeploysAndExercisesLifecycle() throws Exception {
-  try (DeployConfigHelper.TestDeployment deployment = DeployConfigHelper.create(DROPLET, SSH_KEY_PAIR.privateKeyPath())) {
-    DeployConfigHelper.CliResult bootstrap = deployment.executeCli("server", "bootstrap");
-    assertThat(bootstrap.exitCode()).describedAs(bootstrap.output()).isZero();
-    DeployConfigHelper.CliResult bootAccessories = deployment.executeCli("accessory", "boot", "all");
-    assertThat(bootAccessories.exitCode()).describedAs(bootAccessories.output()).isZero();
-    deployment.updateDatabaseHost(deployment.databaseIp());
-    DeployConfigHelper.CliResult deploy = deployment.executeCli("deploy", "--version", deployment.version(), "-P");
-    assertThat(deploy.exitCode()).describedAs(deploy.output()).isZero();
+      try (DeployConfigHelper.TestDeployment deployment = DeployConfigHelper.create(DROPLET, SSH_KEY_PAIR.privateKeyPath())) {
+        DeployConfigHelper.CliResult bootstrap = deployment.executeCli("server", "bootstrap");
+        assertThat(bootstrap.exitCode()).describedAs(bootstrap.output()).isZero();
+        DeployConfigHelper.CliResult bootAccessories = deployment.executeCli("accessory", "boot", "all");
+        assertThat(bootAccessories.exitCode()).describedAs(bootAccessories.output()).isZero();
+        deployment.updateDatabaseHost(deployment.databaseIp());
+        DeployConfigHelper.CliResult deploy = deployment.executeCli("deploy", "--version", deployment.version(), "-P");
+        assertThat(deploy.exitCode()).describedAs(deploy.output()).isZero();
 
-    awaitApplication(deployment);
+        awaitApplication(deployment);
 
       String runningContainerName = deployment.runningContainerName();
       assertThat(runningContainerName).isNotBlank();
       assertThat(deployment.capture("docker ps --format '{{.Names}}'"))
         .contains(runningContainerName);
 
-      String logs = deployment.capture("docker logs " + deployment.runningContainerName());
-      assertThat(logs).isNotBlank();
-      assertThat(logs).contains("Started Deploy4jDemoApplication");
+        String logs = deployment.capture("docker logs " + deployment.runningContainerName());
+        assertThat(logs).isNotBlank();
+        assertThat(logs).contains("Started Deploy4jDemoApplication");
 
-      String home = applicationPage(deployment);
-      assertThat(home).contains("Applications");
+        String home = applicationPage(deployment);
+        assertThat(home).contains("Applications");
 
       DeployConfigHelper.CliResult stop = deployment.executeCli("app", "stop");
       assertThat(stop.exitCode()).describedAs(stop.output()).isZero();

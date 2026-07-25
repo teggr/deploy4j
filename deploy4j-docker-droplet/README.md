@@ -54,7 +54,7 @@ The container will:
 
 ### Scripts
 
-- `build.sh` / `build.bat`: Build the Docker image. \Use '--deploy' option to push to DockerHub
+- `build.sh` / `build.bat`: Build the Docker image. Use '--deploy' option to push to DockerHub
 - `run.sh` / `run.bat`: Run the container with public key mounting
 
 ## Troubleshooting
@@ -73,4 +73,3 @@ The container will:
 ## License
 
 See LICENSE file for details.
-
