@@ -13,6 +13,9 @@
         <module>deploy4j-core</module>
         <module>deploy4j-cli</module>
         <module>deploy4j-maven-plugin</module>
+        <module>deploy4j-demo</module>
+        <module>deploy4j-docker-droplet</module>
+        <module>deploy4j-integration-tests</module>
         <module>deploy4j-coverage-report</module>
     </modules>
 
@@ -111,8 +114,8 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.2.5</version>
                     <configuration>
-                        <!-- Explicitly include JaCoCo agent and ByteBuddy agent so tests always run with both agents attached -->
-                        <argLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec -javaagent:${settings.localRepository}/net/bytebuddy/byte-buddy-agent/${bytebuddy.version}/byte-buddy-agent-${bytebuddy.version}.jar</argLine>
+                        <!-- Use JaCoCo arg prepared at initialize phase and allow Byte Buddy to run on newer JDKs. -->
+                        <argLine>${jacocoArgLine} -Dnet.bytebuddy.experimental=true</argLine>
                         <!-- ensure tests run in a forked JVM so the agent applies -->
                         <forkCount>1</forkCount>
                         <reuseForks>true</reuseForks>
@@ -133,8 +136,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
-                    <!-- Explicitly include JaCoCo agent and ByteBuddy agent so tests always run with both agents attached -->
-                    <argLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec -javaagent:${settings.localRepository}/net/bytebuddy/byte-buddy-agent/${bytebuddy.version}/byte-buddy-agent-${bytebuddy.version}.jar</argLine>
+                    <!-- Use JaCoCo arg prepared at initialize phase and allow Byte Buddy to run on newer JDKs. -->
+                    <argLine>${jacocoArgLine} -Dnet.bytebuddy.experimental=true</argLine>
                     <!-- ensure tests run in a forked JVM so the agent applies -->
                     <forkCount>1</forkCount>
                     <reuseForks>true</reuseForks>
