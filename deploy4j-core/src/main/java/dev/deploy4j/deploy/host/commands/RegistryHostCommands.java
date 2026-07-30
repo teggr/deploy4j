@@ -14,6 +14,9 @@ public class RegistryHostCommands extends BaseHostCommands {
   }
 
   public Cmd login() {
+    if (!registry().credentialsConfigured()) {
+      return Cmd.cmd("true").description("skip login");
+    }
     return docker().login()
       .args(registry().server())
       .args("-u", sensitive(escapeShellValue(registry().username())))
@@ -22,6 +25,9 @@ public class RegistryHostCommands extends BaseHostCommands {
   }
 
   public Cmd logout() {
+    if (!registry().credentialsConfigured()) {
+      return Cmd.cmd("true").description("skip logout");
+    }
     return docker().logout()
       .args(registry().server())
       .description("logout");

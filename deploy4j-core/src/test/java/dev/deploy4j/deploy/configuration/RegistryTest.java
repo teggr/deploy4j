@@ -120,5 +120,25 @@ class RegistryTest {
     assertThat(registry.server()).isEqualTo("registry.example.com");
     assertThat(registry.username()).isNull();
     assertThat(registry.password()).isNull();
+    assertThat(registry.credentialsConfigured()).isFalse();
+  }
+
+  @Test
+  @DisplayName("should report credentials configured when username and password are present")
+  void shouldReportCredentialsConfigured() {
+    RegistryConfig registryConfig = new RegistryConfig(
+      "docker.io",
+      new PlainValueOrSecretKey("user"),
+      new PlainValueOrSecretKey("password")
+    );
+
+    DeployConfig deployConfig = DeployConfigBuilder.minimal().registry(registryConfig).build();
+    Configuration config = mock(Configuration.class);
+    when(config.rawConfig()).thenReturn(deployConfig);
+    Secrets secrets = mock(Secrets.class);
+
+    Registry registry = new Registry(secrets, config);
+
+    assertThat(registry.credentialsConfigured()).isTrue();
   }
 }

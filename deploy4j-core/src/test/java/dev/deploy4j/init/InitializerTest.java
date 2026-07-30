@@ -4,8 +4,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -81,26 +83,33 @@ class InitializerTest {
     // and secrets file gets environment variables template
     
     // Arrange & Act
-    var deployYmlStream = getClass().getClassLoader().getResourceAsStream("templates/deploy.yml");
-    var secretsStream = getClass().getClassLoader().getResourceAsStream("templates/secrets");
+    try (InputStream deployYmlStream = templateStream("templates/deploy.yml");
+         InputStream secretsStream = templateStream("templates/secrets")) {
     
-    // Assert - deploy.yml template should contain deploy configuration
-    assertThat(deployYmlStream).isNotNull();
-    String deployContent = new String(deployYmlStream.readAllBytes());
-    assertThat(deployContent).contains("service: deploy4j-demo");
-    assertThat(deployContent).contains("image: teggr/deploy4j-demo");
-    assertThat(deployContent).contains("servers:");
-    // Ensure it's not the secrets content
-    assertThat(deployContent).doesNotContain("DOCKER_PASSWORD=");
+      // Assert - deploy.yml template should contain deploy configuration
+      String deployContent = new String(deployYmlStream.readAllBytes());
+      assertThat(deployContent).contains("service: deploy4j-demo");
+      assertThat(deployContent).contains("image: teggr/deploy4j-demo");
+      assertThat(deployContent).contains("servers:");
+      // Ensure it's not the secrets content
+      assertThat(deployContent).doesNotContain("DOCKER_PASSWORD=");
     
-    // Assert - secrets template should contain environment variables
-    assertThat(secretsStream).isNotNull();
-    String secretsContent = new String(secretsStream.readAllBytes());
-    assertThat(secretsContent).contains("DOCKER_PASSWORD=");
-    assertThat(secretsContent).contains("DOCKER_USERNAME=");
-    assertThat(secretsContent).contains("PRIVATE_KEY=");
-    assertThat(secretsContent).contains("PRIVATE_KEY_PASSPHRASE=");
-    // Ensure it's not the deploy config
-    assertThat(secretsContent).doesNotContain("service: deploy4j-demo");
+      // Assert - secrets template should contain environment variables
+      String secretsContent = new String(secretsStream.readAllBytes());
+      assertThat(secretsContent).contains("DOCKER_PASSWORD=");
+      assertThat(secretsContent).contains("DOCKER_USERNAME=");
+      assertThat(secretsContent).contains("PRIVATE_KEY=");
+      assertThat(secretsContent).contains("PRIVATE_KEY_PASSPHRASE=");
+      // Ensure it's not the deploy config
+      assertThat(secretsContent).doesNotContain("service: deploy4j-demo");
+    }
+  }
+
+  private InputStream templateStream(String templatePath) {
+    InputStream stream = getClass().getClassLoader().getResourceAsStream(templatePath);
+    if (stream == null) {
+      stream = Initializer.class.getResourceAsStream("/" + templatePath);
+    }
+    return Objects.requireNonNull(stream, "Missing template resource: " + templatePath);
   }
 }
