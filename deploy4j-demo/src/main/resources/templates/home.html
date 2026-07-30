@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Applications</title>
+</head>
+<body>
+    <h1>Applications</h1>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+        <th:block th:each="app : ${applications}">
+            <tr>
+                <td th:text="${app.id}"></td>
+                <td th:text="${app.name}"></td>
+                <td>
+                    <!-- Update form -->
+                    <form th:action="@{/update}" method="post" style="display:inline;">
+                        <input type="hidden" name="id" th:value="${app.id}" />
+                        <input type="text" name="name" th:value="${app.name}" />
+                        <button type="submit">Update</button>
+                    </form>
+                    <!-- Delete form -->
+                    <form th:action="@{/delete}" method="post" style="display:inline;">
+                        <input type="hidden" name="id" th:value="${app.id}" />
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        </th:block>
+    </table>
+
+    <h2>Add Application</h2>
+    <form th:action="@{/add}" method="post" th:object="${applicationForm}">
+        <input type="text" th:field="*{name}" placeholder="Application Name" required />
+        <button type="submit">Add</button>
+    </form>
+</body>
+</html>

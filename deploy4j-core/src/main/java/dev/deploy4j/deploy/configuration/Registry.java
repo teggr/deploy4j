@@ -3,6 +3,7 @@ package dev.deploy4j.deploy.configuration;
 import dev.deploy4j.deploy.Secrets;
 import dev.deploy4j.deploy.configuration.raw.PlainValueOrSecretKey;
 import dev.deploy4j.deploy.configuration.raw.RegistryConfig;
+import org.apache.commons.lang3.StringUtils;
 
 public class Registry {
 
@@ -26,6 +27,10 @@ public class Registry {
 
   public String password() {
     return lookup(registryConfig.password());
+  }
+
+  public boolean credentialsConfigured() {
+    return StringUtils.isNotBlank(username()) && StringUtils.isNotBlank(password());
   }
 
   // private
