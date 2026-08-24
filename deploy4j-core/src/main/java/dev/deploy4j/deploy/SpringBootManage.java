@@ -4,8 +4,10 @@ import dev.deploy4j.deploy.configuration.Role;
 import dev.deploy4j.deploy.host.commands.AppHostCommandsFactory;
 import dev.deploy4j.deploy.host.commands.SpringBootHostCommands;
 import dev.deploy4j.deploy.host.commands.SpringBootHostCommandsFactory;
+import dev.deploy4j.deploy.host.ssh.SshHost;
 import dev.deploy4j.deploy.host.ssh.SshHosts;
 import dev.deploy4j.deploy.local.LocalHost;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -215,11 +217,19 @@ public class SpringBootManage extends Base {
       
       for (Role role : roles) {
 
-        // Get the container name for this role using the current version
-        String containerName = role.containerName(deployContext.config().version());
-        
+        // Resolve the container name from the currently running version on the
+        // host; fall back to the configured version (e.g. when nothing is
+        // running yet). Using the configured version alone breaks commands like
+        // `spring_boot manage health` that are invoked without --version.
+        String containerName = resolveContainerName(deployContext, role, host);
+
         log.info("=== {} ({}) ===", host.hostName(), containerName);
         
+        if (StringUtils.isBlank(containerName)) {
+          log.warn("No running container found for role {} on {}; skipping", role, host.hostName());
+          continue;
+        }
+
         try {
 
           // Create commands for this specific container
@@ -239,6 +249,19 @@ public class SpringBootManage extends Base {
       }
 
     });
+  }
+
+  private String resolveContainerName(DeployContext deployContext, Role role, SshHost host) {
+    try {
+      String runningVersion = host.capture(appFactory.app(role, host.hostName()).currentRunningVersion(), false);
+      if (StringUtils.isNotBlank(runningVersion)) {
+        return role.containerName(runningVersion.trim());
+      }
+    } catch (Exception e) {
+      log.debug("Could not resolve running version for role {} on {}: {}", role, host.hostName(), e.getMessage());
+    }
+    String configuredVersion = deployContext.config().version();
+    return configuredVersion != null ? role.containerName(configuredVersion) : null;
   }
 
 }

@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.awaitility.Awaitility;
 
 final class DeployConfigHelper {
 
@@ -159,6 +162,10 @@ final class DeployConfigHelper {
       return version;
     }
 
+    String demoImageRef() {
+      return DEMO_IMAGE + ":" + version;
+    }
+
     void updateDatabaseHost(String databaseHost) throws IOException {
       Files.writeString(
         projectDirectory.resolve("config/deploy.yml"),
@@ -173,6 +180,10 @@ final class DeployConfigHelper {
     }
 
     String capture(String command) {
+      return capture(command, true);
+    }
+
+    String capture(String command, boolean failOnError) {
       try {
         Process process = new ProcessBuilder(
           "ssh",
@@ -189,7 +200,7 @@ final class DeployConfigHelper {
 
         String output = new String(process.getInputStream().readAllBytes());
         int exitCode = process.waitFor();
-        if (exitCode != 0) {
+        if (exitCode != 0 && failOnError) {
           throw new IllegalStateException("SSH command failed (%s):\n%s".formatted(command, output));
         }
         return output;
@@ -203,6 +214,64 @@ final class DeployConfigHelper {
 
     String runningContainerName() {
       return capture("docker ps --format '{{.Names}}' | grep " + shellQuote("^" + serviceName + "-web-") + " | head -n1 || true").trim();
+    }
+
+    /**
+     * The get.docker.com install script starts dockerd via systemd, which does
+     * not exist inside the droplet container. Start it manually if needed and
+     * wait until the daemon responds.
+     */
+    void ensureDockerDaemon() {
+      capture("docker info > /dev/null 2>&1 || (nohup dockerd --storage-driver=vfs > /var/log/dockerd.log 2>&1 &)", false);
+      Awaitility.await()
+        .atMost(Duration.ofSeconds(60))
+        .pollInterval(Duration.ofSeconds(2))
+        .until(() -> {
+          try {
+            return capture("docker info", false).contains("Server Version");
+          } catch (RuntimeException e) {
+            return false;
+          }
+        });
+    }
+
+    /**
+     * Streams a locally built image into the droplet's own Docker daemon,
+     * since the droplet runs its own dockerd (installed by server bootstrap)
+     * and cannot see images built on the test host.
+     */
+    void loadImage(String imageRef) {
+      ensureDockerDaemon();
+      try {
+        Process save = new ProcessBuilder("docker", "save", imageRef)
+          .start();
+        Process load = new ProcessBuilder(
+          "ssh",
+          "-i", privateKeyPath.toString(),
+          "-o", "StrictHostKeyChecking=no",
+          "-o", "UserKnownHostsFile=/dev/null",
+          "-o", "LogLevel=ERROR",
+          "-p", Integer.toString(droplet.sshPort()),
+          "root@" + droplet.getHost(),
+          "docker load"
+        )
+          .redirectErrorStream(true)
+          .start();
+        try (var in = save.getInputStream(); var out = load.getOutputStream()) {
+          in.transferTo(out);
+        }
+        String output = new String(load.getInputStream().readAllBytes());
+        int exitCode = load.waitFor();
+        save.waitFor();
+        if (exitCode != 0) {
+          throw new IllegalStateException("Loading image %s failed:\n%s".formatted(imageRef, output));
+        }
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new IllegalStateException("Interrupted loading image " + imageRef, e);
+      } catch (IOException e) {
+        throw new IllegalStateException("Failed to load image " + imageRef, e);
+      }
     }
 
     String containerIp() {
