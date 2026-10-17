@@ -87,7 +87,7 @@
                     <skipITs>${skipITs}</skipITs>
                     <systemPropertyVariables>
                         <deploy4j.demo.image>teggr/deploy4j-demo</deploy4j.demo.image>
-                        <deploy4j.demo.version>latest</deploy4j.demo.version>
+                        <deploy4j.demo.version>${project.version}</deploy4j.demo.version>
                         <deploy4j.droplet.image>teggr/deploy4j-docker-droplet:${project.version}</deploy4j.droplet.image>
                     </systemPropertyVariables>
                     <includes>

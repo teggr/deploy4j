@@ -261,10 +261,14 @@ final class DeployConfigHelper {
           in.transferTo(out);
         }
         String output = new String(load.getInputStream().readAllBytes());
-        int exitCode = load.waitFor();
-        save.waitFor();
-        if (exitCode != 0) {
-          throw new IllegalStateException("Loading image %s failed:\n%s".formatted(imageRef, output));
+        String saveError = new String(save.getErrorStream().readAllBytes());
+        int saveExitCode = save.waitFor();
+        int loadExitCode = load.waitFor();
+        if (saveExitCode != 0 || loadExitCode != 0) {
+          throw new IllegalStateException(
+            "Transferring image %s failed (docker save: %d, docker load: %d):\n%s%s"
+              .formatted(imageRef, saveExitCode, loadExitCode, saveError, output)
+          );
         }
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
