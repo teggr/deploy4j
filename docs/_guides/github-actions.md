@@ -51,10 +51,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6.1.0
         with:
           java-version: '21'
           distribution: 'temurin'
@@ -65,7 +65,7 @@ jobs:
 
       # deploy to Docker Hub
       - name: Log in to Docker Hub
-        uses: docker/login-action@v3.1.0
+        uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
