@@ -18,6 +18,13 @@ docker run --rm --volume="%CD%:/srv/jekyll:Z" --volume="%CD%\vendor\bundle:/usr/
 
 Available: http://localhost:4000/
 
+## Analytics
+
+The shared default layout loads PostHog alongside Simple Analytics on all pages.
+PostHog uses the EU Cloud ingestion host (`https://eu.i.posthog.com`) and its
+public browser project token. Both scripts also load during local previews.
+Keep Simple Analytics enabled while comparing the two services.
+
 # References
 
 https://github.com/envygeeks/jekyll-docker/blob/master/README.md
