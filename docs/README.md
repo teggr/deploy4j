@@ -20,12 +20,11 @@ Available: http://localhost:4000/
 
 ## Analytics
 
-The shared default layout loads PostHog alongside Simple Analytics on all pages.
-PostHog uses the EU Cloud ingestion host (`https://eu.i.posthog.com`) and its
-public browser project token. Both scripts also load during local previews.
+The shared default layout loads PostHog on all pages. It sends data to the EU
+Cloud ingestion host (`https://eu.i.posthog.com`) and also loads during local
+previews.
 PostHog uses the `2026-05-30` defaults with person profiles limited to identified
 users, autocapture disabled, and session recording disabled.
-Keep Simple Analytics enabled while comparing the two services.
 
 # References
 
