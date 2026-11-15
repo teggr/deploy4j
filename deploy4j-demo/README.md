@@ -53,7 +53,7 @@ Once set, deploy4j will be able to connect to the remote server and pull the doc
 
 ### Running a local vm
 
-We've created a [deploy4j-docker-droplet image](https://github.com/teggr/deploy4j-docker-droplet) to help with testing. It's contains a minimal Ubuntu image with SSH enabled and support for loading your public key. This is a close representation of what a typical Digital Ocean droplet or Hetzner server would look like.
+The [deploy4j-docker-droplet module](https://github.com/teggr/deploy4j/tree/main/deploy4j-docker-droplet) provides an image to help with testing. It contains a minimal Ubuntu image with SSH enabled and support for loading your public key. This is a close representation of what a typical Digital Ocean droplet or Hetzner server would look like.
 
 Spin up a local ssh docker container for testing.
 

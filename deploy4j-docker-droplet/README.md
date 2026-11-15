@@ -54,8 +54,14 @@ The container will:
 
 ### Scripts
 
-- `build.sh` / `build.bat`: Build the Docker image. Use '--deploy' option to push to DockerHub
+- `build.sh` / `build.bat`: Build the Docker image locally.
 - `run.sh` / `run.bat`: Run the container with public key mounting
+
+## Publishing
+
+The `Publish Docker Droplet Image` GitHub Actions workflow publishes this image to Docker Hub when files in this module change on `main`. It publishes the `latest` tag and a commit-specific `sha-...` tag. The workflow can also be run manually from the `main` branch.
+
+Configure the repository Actions secrets `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` with a Docker Hub account and access token that can push to `teggr/deploy4j-docker-droplet`. Local build scripts only build the image; publishing is handled by this repository's workflow.
 
 ## Troubleshooting
 
