@@ -33,6 +33,56 @@ final class DeployConfigHelper {
     return new TestDeployment(projectDirectory, droplet, privateKeyPath, testServiceName, DEMO_VERSION);
   }
 
+  static DestinationTestDeployment createForDestinations(
+    DropletContainer localDroplet,
+    DropletContainer digitalOceanDroplet,
+    Path privateKeyPath
+  ) throws IOException {
+    Path projectDirectory = Files.createTempDirectory("deploy4j-it-destinations");
+    Path configDirectory = Files.createDirectories(projectDirectory.resolve("config"));
+    String serviceName = "deploy4j-it-" + UUID.randomUUID().toString().replace("-", "");
+    Files.createDirectories(projectDirectory.resolve(".deploy4j"));
+    Files.writeString(projectDirectory.resolve(".deploy4j/secrets"), "");
+    Files.writeString(
+      configDirectory.resolve("deploy.yml"),
+      configYaml(serviceName, localDroplet, privateKeyPath, "127.0.0.1")
+    );
+    Files.writeString(
+      configDirectory.resolve("deploy.local.yml"),
+      destinationConfigYaml(localDroplet, "127.0.0.1")
+    );
+    Files.writeString(
+      configDirectory.resolve("deploy.digitalocean.yml"),
+      destinationConfigYaml(digitalOceanDroplet, "127.0.0.1")
+    );
+    return new DestinationTestDeployment(projectDirectory,
+      new TestDeployment(projectDirectory, localDroplet, privateKeyPath, serviceName, DEMO_VERSION),
+      new TestDeployment(projectDirectory, digitalOceanDroplet, privateKeyPath, serviceName, DEMO_VERSION));
+  }
+
+  private static String destinationConfigYaml(
+    DropletContainer droplet,
+    String databaseHost
+  ) {
+    return """
+      servers:
+        - "%s"
+      ssh:
+        port: %d
+      env:
+       clear:
+         SPRING_DATASOURCE_URL: jdbc:postgresql://%s:5432/testdb
+      accessories:
+       db:
+         host: "%s"
+      """.formatted(
+      droplet.getHost(),
+      droplet.sshPort(),
+      databaseHost,
+      droplet.getHost()
+    );
+  }
+
   private static String configYaml(String serviceName, DropletContainer droplet, Path privateKeyPath, String databaseHost) {
     return """
       service: %s
@@ -71,7 +121,7 @@ final class DeployConfigHelper {
       DEMO_IMAGE,
       droplet.getHost(),
       droplet.sshPort(),
-      privateKeyPath,
+      yamlPath(privateKeyPath),
       databaseHost,
       droplet.getHost()
     );
@@ -130,6 +180,73 @@ final class DeployConfigHelper {
 
   private static String shellQuote(String value) {
     return "'" + value.replace("'", "'\"'\"'") + "'";
+  }
+
+  private static String yamlPath(Path path) {
+    return path.toString().replace("\\", "\\\\");
+  }
+
+  static final class DestinationTestDeployment implements AutoCloseable {
+    private final Path projectDirectory;
+    private final TestDeployment local;
+    private final TestDeployment digitalOcean;
+
+    private DestinationTestDeployment(Path projectDirectory, TestDeployment local, TestDeployment digitalOcean) {
+      this.projectDirectory = projectDirectory;
+      this.local = local;
+      this.digitalOcean = digitalOcean;
+    }
+
+    CliResult executeCli(String destination, String... args) {
+      String[] destinationArgs = Arrays.copyOf(args, args.length + 2);
+      destinationArgs[args.length] = "--destination";
+      destinationArgs[args.length + 1] = destination;
+      return DeployConfigHelper.executeCli(projectDirectory, destinationArgs);
+    }
+
+    String version() {
+      return local.version();
+    }
+
+    String demoImageRef() {
+      return local.demoImageRef();
+    }
+
+    void updateDatabaseHost(String destination, String databaseHost) throws IOException {
+      Files.writeString(projectDirectory.resolve("config/deploy." + destination + ".yml"),
+        destinationConfigYaml(host(destination).droplet, databaseHost));
+    }
+
+    String databaseIp(String destination) {
+      return host(destination).databaseIp();
+    }
+
+    String runningContainerName(String destination) {
+      TestDeployment host = host(destination);
+      return host.capture("docker ps --format '{{.Names}}' | grep "
+        + shellQuote("^" + host.serviceName + "-web-" + destination + "-") + " | head -n1 || true").trim();
+    }
+
+    String capture(String destination, String command) {
+      return host(destination).capture(command);
+    }
+
+    void loadImage(String destination, String imageRef) {
+      host(destination).loadImage(imageRef);
+    }
+
+    private TestDeployment host(String destination) {
+      return switch (destination) {
+        case "local" -> local;
+        case "digitalocean" -> digitalOcean;
+        default -> throw new IllegalArgumentException("Unknown test destination: " + destination);
+      };
+    }
+
+    @Override
+    public void close() throws IOException {
+      deleteRecursively(projectDirectory);
+    }
   }
 
   static final class TestDeployment implements AutoCloseable {
