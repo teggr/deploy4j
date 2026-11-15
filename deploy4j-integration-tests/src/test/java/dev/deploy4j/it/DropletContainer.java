@@ -1,6 +1,5 @@
 package dev.deploy4j.it;
 
-import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.MountableFile;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -21,8 +20,9 @@ final class DropletContainer extends GenericContainer<DropletContainer> {
   DropletContainer(Path authorizedKeysPath) {
     super(IMAGE);
     withCopyFileToContainer(MountableFile.forHostPath(authorizedKeysPath), "/tmp/authorized_keys");
-    withFileSystemBind("/usr/bin/docker", "/usr/bin/docker", BindMode.READ_ONLY);
-    withFileSystemBind("/var/run/docker.sock", "/var/run/docker.sock", BindMode.READ_WRITE);
+    // No docker.sock / docker binary mounts here: `server bootstrap` installs
+    // real Docker inside the container so the SSH host and the Docker daemon
+    // share one filesystem (required for cords, volumes, etc).
     withExposedPorts(SSH_PORT, HTTP_PORT);
     withEnv("DOCKER_TLS_CERTDIR", "");
     withEnv("DOCKERD_ARGS", "--mtu=1400");

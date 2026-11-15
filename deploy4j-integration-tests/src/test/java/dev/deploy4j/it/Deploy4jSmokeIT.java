@@ -50,6 +50,10 @@ class Deploy4jSmokeIT {
       try (DeployConfigHelper.TestDeployment deployment = DeployConfigHelper.create(DROPLET, SSH_KEY_PAIR.privateKeyPath())) {
         DeployConfigHelper.CliResult bootstrap = deployment.executeCli("server", "bootstrap");
         assertThat(bootstrap.exitCode()).describedAs(bootstrap.output()).isZero();
+
+        // The droplet runs its own dockerd (installed by bootstrap), so the
+        // locally built demo image has to be transferred into it.
+        deployment.loadImage(deployment.demoImageRef());
         DeployConfigHelper.CliResult bootAccessories = deployment.executeCli("accessory", "boot", "all");
         assertThat(bootAccessories.exitCode()).describedAs(bootAccessories.output()).isZero();
         deployment.updateDatabaseHost(deployment.databaseIp());
