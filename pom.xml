@@ -28,7 +28,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.10.0</junit.version>
-        <assertj.version>3.24.2</assertj.version>
+        <assertj.version>3.27.7</assertj.version>
         <mockito.version>5.14.2</mockito.version>
         <bytebuddy.version>1.15.11</bytebuddy.version>
         <jacoco.version>0.8.14</jacoco.version>
