@@ -21,6 +21,9 @@ image: [(${env.get("DYNAMIC_IMAGE_NAME", "DEFAULT_IMAGE_NAME")})]
 When running commands, you can specify a destination with the `-d` flag, e.g. `deploy4j deploy -d staging`.
 
 In that case the configuration will also be read from `config/deploy.staging.yml` and merged with the base configuration.
+Nested mappings are merged recursively. Values in the destination file override matching base values; lists and scalar values are replaced, while base keys not specified in the destination file remain unchanged. For example, a destination-specific `servers` list replaces the base list, but a destination-specific `ssh.port` can override the port while retaining the base `ssh.user`.
+
+The destination integration test uses two local Testcontainers SSH hosts; it does not provision a DigitalOcean droplet.
 
 ## Extensions
 

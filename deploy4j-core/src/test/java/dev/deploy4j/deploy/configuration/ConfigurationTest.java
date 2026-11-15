@@ -4,7 +4,10 @@ import dev.deploy4j.deploy.configuration.raw.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +16,50 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("Configuration")
 class ConfigurationTest {
+
+    @Nested
+    @DisplayName("destination configuration")
+    class DestinationConfiguration {
+
+        @Test
+        @DisplayName("should merge a destination config over the base config")
+        void shouldMergeDestinationConfigOverBaseConfig(@TempDir Path tempDir) throws Exception {
+            Path baseConfig = tempDir.resolve("deploy.yml");
+            Files.writeString(baseConfig, """
+                service: myapp
+                image: repo/myapp
+                registry:
+                  server: registry.example.com
+                  username: baseuser
+                servers:
+                  - base.example.com
+                ssh:
+                  user: root
+                  port: 22
+                """);
+            Files.writeString(tempDir.resolve("deploy.staging.yml"), """
+                image: repo/myapp-staging
+                registry:
+                  username: staginguser
+                servers:
+                  - staging.example.com
+                ssh:
+                  port: 2222
+                """);
+
+            Configuration configuration = Configuration.createFrom(baseConfig.toString(), "staging", "1.0.0");
+
+            assertThat(configuration.service()).isEqualTo("myapp");
+            assertThat(configuration.image()).isEqualTo("repo/myapp-staging");
+            assertThat(configuration.rawConfig().registry().server()).isEqualTo("registry.example.com");
+            assertThat(configuration.rawConfig().registry().username().value()).isEqualTo("staginguser");
+            assertThat(configuration.rawConfig().servers().list())
+                .extracting(server -> server.host())
+                .containsExactly("staging.example.com");
+            assertThat(configuration.rawConfig().ssh().user().value()).isEqualTo("root");
+            assertThat(configuration.rawConfig().ssh().port()).isEqualTo(2222);
+        }
+    }
 
     @Nested
     @DisplayName("version handling")

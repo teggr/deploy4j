@@ -14,6 +14,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.Locale;
 import java.util.Set;
 
 final class SshKeyHelper {
@@ -83,7 +84,27 @@ final class SshKeyHelper {
       );
       Files.setPosixFilePermissions(privateKeyPath, permissions);
     } catch (UnsupportedOperationException ignored) {
-      // Ignore on non-POSIX filesystems.
+      if (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("win")) {
+        Process process = new ProcessBuilder(
+          "icacls",
+          privateKeyPath.toString(),
+          "/inheritance:r",
+          "/grant:r",
+          System.getProperty("user.name") + ":(R)"
+        )
+          .redirectErrorStream(true)
+          .start();
+        String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        try {
+          int exitCode = process.waitFor();
+          if (exitCode != 0) {
+            throw new IOException("Failed to restrict SSH key permissions:\n" + output);
+          }
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          throw new IOException("Interrupted while restricting SSH key permissions", e);
+        }
+      }
     }
   }
 
